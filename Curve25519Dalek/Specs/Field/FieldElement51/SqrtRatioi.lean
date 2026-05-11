@@ -1,12 +1,11 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Curve
-
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Field.FieldElement51.PowP58
@@ -18,68 +17,87 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Conditional
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SqrtM1
 import Curve25519Dalek.Specs.Field.FieldElement51.Invert
 import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
-/-! # Spec Theorem for `FieldElement51::sqrt_ratio_i`
 
-Specification and proof for `FieldElement51::sqrt_ratio_i`.
+/-!
+# Spec theorem for `curve25519_dalek::field::FieldElement51::sqrt_ratio_i`
 
-This function computes a nonnegative square root of u/v or i*u/v (where i = sqrt(-1) = SQRT_M1 constant),
+This function computes a nonnegative square root of u/v or i*u/v
+(where i = sqrt(-1) = SQRT_M1 constant),
 returning a flag indicating which case occurred and handling zero inputs specially.
 
-**Source**: curve25519-dalek/src/field.rs
+Source: "curve25519-dalek/src/field.rs"
 -/
 
-
-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-open curve25519_dalek.backend.serial.u64
-open curve25519_dalek.backend.serial.u64.field.FieldElement51
-open curve25519_dalek.math
+open curve25519_dalek.backend.serial.u64 curve25519_dalek.math
+  curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.field.FieldElement51
 
-/-- The SQRT_M1 constant as a plain FieldElement51 (alias for `constants.SQRT_M1_raw`). -/
-def SQRT_M1_val := backend.serial.u64.constants.SQRT_M1_raw
+attribute [-simp] Int.reducePow Nat.reducePow
 
-theorem SQRT_M1_val_spec : (Field51_as_Nat SQRT_M1_val)^2 % p = p - 1 := by
+/-- Algebraic identity used in sqrt_ratio_i: collecting powers of u and v. -/
+private theorem sqrt_ratio_collect (u v e : Nat) :
+    v * (u ^ 2 * (v ^ (2 + 1)) ^ 2 *
+      (u ^ (e * 2) * v ^ (((2 + 1) * 2 + 1) * (e * 2)))) =
+    u ^ (2 + e * 2) * v ^ (14 * e + 7) := by ring
+
+/-- Algebraic identity used in sqrt_ratio_i: rearranging factors. -/
+private theorem sqrt_ratio_rearrange (u v e : Nat) :
+    u ^ 2 * (v ^ (2 + 1)) ^ 2 *
+      (u ^ (e * 2) * v ^ (((2 + 1) * 2 + 1) * (e * 2))) * v =
+    (u ^ 2 * u ^ (e * 2)) *
+      ((v ^ (2 + 1)) ^ 2 * v ^ (((2 + 1) * 2 + 1) * (e * 2)) * v) := by ring
+
+/-- The SQRT_M1 constant as a plain FieldElement51 (alias for `constants.SQRT_M1_raw`). -/
+def SQRT_M1_val : field.FieldElement51 := constants.SQRT_M1_raw
+
+/-- The square of `SQRT_M1_val` reduces to `p - 1` modulo `p`. -/
+private theorem SQRT_M1_val_spec : (Field51_as_Nat SQRT_M1_val) ^ 2 % p = p - 1 := by
   unfold SQRT_M1_val constants.SQRT_M1_raw; decide
 
+/-- If a power is zero modulo the prime `p`, then the base itself is zero modulo `p`. -/
 private theorem modEq_zero_of_pow_modEq_zero {a k : ℕ}
     (h : a ^ k ≡ 0 [MOD p]) :
     a ≡ 0 [MOD p] := by
   rw [Nat.modEq_zero_iff_dvd] at h ⊢
   exact prime_25519.dvd_of_dvd_pow h
 
+/-- `SQRT_M1_val` squared is congruent to `p - 1` modulo `p`. -/
 private theorem sqrt_m1_sq_modEq :
     Field51_as_Nat SQRT_M1_val ^ 2 ≡ p - 1 [MOD p] := by
   simp [Nat.ModEq, SQRT_M1_val_spec]
 
-theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
-  (h : a + b ≡ 0 [MOD p]) :
-  a ≡ (Field51_as_Nat SQRT_M1_val) ^ 2 * b [MOD p] := by
+/-- If `a + b ≡ 0 [MOD p]`, then `a ≡ (SQRT_M1_val)^2 * b [MOD p]`
+(since `(SQRT_M1_val)^2 ≡ -1`). -/
+private theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
+    (h : a + b ≡ 0 [MOD p]) :
+    a ≡ (Field51_as_Nat SQRT_M1_val) ^ 2 * b [MOD p] := by
   have h_sqrt_eq : (Field51_as_Nat SQRT_M1_val) ^ 2 % p = p - 1 :=
     SQRT_M1_val_spec
   have h_sqrt_mod : (Field51_as_Nat SQRT_M1_val) ^ 2 ≡ p - 1 [MOD p] := by
-    simp [Nat.ModEq, h_sqrt_eq]
+    exact sqrt_m1_sq_modEq
   have h1 : (Field51_as_Nat SQRT_M1_val) ^ 2 * b ≡ (p - 1) * b [MOD p] := by
     exact h_sqrt_mod.mul_right b
-  have hp_pos : 1 ≤ p := by unfold p; simp
+  have hp_pos : 1 ≤ p := by unfold p; simp [Nat.reducePow]
   have h2 : (p - 1) * b = p * b - b := by
-      rw [Nat.sub_mul _ _ _, Nat.one_mul]
-  have h3 : 0 ≡ p * b  [MOD p] := by
-      simp [Nat.ModEq]
-  have : p *b =  b + (p-1) *b  := by unfold p; omega
-  rw[this] at h3
-  have h4:=h3.add_left a
-  have : a + (b + (p - 1) * b) =(a + b) + (p - 1) * b := by omega
+    rw [Nat.sub_mul _ _ _, Nat.one_mul]
+  have h3 : 0 ≡ p * b [MOD p] := by
+    simp only [Nat.ModEq, Nat.zero_mod, Nat.mul_mod_right]
+  have : p * b = b + (p - 1) * b := by unfold p; omega
+  rw [this] at h3
+  have h4 := h3.add_left a
+  have : a + (b + (p - 1) * b) = (a + b) + (p - 1) * b := by omega
   simp only [add_zero, this] at h4
-  have h5:=h.add_right ((p - 1) * b)
-  have h6:=h4.trans h5
+  have h5 := h.add_right ((p - 1) * b)
+  have h6 := h4.trans h5
   simp only [zero_add] at h6
   exact h6.trans (h1.symm)
 
-theorem eq_to_bytes_eq_Field51_as_Nat
-    {u v : backend.serial.u64.field.FieldElement51}
+/-- Equal `to_bytes` outputs imply equal underlying field-element values modulo `p`. -/
+private theorem eq_to_bytes_eq_Field51_as_Nat
+    {u v : field.FieldElement51}
     (h : u.to_bytes = v.to_bytes) :
-  Field51_as_Nat u % p = Field51_as_Nat v % p := by
+    Field51_as_Nat u % p = Field51_as_Nat v % p := by
   classical
   obtain ⟨ru, hu, hru_mod, _⟩ := spec_imp_exists (to_bytes_spec u)
   obtain ⟨rv, hv, hrv_mod, _⟩ := spec_imp_exists (to_bytes_spec v)
@@ -94,24 +112,26 @@ theorem eq_to_bytes_eq_Field51_as_Nat
     exact (Nat.ModEq.symm h1).trans h2
   simpa only [Nat.ModEq] using huv_mod
 
-lemma zero_mod_lt_zero {u p : ℕ} (hu_lt : u < p) (hu_mod : u ≡ 0 [MOD p]) :
+/-- A value below `p` that is congruent to `0` modulo `p` must be exactly `0`. -/
+private lemma zero_mod_lt_zero {u p : ℕ} (hu_lt : u < p) (hu_mod : u ≡ 0 [MOD p]) :
     u = 0 := by
-    rw[Nat.ModEq] at hu_mod
-    simp only [Nat.zero_mod] at hu_mod
-    have : u % p = u := Nat.mod_eq_of_lt hu_lt
-    rw[hu_mod] at this
-    simp only [ReduceNat.reduceNatEq] at this
-    exact this
+  rw [Nat.ModEq] at hu_mod
+  simp only [Nat.zero_mod] at hu_mod
+  have : u % p = u := Nat.mod_eq_of_lt hu_lt
+  rw [hu_mod] at this
+  simp only [ReduceNat.reduceNatEq] at this
+  exact this
 
-theorem to_bytes_zero_of_Field51_as_Nat_zero
-    {u : backend.serial.u64.field.FieldElement51}
+/-- A field element representing `0` modulo `p` serializes to the all-zero byte array. -/
+private theorem to_bytes_zero_of_Field51_as_Nat_zero
+    {u : field.FieldElement51}
     (h : Field51_as_Nat u % p = 0) :
-   u.to_bytes = ok (Array.repeat 32#usize 0#u8)  := by
+    u.to_bytes = ok (Array.repeat 32#usize 0#u8) := by
   classical
   obtain ⟨ru, hu, hru_mod, hru_lt⟩ := spec_imp_exists (to_bytes_spec u)
-  rw[← modEq_zero_iff] at h
+  rw [← modEq_zero_iff] at h
   have := hru_mod.trans h
-  have h_bytes_zero:= zero_mod_lt_zero hru_lt this
+  have h_bytes_zero := zero_mod_lt_zero hru_lt this
   obtain ⟨c, c_ok, hc ⟩  := spec_imp_exists (is_zero_spec u)
   have hru_eq : ru = Array.repeat 32#usize 0#u8 := by
     unfold U8x32_as_Nat at h_bytes_zero
@@ -125,179 +145,188 @@ theorem to_bytes_zero_of_Field51_as_Nat_zero
     intro i hi _
     have hi_val := h_bytes_zero i hi
     interval_cases i
-    all_goals simp only [Array.repeat, UScalar.ofNatCore_val_eq, List.replicate, List.getElem_cons_succ,
-      List.getElem_cons_zero]; grind only [= UScalar.ofNatCore_val_eq]
+    all_goals simp only [Array.repeat, UScalar.ofNatCore_val_eq, List.replicate,
+      List.getElem_cons_succ, List.getElem_cons_zero]; grind only [= UScalar.ofNatCore_val_eq]
   rw [← hru_eq]
   exact hu
 
-theorem SQRT_M1_not_square (x : ℕ) :
-  ¬ (x ^ 4 ≡ p - 1 [MOD p]) := by
+/-- `SQRT_M1` is not a square in `ZMod p`: no natural number `x` satisfies `x^4 ≡ -1 [MOD p]`. -/
+private theorem SQRT_M1_not_square (x : ℕ) :
+    ¬ (x ^ 4 ≡ p - 1 [MOD p]) := by
   intro hx
   have hx_z : ((x : ZMod p) ^ 4) = (-1 : ZMod p) := by
     have hcast : (((x ^ 4 : ℕ)) : ZMod p) = ((p - 1 : ℕ) : ZMod p) := by
       exact (ZMod.natCast_eq_natCast_iff _ _ _).2 (by simpa [Nat.ModEq] using hx)
     push_cast at hcast
-    rwa [_root_.curve25519_dalek.math.p_sub_one_cast] at hcast
+    rwa [p_sub_one_cast] at hcast
   have hx_sq :
-      (((x : ZMod p) ^ 2) ^ 2) = _root_.curve25519_dalek.math.sqrt_m1 ^ 2 := by
+      (((x : ZMod p) ^ 2) ^ 2) = sqrt_m1 ^ 2 := by
     calc
       (((x : ZMod p) ^ 2) ^ 2) = ((x : ZMod p) ^ 4) := by
         rw [show 4 = 2 * 2 by norm_num, pow_mul]
       _ = (-1 : ZMod p) := hx_z
-      _ = _root_.curve25519_dalek.math.sqrt_m1 ^ 2 := by
-        rw [_root_.curve25519_dalek.math.sqrt_m1_sq]
-  have hsquare : IsSquare (_root_.curve25519_dalek.math.sqrt_m1) := by
+      _ = sqrt_m1 ^ 2 := by
+        rw [sqrt_m1_sq]
+  have hsquare : IsSquare (sqrt_m1) := by
     rcases sq_eq_sq_iff_eq_or_eq_neg.mp hx_sq with hroot | hroot
     · refine ⟨(x : ZMod p), ?_⟩
       simpa [pow_two] using hroot.symm
-    · refine ⟨(x : ZMod p) * _root_.curve25519_dalek.math.sqrt_m1, ?_⟩
+    · refine ⟨(x : ZMod p) * sqrt_m1, ?_⟩
       calc
-        _root_.curve25519_dalek.math.sqrt_m1 =
-            (-_root_.curve25519_dalek.math.sqrt_m1) * (-1 : ZMod p) := by
+        sqrt_m1 =
+            (-sqrt_m1) * (-1 : ZMod p) := by
           ring
-        _ = ((x : ZMod p) ^ 2) * (_root_.curve25519_dalek.math.sqrt_m1 ^ 2) := by
-          rw [hroot, _root_.curve25519_dalek.math.sqrt_m1_sq]
-        _ = ((x : ZMod p) * _root_.curve25519_dalek.math.sqrt_m1) *
-              ((x : ZMod p) * _root_.curve25519_dalek.math.sqrt_m1) := by
+        _ = ((x : ZMod p) ^ 2) * (sqrt_m1 ^ 2) := by
+          rw [hroot, sqrt_m1_sq]
+        _ = ((x : ZMod p) * sqrt_m1) *
+              ((x : ZMod p) * sqrt_m1) := by
           ring
-  exact _root_.curve25519_dalek.math.sqrt_m1_not_square hsquare
+  exact sqrt_m1_not_square hsquare
 
-lemma zero_of_mul_SQRT_M1_zero {a : ℕ} (ha : a * Field51_as_Nat SQRT_M1_val ≡ 0 [MOD p]) :
-  a ≡ 0 [MOD p] := by
-  have eq:= ha.mul_right (Field51_as_Nat SQRT_M1_val)
+/-- If `a * SQRT_M1_val ≡ 0 [MOD p]`, then `a ≡ 0 [MOD p]` (since `SQRT_M1_val` is a unit). -/
+private lemma zero_of_mul_SQRT_M1_zero {a : ℕ}
+    (ha : a * Field51_as_Nat SQRT_M1_val ≡ 0 [MOD p]) :
+    a ≡ 0 [MOD p] := by
+  have eq := ha.mul_right (Field51_as_Nat SQRT_M1_val)
   simp only [mul_assoc, zero_mul] at eq
-  have : Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val ≡ p-1 [MOD p] := by
+  have : Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val ≡ p - 1 [MOD p] := by
     simpa only [pow_two] using sqrt_m1_sq_modEq
-  have eq:= ((this.mul_left a).symm.trans eq).add_right a
-  rw[(by simp : 0 +a =a)] at eq
-  have : a * (p - 1) + a= p * a := by
+  have eq := ((this.mul_left a).symm.trans eq).add_right a
+  rw [(by simp : 0 + a = a)] at eq
+  have : a * (p - 1) + a = p * a := by
     unfold p
     omega
-  rw[this] at eq
-  have : p * a ≡ 0  [MOD p] := by
-    rw[Nat.ModEq]
+  rw [this] at eq
+  have : p * a ≡ 0 [MOD p] := by
+    rw [Nat.ModEq]
     simp
   apply eq.symm.trans this
 
-theorem pow_div_two_eq_neg_one_or_one {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
-    a ^ ((p -1) / 2) ≡ 1 [MOD p]∨ a ^ ((p-1) / 2) ≡ p - 1 [MOD p] := by
-    have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1) ≡ 0 [MOD p] := by
-      have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1)
-        = a ^ ((p -1) ) + p * a ^ ((p -1) / 2) + (p-1) := by
-        rw[mul_add, add_mul, (fun a => by ring : ∀ a, a * a = a^2), ← pow_mul]
-        simp only [mul_one, ← add_assoc, Nat.add_right_cancel_iff]
-        simp only [add_assoc,
-          (by ring :
-              (p - 1) * a ^ ((p - 1) / 2) + a ^ ((p - 1) / 2) = ((p - 1) + 1) * a ^ ((p - 1) / 2))]
-        have : p-1 +1 =p := by unfold p; omega
-        rw[this]
-        have : (p-1)/2 *2 =p-1 := by unfold p; omega
-        rw[this]
-      rw[this]
-      rw[Nat.modEq_zero_iff_dvd] at ha
-      have := coprime_of_prime_not_dvd prime_25519 ha
-      have fermat:= Nat.ModEq.pow_card_sub_one_eq_one prime_25519 this
-      have :p * a ^ ((p - 1) / 2) ≡ 0 [MOD p] := by
-        rw[Nat.modEq_zero_iff_dvd]
-        simp
-      have := (fermat.add this).add_right (p-1)
-      apply this.trans
-      have : 1 + 0 + (p - 1) =p := by unfold p; omega
-      rw[this]
-      rw[Nat.modEq_zero_iff_dvd]
-    have := mul_zero_eq_or (hp := prime_25519) this
-    rcases this with r | l
-    · have r:= r.add_right 1
-      rw[add_assoc] at r
-      have : p-1 +1 =p := by unfold p; omega
-      simp[this] at r
-      simp[r]
-    · have r:= l.add_right (p-1)
-      rw[add_assoc] at r
-      have :  1 + (p-1) =p := by unfold p; omega
-      simp[this] at r
-      simp[r]
+/-- For nonzero `a` mod `p`, `a^((p - 1)/2)` is either `1` or `p - 1` modulo `p`
+(Euler criterion). -/
+private theorem pow_div_two_eq_neg_one_or_one {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
+    a ^ ((p - 1) / 2) ≡ 1 [MOD p] ∨ a ^ ((p - 1) / 2) ≡ p - 1 [MOD p] := by
+  have : (a ^ ((p - 1) / 2) + (p - 1)) * (a ^ ((p - 1) / 2) + 1) ≡ 0 [MOD p] := by
+    have : (a ^ ((p - 1) / 2) + (p - 1)) * (a ^ ((p - 1) / 2) + 1)
+      = a ^ (p - 1) + p * a ^ ((p - 1) / 2) + (p - 1) := by
+      rw [mul_add, add_mul, (fun a => by ring : ∀ a, a * a = a ^ 2), ← pow_mul]
+      simp only [mul_one, ← add_assoc, Nat.add_right_cancel_iff]
+      simp only [add_assoc,
+        (by ring :
+            (p - 1) * a ^ ((p - 1) / 2) + a ^ ((p - 1) / 2) = ((p - 1) + 1) * a ^ ((p - 1) / 2))]
+      have : p - 1 + 1 = p := by unfold p; omega
+      rw [this]
+      have : (p - 1) / 2 * 2 = p - 1 := by unfold p; omega
+      rw [this]
+    rw [this]
+    rw [Nat.modEq_zero_iff_dvd] at ha
+    have := coprime_of_prime_not_dvd prime_25519 ha
+    have fermat := Nat.ModEq.pow_card_sub_one_eq_one prime_25519 this
+    have : p * a ^ ((p - 1) / 2) ≡ 0 [MOD p] := by
+      rw [Nat.modEq_zero_iff_dvd]
+      simp
+    have := (fermat.add this).add_right (p - 1)
+    apply this.trans
+    have : 1 + 0 + (p - 1) = p := by unfold p; omega
+    rw [this]
+    rw [Nat.modEq_zero_iff_dvd]
+  have := mul_zero_eq_or (hp := prime_25519) this
+  rcases this with r | l
+  · have r := r.add_right 1
+    rw [add_assoc] at r
+    have : p - 1 + 1 = p := by unfold p; omega
+    simp [this] at r
+    simp [r]
+  · have r := l.add_right (p - 1)
+    rw [add_assoc] at r
+    have : 1 + (p - 1) = p := by unfold p; omega
+    simp [this] at r
+    simp [r]
 
-theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
-    a ^ ((p -1) / 4) ≡ 1 [MOD p] ∨
-    a ^ ((p-1) / 4) ≡ Field51_as_Nat SQRT_M1_val [MOD p] ∨
-    a ^ ((p-1) / 4) ≡ (Field51_as_Nat SQRT_M1_val)^2 [MOD p] ∨
-    a ^ ((p-1) / 4) ≡ (Field51_as_Nat SQRT_M1_val)^3 [MOD p] := by
-  have eq1:  (a ^ ((p -1) / 4) + (p-1)) *
-          (a ^ ((p -1) / 4) + 1)
+/-- For nonzero `a` mod `p`, `a^((p - 1)/4)` lies in the four-element group
+generated by `SQRT_M1_val` (i.e. equals `1`, `i`, `-1`, or `-i` modulo `p`). -/
+private theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
+    a ^ ((p - 1) / 4) ≡ 1 [MOD p] ∨
+    a ^ ((p - 1) / 4) ≡ Field51_as_Nat SQRT_M1_val [MOD p] ∨
+    a ^ ((p - 1) / 4) ≡ (Field51_as_Nat SQRT_M1_val) ^ 2 [MOD p] ∨
+    a ^ ((p - 1) / 4) ≡ (Field51_as_Nat SQRT_M1_val) ^ 3 [MOD p] := by
+  have eq1 : (a ^ ((p - 1) / 4) + (p - 1)) *
+          (a ^ ((p - 1) / 4) + 1)
            =
-          a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4) + (p-1)
+          a ^ ((p - 1) / 2) + p * a ^ ((p - 1) / 4) + (p - 1)
            := by
-        rw[mul_add, add_mul, (fun a => by ring : ∀ a, a * a = a^2), ← pow_mul]
+        rw [mul_add, add_mul, (fun a => by ring : ∀ a, a * a = a ^ 2), ← pow_mul]
         simp only [mul_one, ← add_assoc, Nat.add_right_cancel_iff]
         simp only [add_assoc,
           (by ring :
               (p - 1) * a ^ ((p - 1) / 4) + a ^ ((p - 1) / 4) = ((p - 1) + 1) * a ^ ((p - 1) / 4))]
-        have : p-1 +1 =p := by unfold p; omega
-        rw[this]
-        have : (p-1)/4 *2 =(p-1)/2 := by unfold p; omega
-        rw[this]
-  have eq2:  (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat SQRT_M1_val)) * (a ^ ((p -1) / 4)
-          + Field51_as_Nat SQRT_M1_val) = a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4)
-          * (Field51_as_Nat SQRT_M1_val) + (p-1) *
+        have : p - 1 + 1 = p := by unfold p; omega
+        rw [this]
+        have : (p - 1) / 4 * 2 = (p - 1) / 2 := by unfold p; omega
+        rw [this]
+  have eq2 : (a ^ ((p - 1) / 4) + (p - 1) * (Field51_as_Nat SQRT_M1_val)) * (a ^ ((p - 1) / 4)
+          + Field51_as_Nat SQRT_M1_val) = a ^ ((p - 1) / 2) + p * a ^ ((p - 1) / 4)
+          * (Field51_as_Nat SQRT_M1_val) + (p - 1) *
           Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val := by
-        rw[mul_add, add_mul,add_mul, (fun a => by ring : ∀ a, a * a = a^2), ← pow_mul]
-        rw[← add_assoc]
+        rw [mul_add, add_mul, add_mul, (fun a => by ring : ∀ a, a * a = a ^ 2), ← pow_mul]
+        rw [← add_assoc]
         simp only [add_assoc,
           (by ring :
               (p - 1) * (Field51_as_Nat SQRT_M1_val) * a ^ ((p - 1) / 4) +
                   a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val =
                 ((p - 1) + 1) * a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val)]
-        have : p-1 +1 =p := by unfold p; omega
+        have : p - 1 + 1 = p := by unfold p; omega
         rw [this]
-        have : (p-1)/4 *2 =(p-1)/2 := by unfold p; omega
-        rw[this, ← add_assoc]
-  have : (a ^ ((p -1) / 4) + (p-1)) *
-          (a ^ ((p -1) / 4) + 1) *
-          (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat SQRT_M1_val)) *
-          (a ^ ((p -1) / 4) + Field51_as_Nat SQRT_M1_val)
+        have : (p - 1) / 4 * 2 = (p - 1) / 2 := by unfold p; omega
+        rw [this, ← add_assoc]
+  have : (a ^ ((p - 1) / 4) + (p - 1)) *
+          (a ^ ((p - 1) / 4) + 1) *
+          (a ^ ((p - 1) / 4) + (p - 1) * (Field51_as_Nat SQRT_M1_val)) *
+          (a ^ ((p - 1) / 4) + Field51_as_Nat SQRT_M1_val)
           ≡ 0 [MOD p] := by
           simp only [eq1, mul_assoc, eq2]
-          have eq1:a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4) + (p-1) ≡
-            a ^ ((p -1)/2 ) + (p-1)
+          have eq1 : a ^ ((p - 1) / 2) + p * a ^ ((p - 1) / 4) + (p - 1) ≡
+            a ^ ((p - 1) / 2) + (p - 1)
             [MOD p] := by
-            simp[Nat.modEq_iff_dvd]
+            simp [Nat.modEq_iff_dvd]
           have : a ^ ((p - 1) / 2) + p * (a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val) +
             (p - 1) * (Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val) ≡
-            a ^ ((p -1)/2 ) + 1
+            a ^ ((p - 1) / 2) + 1
             [MOD p] := by
-            have :(p - 1) * (Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val) ≡ 1 [MOD p]:= by
+            have : (p - 1) * (Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val) ≡
+                1 [MOD p] := by
               unfold SQRT_M1_val
               decide
-            have :=this.add_left (a ^ ((p - 1) / 2) + p * (a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val))
+            have := this.add_left
+              (a ^ ((p - 1) / 2) + p * (a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val))
             apply Nat.ModEq.trans this
-            simp[Nat.modEq_iff_dvd]
+            simp [Nat.modEq_iff_dvd]
           apply (eq1.mul this).trans
-          have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1) ≡ 0 [MOD p] := by
-            have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1)
-              = a ^ ((p -1) ) + p * a ^ ((p -1) / 2) + (p-1) := by
-              rw[mul_add, add_mul, (fun a => by ring : ∀ a, a * a = a^2), ← pow_mul]
+          have : (a ^ ((p - 1) / 2) + (p - 1)) * (a ^ ((p - 1) / 2) + 1) ≡ 0 [MOD p] := by
+            have : (a ^ ((p - 1) / 2) + (p - 1)) * (a ^ ((p - 1) / 2) + 1)
+              = a ^ (p - 1) + p * a ^ ((p - 1) / 2) + (p - 1) := by
+              rw [mul_add, add_mul, (fun a => by ring : ∀ a, a * a = a ^ 2), ← pow_mul]
               simp only [mul_one, ← add_assoc, Nat.add_right_cancel_iff]
               simp only [add_assoc,
                 (by ring :
                     (p - 1) * a ^ ((p - 1) / 2) + a ^ ((p - 1) / 2) =
                       ((p - 1) + 1) * a ^ ((p - 1) / 2))]
-              have : p-1 +1 =p := by unfold p; omega
-              rw[this]
-              have : (p-1)/2 *2 =p-1 := by unfold p; omega
-              rw[this]
-            rw[this]
-            rw[Nat.modEq_zero_iff_dvd] at ha
+              have : p - 1 + 1 = p := by unfold p; omega
+              rw [this]
+              have : (p - 1) / 2 * 2 = p - 1 := by unfold p; omega
+              rw [this]
+            rw [this]
+            rw [Nat.modEq_zero_iff_dvd] at ha
             have := coprime_of_prime_not_dvd prime_25519 ha
-            have fermat:= Nat.ModEq.pow_card_sub_one_eq_one prime_25519 this
-            have :p * a ^ ((p - 1) / 2) ≡ 0 [MOD p] := by
-              rw[Nat.modEq_zero_iff_dvd]
+            have fermat := Nat.ModEq.pow_card_sub_one_eq_one prime_25519 this
+            have : p * a ^ ((p - 1) / 2) ≡ 0 [MOD p] := by
+              rw [Nat.modEq_zero_iff_dvd]
               simp
-            have := (fermat.add this).add_right (p-1)
+            have := (fermat.add this).add_right (p - 1)
             apply this.trans
-            have : 1 + 0 + (p - 1) =p := by unfold p; omega
-            rw[this]
-            rw[Nat.modEq_zero_iff_dvd]
+            have : 1 + 0 + (p - 1) = p := by unfold p; omega
+            rw [this]
+            rw [Nat.modEq_zero_iff_dvd]
           apply this
   have := mul_zero_eq_or (hp := prime_25519) this
   rcases this with hl | hl
@@ -305,36 +334,37 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
     rcases this with hl | hl
     · have := mul_zero_eq_or (hp := prime_25519) hl
       rcases this with hl | hl
-      · have r:= hl.add_right 1
-        rw[add_assoc] at r
-        have : p-1 +1 =p := by unfold p; omega
-        simp[this] at r
-        simp[r]
-      · have r:= hl.add_right (p-1)
-        rw[add_assoc] at r
-        have :  1 + (p-1) =p := by unfold p; omega
+      · have r := hl.add_right 1
+        rw [add_assoc] at r
+        have : p - 1 + 1 = p := by unfold p; omega
+        simp [this] at r
+        simp [r]
+      · have r := hl.add_right (p - 1)
+        rw [add_assoc] at r
+        have : 1 + (p - 1) = p := by unfold p; omega
         simp only [this, zero_add, Nat.add_modulus_modEq_iff] at r
-        have :p - 1  ≡Field51_as_Nat SQRT_M1_val ^2  [MOD p]:= by
-              exact sqrt_m1_sq_modEq.symm
-        have r:= r.trans this
-        simp[r]
-    · have r:= hl.add_right (Field51_as_Nat SQRT_M1_val)
-      rw[add_assoc] at r
-      have : (p-1) * Field51_as_Nat SQRT_M1_val + Field51_as_Nat SQRT_M1_val =
+        have : p - 1 ≡ Field51_as_Nat SQRT_M1_val ^ 2 [MOD p] := by
+          exact sqrt_m1_sq_modEq.symm
+        have r := r.trans this
+        simp [r]
+    · have r := hl.add_right (Field51_as_Nat SQRT_M1_val)
+      rw [add_assoc] at r
+      have : (p - 1) * Field51_as_Nat SQRT_M1_val + Field51_as_Nat SQRT_M1_val =
         p * (Field51_as_Nat SQRT_M1_val) := by unfold p; omega
-      simp[this] at r
-      simp[r]
-  · have r:= hl.add_right ((p-1)*Field51_as_Nat SQRT_M1_val)
-    rw[add_assoc] at r
-    have :  Field51_as_Nat SQRT_M1_val + (p-1) * Field51_as_Nat SQRT_M1_val
+      simp [this] at r
+      simp [r]
+  · have r := hl.add_right ((p - 1) * Field51_as_Nat SQRT_M1_val)
+    rw [add_assoc] at r
+    have :  Field51_as_Nat SQRT_M1_val + (p - 1) * Field51_as_Nat SQRT_M1_val
       = p * (Field51_as_Nat SQRT_M1_val) := by unfold p; omega
     simp only [this, zero_add, Nat.add_modulus_mul_modEq_iff] at r
-    have : (p - 1) * (Field51_as_Nat SQRT_M1_val)  ≡Field51_as_Nat SQRT_M1_val ^3  [MOD p]:= by
-              unfold SQRT_M1_val
-              decide
-    have r:= r.trans this
+    have : (p - 1) * (Field51_as_Nat SQRT_M1_val) ≡ Field51_as_Nat SQRT_M1_val ^ 3 [MOD p] := by
+      unfold SQRT_M1_val
+      decide
+    have r := r.trans this
     simp [r]
 
+/-- If `a + b ≡ 0 [MOD p]` and `a mod p` is odd, then `b mod p` is even (uses oddness of `p`). -/
 private theorem nonneg_of_neg_mod_p (a b : ℕ)
     (h_sum : (a + b) % p = 0) (h_a_odd : a % p % 2 = 1) :
     b % p % 2 = 0 := by
@@ -367,7 +397,7 @@ private theorem nonneg_of_neg_mod_p (a b : ℕ)
 
 /-- Whole-element `Field51_as_Nat` equality from pointwise limb-value equality. -/
 private theorem field51_as_Nat_eq_of_pointwise_eq
-    {x y : backend.serial.u64.field.FieldElement51}
+    {x y : field.FieldElement51}
     (hxy : ∀ i < 5, x[i]!.val = y[i]!.val) :
     Field51_as_Nat x = Field51_as_Nat y := by
   unfold Field51_as_Nat
@@ -377,7 +407,7 @@ private theorem field51_as_Nat_eq_of_pointwise_eq
 
 /-- Whole-element consequence of a limbwise `conditional_assign` postcondition. -/
 private theorem field51_as_Nat_conditional_assign
-    (x y z : backend.serial.u64.field.FieldElement51)
+    (x y z : field.FieldElement51)
     (c : subtle.Choice)
     (z_post : ∀ i < 5, z[i]! = if c.val = 1#u8 then y[i]! else x[i]!) :
     Field51_as_Nat z =
@@ -400,7 +430,7 @@ private theorem field51_as_Nat_conditional_assign
 
 /-- Whole-element consequence of taking the right branch in `conditional_assign`. -/
 private theorem field51_as_Nat_conditional_assign_eq_right
-    (x y z : backend.serial.u64.field.FieldElement51)
+    (x y z : field.FieldElement51)
     (c : subtle.Choice)
     (hc : c.val = 1#u8)
     (z_post : ∀ i < 5, z[i]! = if c.val = 1#u8 then y[i]! else x[i]!) :
@@ -410,7 +440,7 @@ private theorem field51_as_Nat_conditional_assign_eq_right
 
 /-- Whole-element consequence of taking the left branch in `conditional_assign`. -/
 private theorem field51_as_Nat_conditional_assign_eq_left
-    (x y z : backend.serial.u64.field.FieldElement51)
+    (x y z : field.FieldElement51)
     (c : subtle.Choice)
     (hc : c.val ≠ 1#u8)
     (z_post : ∀ i < 5, z[i]! = if c.val = 1#u8 then y[i]! else x[i]!) :
@@ -420,7 +450,7 @@ private theorem field51_as_Nat_conditional_assign_eq_left
 
 /-- Convert a pointwise postcondition into whole-element equality on `Field51_as_Nat`. -/
 private theorem field51_as_Nat_eq_of_post
-    (base x : backend.serial.u64.field.FieldElement51)
+    (base x : field.FieldElement51)
     (x_post : ∀ i < 5, x[i]! = base[i]!) :
     Field51_as_Nat x = Field51_as_Nat base := by
   refine field51_as_Nat_eq_of_pointwise_eq ?_
@@ -430,7 +460,7 @@ private theorem field51_as_Nat_eq_of_post
 
 /-- `conditional_negate` preserves the represented square modulo `p`. -/
 private theorem conditional_negate_sq
-    (r1 x r2 : backend.serial.u64.field.FieldElement51)
+    (r1 x r2 : field.FieldElement51)
     (r_is_negative : subtle.Choice)
     (x_post_1 : Field51_as_Nat r1 + Field51_as_Nat x ≡ 0 [MOD p])
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then x[i]! else r1[i]!) :
@@ -448,7 +478,7 @@ private theorem conditional_negate_sq
 
 /-- After `conditional_negate`, the result `r2` is always non-negative (even mod p). -/
 private theorem conditional_negate_nonneg
-    (r1 x r2 : backend.serial.u64.field.FieldElement51)
+    (r1 x r2 : field.FieldElement51)
     (r_is_negative : subtle.Choice)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1)
     (x_post_1 : Field51_as_Nat r1 + Field51_as_Nat x ≡ 0 [MOD p])
@@ -471,11 +501,11 @@ private theorem conditional_negate_nonneg
 
 /-- Limb bounds after `conditional_negate`: either the negated value or the original value. -/
 private theorem conditional_negate_bounds_of_eq
-    (base r1 x r2 : backend.serial.u64.field.FieldElement51)
+    (base r1 x r2 : field.FieldElement51)
     (r_is_negative : subtle.Choice)
     (r1_post : ∀ i < 5, r1[i]! = base[i]!)
     (base_bounds : ∀ i < 5, base[i]!.val < 2 ^ 52)
-    (x_bounds : ∀ i < 5, x[i]!.val ≤ 2 ^ 52)
+    (x_bounds : ∀ i < 5, x[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then x[i]! else r1[i]!) :
     ∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1 := by
   intro i hi
@@ -497,7 +527,7 @@ private theorem conditional_negate_bounds_of_eq
 
 /-- Common square-preservation branch pattern after `conditional_negate`. -/
 private theorem conditional_negate_sq_mul_eq_of_modeq
-    (base r1 x r2 : backend.serial.u64.field.FieldElement51)
+    (base r1 x r2 : field.FieldElement51)
     (r_is_negative : subtle.Choice)
     (b rhs : ℕ)
     (r1_eq : Field51_as_Nat r1 = Field51_as_Nat base)
@@ -512,7 +542,7 @@ private theorem conditional_negate_sq_mul_eq_of_modeq
 
 /-- If `conditional_negate` does not negate, the output still represents the base element. -/
 private theorem conditional_negate_eq_of_not_negative
-    (base r1 x r2 : backend.serial.u64.field.FieldElement51)
+    (base r1 x r2 : field.FieldElement51)
     (r_is_negative : subtle.Choice)
     (h_not_neg : r_is_negative.val ≠ 1#u8)
     (r1_eq : Field51_as_Nat r1 = Field51_as_Nat base)
@@ -526,7 +556,7 @@ private theorem conditional_negate_eq_of_not_negative
 /-- Main algebraic bridge before the branch split in `sqrt_ratio_i`. -/
 private theorem check_eq_v_of_sqrt_ratio_data
     (u v fe v3 fe1 v7 fe2 fe3 fe4 r fe5 check :
-      backend.serial.u64.field.FieldElement51)
+      field.FieldElement51)
     (check_post1 :
       Field51_as_Nat check ≡ Field51_as_Nat v * Field51_as_Nat fe5 [MOD p])
     (fe5_post1 :
@@ -534,7 +564,7 @@ private theorem check_eq_v_of_sqrt_ratio_data
     (r_post1 :
       Field51_as_Nat r ≡ Field51_as_Nat fe2 * Field51_as_Nat fe4 [MOD p])
     (fe4_post1 :
-      Field51_as_Nat fe4 % p = Field51_as_Nat fe3 ^ (2 ^ 252 - 3) % p)
+      Field51_as_Nat fe4 % p = Field51_as_Nat fe3 ^ pow_p58_exp % p)
     (fe3_post1 :
       Field51_as_Nat fe3 ≡ Field51_as_Nat u * Field51_as_Nat v7 [MOD p])
     (fe2_post1 :
@@ -548,8 +578,8 @@ private theorem check_eq_v_of_sqrt_ratio_data
     (fe_post1 :
       Field51_as_Nat fe ≡ Field51_as_Nat v ^ 2 [MOD p]) :
     Field51_as_Nat check ≡
-      Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
-        Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) [MOD p] := by
+      Field51_as_Nat u ^ (2 + pow_p58_exp * 2) *
+        Field51_as_Nat v ^ (14 * pow_p58_exp + 7) [MOD p] := by
   apply check_post1.trans
   have := fe5_post1.mul_left (Field51_as_Nat v)
   apply this.trans
@@ -560,7 +590,7 @@ private theorem check_eq_v_of_sqrt_ratio_data
   rw [← Nat.ModEq] at fe4_post1
   have eq1 := Nat.ModEq.pow 2 fe4_post1
   rw [← pow_mul] at eq1
-  have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) fe3_post1
+  have := Nat.ModEq.pow (pow_p58_exp * 2) fe3_post1
   have eq2 := Nat.ModEq.trans eq1 this
   rw [mul_pow] at eq2
   have := Nat.ModEq.mul_right (Field51_as_Nat v) fe_post1
@@ -572,9 +602,9 @@ private theorem check_eq_v_of_sqrt_ratio_data
   have := Nat.ModEq.mul_right (Field51_as_Nat v) this
   rw [← pow_succ] at this
   have := Nat.ModEq.trans v7_post1 this
-  have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) this
+  have := Nat.ModEq.pow (pow_p58_exp * 2) this
   rw [← pow_mul] at this
-  have := Nat.ModEq.mul_left (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2)) this
+  have := Nat.ModEq.mul_left (Field51_as_Nat u ^ (pow_p58_exp * 2)) this
   have eq3 := Nat.ModEq.trans eq2 this
   have := Nat.ModEq.mul_left (Field51_as_Nat u) eq_v3
   have := Nat.ModEq.trans fe2_post1 this
@@ -583,21 +613,12 @@ private theorem check_eq_v_of_sqrt_ratio_data
   have := Nat.ModEq.mul eq4 eq3
   have := Nat.ModEq.mul_left (Field51_as_Nat v) this
   apply Nat.ModEq.trans this
-  have :
-      Field51_as_Nat v *
-        (Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-          (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) *
-            Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2)))) =
-      Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
-        Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) := by
-    simp only [Nat.reduceAdd, Nat.reducePow, Nat.reduceSub, Nat.reduceMul]
-    ring
-  rw [this]
+  rw [sqrt_ratio_collect]
 
 /-- Main algebraic bridge before the branch split in `sqrt_ratio_i`. -/
 private theorem check_eq_mod_of_sqrt_ratio_data
     (u v fe v3 fe1 v7 fe2 fe3 fe4 r fe5 check r_prime :
-      backend.serial.u64.field.FieldElement51)
+      field.FieldElement51)
     (r_prime_post1 :
       Field51_as_Nat r_prime ≡
         Field51_as_Nat SQRT_M1_val * Field51_as_Nat r [MOD p])
@@ -608,7 +629,7 @@ private theorem check_eq_mod_of_sqrt_ratio_data
     (r_post1 :
       Field51_as_Nat r ≡ Field51_as_Nat fe2 * Field51_as_Nat fe4 [MOD p])
     (fe4_post1 :
-      Field51_as_Nat fe4 % p = Field51_as_Nat fe3 ^ (2 ^ 252 - 3) % p)
+      Field51_as_Nat fe4 % p = Field51_as_Nat fe3 ^ pow_p58_exp % p)
     (fe3_post1 :
       Field51_as_Nat fe3 ≡ Field51_as_Nat u * Field51_as_Nat v7 [MOD p])
     (fe2_post1 :
@@ -626,8 +647,8 @@ private theorem check_eq_mod_of_sqrt_ratio_data
   have eq1_mod :
       Field51_as_Nat r_prime ^ 2 * Field51_as_Nat v ≡
         Field51_as_Nat SQRT_M1_val ^ 2 *
-          (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
-            Field51_as_Nat v ^ (7 * 2 ^ 253 - 35)) [MOD p] := by
+          (Field51_as_Nat u ^ (2 + pow_p58_exp * 2) *
+            Field51_as_Nat v ^ (14 * pow_p58_exp + 7)) [MOD p] := by
     have := r_prime_post1.pow 2
     rw [mul_pow] at this
     have := this.mul_right (Field51_as_Nat v)
@@ -641,7 +662,7 @@ private theorem check_eq_mod_of_sqrt_ratio_data
     rw [← Nat.ModEq] at fe4_post1
     have eq1 := fe4_post1.pow 2
     rw [← pow_mul] at eq1
-    have := fe3_post1.pow ((2 ^ 252 - 3) * 2)
+    have := fe3_post1.pow (pow_p58_exp * 2)
     have eq2 := eq1.trans this
     rw [mul_pow] at eq2
     have := fe_post1.mul_right (Field51_as_Nat v)
@@ -653,9 +674,9 @@ private theorem check_eq_mod_of_sqrt_ratio_data
     have := this.mul_right (Field51_as_Nat v)
     rw [← pow_succ] at this
     have := v7_post1.trans this
-    have := this.pow ((2 ^ 252 - 3) * 2)
+    have := this.pow (pow_p58_exp * 2)
     rw [← pow_mul] at this
-    have := this.mul_left (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2))
+    have := this.mul_left (Field51_as_Nat u ^ (pow_p58_exp * 2))
     have eq3 := eq2.trans this
     have := eq_v3.mul_left (Field51_as_Nat u)
     have := fe2_post1.trans this
@@ -664,23 +685,9 @@ private theorem check_eq_mod_of_sqrt_ratio_data
     have := eq4.mul eq3
     have := this.mul_right (Field51_as_Nat v)
     apply this.trans
-    have :
-        Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-          (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) *
-            Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2))) *
-          Field51_as_Nat v =
-        (Field51_as_Nat u ^ 2 * Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2)) *
-          ((Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-            Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2)) *
-            Field51_as_Nat v) := by
-      simp
-      ring
-    rw [this]
-    rw [← pow_add, ← pow_mul, ← pow_add, ← pow_succ,
-      (by
-        simp only [Nat.reduceAdd, Nat.reduceMul, Nat.reducePow, Nat.reduceSub] :
-          (2 + 1) * 2 + ((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2) + 1 =
-            7 * 2 ^ 253 - 35)]
+    rw [sqrt_ratio_rearrange, ← pow_add, ← pow_mul, ← pow_add, ← pow_succ]
+    rw [show (2 + 1) * 2 + ((2 + 1) * 2 + 1) * (pow_p58_exp * 2) + 1 =
+            (14 * pow_p58_exp + 7) from by omega]
   have check_eq_v :=
     check_eq_v_of_sqrt_ratio_data u v fe v3 fe1 v7 fe2 fe3 fe4 r fe5 check
       check_post1 fe5_post1 r_post1 fe4_post1 fe3_post1 fe2_post1
@@ -710,7 +717,7 @@ private theorem modEq_zero_of_sqrt_m1_mul_self {a : ℕ}
 
 /-- Bundled postcondition for a fully normalized `sqrt_ratio_i` result. -/
 private abbrev sqrt_ratio_i_cases
-    (u v r2 : backend.serial.u64.field.FieldElement51)
+    (u v r2 : field.FieldElement51)
     (c : subtle.Choice) : Prop :=
   (Field51_as_Nat u % p = 0 →
       c.val = 1#u8 ∧ Field51_as_Nat r2 % p = 0 ∧
@@ -736,7 +743,7 @@ section sqrt_ratio_i_branch_solvers
 
 variable
   {u v fe v3 fe2 fe4 r fe5 check fe6 fe7 r_prime r1 r_neg r2 :
-    backend.serial.u64.field.FieldElement51}
+    field.FieldElement51}
   {r_is_negative : subtle.Choice}
 
 /-- Solves the branch where `check = -u`, so `r_prime` is the square root candidate. -/
@@ -753,7 +760,7 @@ private theorem solve_first_choice_true
     (r1_post : ∀ i < 5, r1[i]! = r_prime[i]!)
     (r_prime_post2 : ∀ i < 5, r_prime[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.one := by
@@ -832,7 +839,7 @@ private theorem solve_second_choice_true_choice3_true
       Field51_as_Nat SQRT_M1_val * Field51_as_Nat r [MOD p])
     (r1_post : ∀ i < 5, r1[i]! = r_prime[i]!)
     (r_prime_post2 : ∀ i < 5, r_prime[i]!.val < 2 ^ 52)
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.one := by
@@ -905,7 +912,7 @@ private theorem solve_second_choice_true_choice3_false
     (r1_post : ∀ i < 5, r1[i]! = r_prime[i]!)
     (r_prime_post2 : ∀ i < 5, r_prime[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.zero := by
@@ -1020,7 +1027,7 @@ private theorem solve_second_choice_false_choice3_true
     (r1_post : ∀ i < 5, r1[i]! = r[i]!)
     (r_post2 : ∀ i < 5, r[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.one := by
@@ -1086,8 +1093,8 @@ private theorem solve_second_choice_false_choice3_true
 /-- Solves the nonsquare `r` branch where no matching signature is found for check. -/
 private theorem solve_second_choice_false_choice3_false
     (check_eq_v : Field51_as_Nat check ≡
-      Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
-        Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) [MOD p])
+      Field51_as_Nat u ^ (2 + pow_p58_exp * 2) *
+        Field51_as_Nat v ^ (14 * pow_p58_exp + 7) [MOD p])
     (check_eq_r_v : Field51_as_Nat check ≡
       Field51_as_Nat r ^ 2 * Field51_as_Nat v [MOD p])
     (u_m : Field51_as_Nat u ≡
@@ -1100,7 +1107,7 @@ private theorem solve_second_choice_false_choice3_false
     (r1_post : ∀ i < 5, r1[i]! = r[i]!)
     (r_post2 : ∀ i < 5, r[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1)
     (h_check_ne_u : ¬(check.to_bytes = u.to_bytes))
@@ -1114,13 +1121,15 @@ private theorem solve_second_choice_false_choice3_false
   · intro hu; exfalso
     rw [← modEq_zero_iff] at hu
     have := check_eq_v.trans
-      ((hu.pow (2 + (2 ^ 252 - 3) * 2)).mul_right
-       (Field51_as_Nat v ^ (7 * 2 ^ 253 - 35)))
+      ((hu.pow (2 + pow_p58_exp * 2)).mul_right
+       (Field51_as_Nat v ^ (14 * pow_p58_exp + 7)))
+    rw [pow_p58_exp_def] at this
     simp only [Nat.reducePow, Nat.reduceSub, Nat.reduceMul, Nat.reduceAdd, ne_eq,
       OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_mul] at this
     rw [modEq_zero_iff] at hu this
+    have hcheck0 : Field51_as_Nat check % p = 0 := this
     exact h_check_ne_u
-      ((to_bytes_zero_of_Field51_as_Nat_zero this).trans
+      ((to_bytes_zero_of_Field51_as_Nat_zero hcheck0).trans
        (to_bytes_zero_of_Field51_as_Nat_zero hu).symm)
   · intro ⟨hu, hv⟩
     rw [← modEq_zero_iff] at hv
@@ -1153,13 +1162,16 @@ private theorem solve_second_choice_false_choice3_false
   · intro ⟨hu, hv, xx, hxx⟩; exfalso
     simp only [Nat.mul_mod_mod] at hxx
     rw [← Nat.ModEq] at hxx
-    have p_eq : 2 + (2 ^ 252 - 3) * 2 + (7 * 2 ^ 253 - 35) =
-        (p - 1) * 2 + 1 := by unfold p; simp
-    have p_eq1 : 2 * (2 + (2 ^ 252 - 3) * 2) =
-        (p - 1) / 2 + 2 := by unfold p; omega
+    have p_eq : (2 + pow_p58_exp * 2) + (14 * pow_p58_exp + 7) =
+        (p - 1) * 2 + 1 := by
+      rw [pow_p58_exp_def]
+      unfold p; simp [Nat.reducePow]
+    have p_eq1 : 2 * (2 + pow_p58_exp * 2) =
+        (p - 1) / 2 + 2 := by
+      rw [pow_p58_exp_def]; unfold p; omega
     have xx_check :=
-      ((hxx.pow (2 + (2 ^ 252 - 3) * 2)).mul_right
-        (Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))).trans
+      ((hxx.pow (2 + pow_p58_exp * 2)).mul_right
+        (Field51_as_Nat v ^ (14 * pow_p58_exp + 7))).trans
       check_eq_v.symm
     rw [mul_pow, mul_assoc, ← pow_add, p_eq,
       ← pow_mul, p_eq1, pow_add] at xx_check
@@ -1232,11 +1244,11 @@ private theorem solve_second_choice_false_choice3_false
       rw [← Nat.ModEq]
       have eq_check :=
         (check_eq_v.symm.trans check_eq_r_v).symm
-      have : 2 + (2 ^ 252 - 3) * 2 = (p - 1) / 4 + 1 := by
-        unfold p; omega
+      have : (2 + pow_p58_exp * 2) = (p - 1) / 4 + 1 := by
+        rw [pow_p58_exp_def]; unfold p; omega
       rw [this, pow_add] at eq_check
-      have : 7 * 2 ^ 253 - 35 = 7 * ((p - 1) / 4) := by
-        unfold p; omega
+      have : (14 * pow_p58_exp + 7) = 7 * ((p - 1) / 4) := by
+        rw [pow_p58_exp_def]; unfold p; omega
       rw [this] at eq_check
       simp only [pow_mul, mul_assoc, pow_one] at eq_check
       rw [mul_comm (Field51_as_Nat u) ((Field51_as_Nat v ^ 7) ^ ((p - 1) / 4))] at eq_check
@@ -1261,7 +1273,7 @@ private theorem solve_second_choice_false_choice3_false
           have := eq_check.trans this
           simp only at this
           have r2_eq_sq := conditional_negate_sq r1 r_neg r2 r_is_negative
-            (by simpa [r1_eq_r] using r_neg_post1) r2_post
+            (by simpa only [r1_eq_r] using r_neg_post1) r2_post
           rw [r1_eq_r] at r2_eq_sq
           exact (r2_eq_sq.mul_right (Field51_as_Nat v)).trans this
         · rcases h with h | h
@@ -1316,25 +1328,15 @@ private theorem solve_second_choice_false_choice3_false
 
 end sqrt_ratio_i_branch_solvers
 
-set_option maxHeartbeats 400000 in -- the proof works even with 230k heartbeats, but not much less.
-/-- Spec for `FieldElement51::sqrt_ratio_i`: computes a nonnegative square root of u/v or
-i*u/v (where i = sqrt(-1) = SQRT_M1), returning a flag indicating which case occurred.
+attribute [local irreducible] p
 
-Returns `(Choice(1), +sqrt(u/v))` if u/v is square, `(Choice(1), 0)` if u=0,
-`(Choice(0), 0)` if v=0 and u≠0, `(Choice(0), +sqrt(i*u/v))` if u/v is nonsquare.
-
-Postconditions (4 mutually exclusive cases + non-negativity):
-1. u ≡ 0 → c=1, r≡0
-2. u≢0, v≡0 → c=0, r≡0
-3. u≢0, v≢0, ∃x, x²v≡u → c=1, r²v≡u
-4. u≢0, v≢0, ¬∃x, x²v≡u → c=0, r²v≡SQRT_M1·u
-5. r is non-negative (r % p % 2 = 0)
--/
-theorem sqrt_ratio_i_spec'
-    (u : backend.serial.u64.field.FieldElement51)
-    (v : backend.serial.u64.field.FieldElement51)
-    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)
-    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :
+set_option maxHeartbeats 400000 in -- this proof even works with 230k heartbeats, but not much less.
+/-- Existential-form helper used internally to derive `sqrt_ratio_i_spec`. -/
+private theorem sqrt_ratio_i_spec'
+    (u : field.FieldElement51)
+    (v : field.FieldElement51)
+    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val < 2 ^ 54)
+    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val < 2 ^ 54) :
     ∃ c, sqrt_ratio_i u v = ok c ∧
     let u_nat := Field51_as_Nat u % p
     let v_nat := Field51_as_Nat v % p
@@ -1343,19 +1345,19 @@ theorem sqrt_ratio_i_spec'
     -- Case 1: u is zero
     (u_nat = 0 →
     c.1.val = 1#u8 ∧ r_nat = 0 ∧
-    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧
+    (∀ i < 5, c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧
     -- Case 2: u is nonzero and v is zero
     (u_nat ≠ 0 ∧ v_nat = 0 →
     c.1.val = 0#u8 ∧ r_nat = 0 ∧
-    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧
+    (∀ i < 5, c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧
     -- Case 3: u and v are nonzero and u/v is a square
-    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →
+    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x ^ 2 * v_nat) % p = u_nat) →
     c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat ∧
-    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧
+    (∀ i < 5, c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧
     -- Case 4: u and v are nonzero and u/v is not a square
-    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →
-    c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p ∧
-    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧
+    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x ^ 2 * v_nat) % p = u_nat)) →
+    c.1.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = (i_nat * u_nat) % p ∧
+    (∀ i < 5, c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧
     -- Non-negativity of the result
     (r_nat % 2 = 0)
     := by
@@ -1380,11 +1382,13 @@ theorem sqrt_ratio_i_spec'
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
   let* ⟨ i, i_post1, i_post2, i_post3 ⟩ ← constants.SQRT_M1_spec
   let* ⟨ correct_sign_sqrt, correct_sign_sqrt_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
-  let* ⟨ fe6, fe6_post1, fe6_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+  let* ⟨ fe6, fe6_post1, fe6_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
   let* ⟨ flipped_sign_sqrt, flipped_sign_sqrt_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
   let* ⟨ fe7, fe7_post1, fe7_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
-  let* ⟨ flipped_sign_sqrt_i, flipped_sign_sqrt_i_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
+  let* ⟨ flipped_sign_sqrt_i, flipped_sign_sqrt_i_post ⟩ ←
+    Insts.SubtleConstantTimeEq.ct_eq_spec
   let* ⟨ r_prime, r_prime_post1, r_prime_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
   -- Bridge: i = SQRT_M1_raw, fold back to SQRT_M1_val
@@ -1399,15 +1403,16 @@ theorem sqrt_ratio_i_spec'
       r_prime_post1 check_post1 fe5_post1 r_post1 fe4_post1 fe3_post1 fe2_post1
       v7_post1 fe1_post1 v3_post1 fe_post1
   have u_m := nat_sqrt_m1_sq_of_add_modeq_zero fe6_post1
-  have check_eq_r_v:= check_post1.trans (fe5_post1.mul_left (Field51_as_Nat v))
-  rw[mul_comm] at check_eq_r_v
+  have check_eq_r_v := check_post1.trans (fe5_post1.mul_left (Field51_as_Nat v))
+  rw [mul_comm] at check_eq_r_v
   by_cases first_choice :  flipped_sign_sqrt.val = 1#u8
   · simp only [show flipped_sign_sqrt.val = 1#u8 ∨ flipped_sign_sqrt_i.val = 1#u8 from
         Or.inl first_choice, show correct_sign_sqrt.val = 1#u8 ∨ flipped_sign_sqrt.val = 1#u8 from
         Or.inr first_choice, if_true, bind_tc_ok]
     let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
     let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
-    let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+    let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ←
+      Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
     · intro i hi
       simp only [Choice.one, ↓reduceIte] at r1_post
       rw [r1_post i hi]
@@ -1432,7 +1437,8 @@ theorem sqrt_ratio_i_spec'
       simp only [first_choice, false_or, or_false, if_pos second_choice, bind_tc_ok]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
-      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ←
+        Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
       · intro i hi
         simp only [Choice.one, ↓reduceIte] at r1_post
         rw [r1_post i hi]
@@ -1494,7 +1500,8 @@ theorem sqrt_ratio_i_spec'
       simp only [if_neg second_choice, first_choice, false_or, or_false, bind_tc_ok]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
-      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ←
+        Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
       · intro i hi
         have h01 : ¬(0#u8 = 1#u8) := by decide
         simp only [Choice.zero, h01, ite_false] at r1_post
@@ -1532,29 +1539,37 @@ theorem sqrt_ratio_i_spec'
               r2_post r_is_negative_post
               h_check_ne_u h_check_ne_fe6 h_check_ne_fe7
 
-
+/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::sqrt_ratio_i`**
+• The function succeeds (no panic) for limb-bounded inputs `u, v` with limbs `< 2^54`
+• Output limbs are bounded by `2^53 - 1`
+• The result `r` is non-negative (`r_nat % 2 = 0`)
+• If `u ≡ 0 (mod p)`, then `c.1 = 1` and `r ≡ 0 (mod p)`
+• If `u ≢ 0` and `v ≡ 0 (mod p)`, then `c.1 = 0` and `r ≡ 0 (mod p)`
+• If `u ≢ 0`, `v ≢ 0`, and `u/v` is a square, then `c.1 = 1` and `r^2 * v ≡ u (mod p)`
+• If `u ≢ 0`, `v ≢ 0`, and `u/v` is not a square, then `c.1 = 0` and
+  `r^2 * v ≡ SQRT_M1 * u (mod p)`
+-/
 @[step]
 theorem sqrt_ratio_i_spec
-    (u : backend.serial.u64.field.FieldElement51)
-    (v : backend.serial.u64.field.FieldElement51)
-    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)
-    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :
-    sqrt_ratio_i u v ⦃ c =>
-    let u_nat := Field51_as_Nat u % p
-    let v_nat := Field51_as_Nat v % p
-    let r_nat := Field51_as_Nat c.2 % p
-    let i_nat := Field51_as_Nat SQRT_M1_val % p
-    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1) ∧
-    (r_nat % 2 = 0) ∧
-    (u_nat = 0 →
-      c.1.val = 1#u8 ∧ r_nat = 0) ∧
-    (u_nat ≠ 0 ∧ v_nat = 0 →
-      c.1.val = 0#u8 ∧ r_nat = 0) ∧
-    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →
-      c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧
-    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →
-      c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p)
-    ⦄ := by
+    (u : field.FieldElement51)
+    (v : field.FieldElement51)
+    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val < 2 ^ 54)
+    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val < 2 ^ 54) :
+    sqrt_ratio_i u v ⦃ (result : subtle.Choice × field.FieldElement51) =>
+      let u_nat := Field51_as_Nat u % p
+      let v_nat := Field51_as_Nat v % p
+      let r_nat := Field51_as_Nat result.2 % p
+      let i_nat := Field51_as_Nat SQRT_M1_val % p
+      (∀ i < 5, result.2[i]!.val ≤ 2 ^ 53 - 1) ∧
+      (r_nat % 2 = 0) ∧
+      (u_nat = 0 →
+        result.1.val = 1#u8 ∧ r_nat = 0) ∧
+      (u_nat ≠ 0 ∧ v_nat = 0 →
+        result.1.val = 0#u8 ∧ r_nat = 0) ∧
+      (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x ^ 2 * v_nat) % p = u_nat) →
+        result.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧
+      (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x ^ 2 * v_nat) % p = u_nat)) →
+        result.1.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = (i_nat * u_nat) % p) ⦄ := by
   have ⟨c, h_ok, h1, h2, h3, h4, h_nonneg⟩ := sqrt_ratio_i_spec' u v h_u_bounds h_v_bounds
   exact exists_imp_spec ⟨c, h_ok, by
     refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
@@ -1575,6 +1590,7 @@ theorem sqrt_ratio_i_spec
     · -- Case 3
       intro ⟨hu, hv, hqr⟩; exact ⟨(h3 ⟨hu, hv, hqr⟩).1, (h3 ⟨hu, hv, hqr⟩).2.1⟩
     · -- Case 4
-      intro ⟨hu, hv, hnqr⟩; exact ⟨(h4 ⟨hu, hv, hnqr⟩).1, (h4 ⟨hu, hv, hnqr⟩).2.1⟩⟩
+      intro ⟨hu, hv, hnqr⟩
+      exact ⟨(h4 ⟨hu, hv, hnqr⟩).1, (h4 ⟨hu, hv, hnqr⟩).2.1⟩⟩
 
 end curve25519_dalek.field.FieldElement51

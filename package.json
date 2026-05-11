@@ -8,7 +8,8 @@
     "docs:build": "vitepress build site",
     "docs:preview": "vitepress preview site",
     "docs:rust": "bash scripts/build-rust-docs.sh",
-    "src-diff": "node scripts/src-diff.js"
+    "src-diff": "node scripts/src-diff.js",
+    "warning-diff": "node scripts/warning-diff.js"
   },
   "devDependencies": {
     "@types/cytoscape-dagre": "^2.3.4",

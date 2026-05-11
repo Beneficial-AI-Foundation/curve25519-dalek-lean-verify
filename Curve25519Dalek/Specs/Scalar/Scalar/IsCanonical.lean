@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander, Liao Zhang
 -/
@@ -9,33 +9,21 @@ import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Scalar.Scalar.Reduce
 import Curve25519Dalek.Specs.Scalar.Scalar.CtEq
 
-/-! # Spec Theorem for `Scalar::is_canonical`
+/-!
+# Spec theorem for `curve25519_dalek::scalar::Scalar::is_canonical`
 
-Specification and proof for `Scalar::is_canonical`.
+Returns `True` if the input scalar `s` is the canonical representative modulo ℓ
+within the scalar field (i.e., s ∈ {0, …, ℓ − 1}), and `False` otherwise.
 
-This function checks if the representation is canonical.
-
-**Source**: curve25519-dalek/src/scalar.rs
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
-open Aeneas Aeneas.Std Aeneas.Std.WP Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.scalar.Scalar
 
-/-
-natural language description:
-
-    • Returns True if the input Scalar s is the canonical
-      representative modulo \ell within the scalar field, i.e.,
-      if s \in \{0,…, \ell – 1\}, else returns False.
-
-natural language specs:
-
-    • scalar_to_nat(s) \in \{0,…, \ell - 1 \} \iff Return value = True
--/
-
-/-- **Spec and proof concerning `scalar.Scalar.is_canonical`**:
-- No panic (always returns successfully)
-- Returns Choice.one if and only if the scalar's bytes represent a value less than L (the group order)
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::is_canonical`**
+• No panic (always returns successfully)
+• Returns `Choice.one` if and only if the bytes of `s` represent a value less than `L` (group order)
 -/
 @[step]
 theorem is_canonical_spec (s : Scalar) :
@@ -47,7 +35,8 @@ theorem is_canonical_spec (s : Scalar) :
   · grind
   · intro h
     rename_i s' _
-    have bytes_eq : U8x32_as_Nat s.bytes = U8x32_as_Nat s'.bytes := Nat.ModEq.eq_of_lt_of_lt s_post1 s_post2 h
+    have bytes_eq : U8x32_as_Nat s.bytes = U8x32_as_Nat s'.bytes :=
+        Nat.ModEq.eq_of_lt_of_lt s_post1 s_post2 h
     rw [c_post]
     apply U8x32_as_Nat_injective
     symm

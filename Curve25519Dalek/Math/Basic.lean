@@ -82,6 +82,15 @@ def U8x32_as_Field (bytes : Array U8 32#usize) : ZMod (2^255 - 19) :=
 def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
   ∑ i ∈ Finset.range 64, 2^(8 * i) * (bytes[i]!).val
 
+/-- Interpret a 4-element `u64` array as a 256-bit natural number in
+    little-endian limb order. -/
+def X64_as_Nat (limbs : Array U64 4#usize) : ℕ :=
+  ∑ i ∈ Finset.range 4, 2 ^ (64 * i) * (limbs[i]!).val
+
+/-- Interpret a 64-element `i8` array as a signed integer in base `2^w`. -/
+def I8x64_as_Radix2w (w : ℕ) (digits : Array I8 64#usize) : ℤ :=
+  ∑ i ∈ Finset.range 64, (2 ^ w : ℤ) ^ i * (digits[i]!).val
+
 /-! ## Basic properties of the defined quantities -/
 
 theorem L_lt : L < 2 ^ 260 := by
@@ -131,25 +140,12 @@ theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : Cu
 
 end Edwards
 
-/-! ## Field Element Conversions -/
-
-namespace Edwards
-
-open curve25519_dalek.backend.serial.u64.field ZMod
-
-/-- Convert the 5-limb array to a field element in ZMod p. -/
-def field_from_limbs (fe : FieldElement51) : CurveField :=
-  (Field51_as_Nat fe : CurveField)
-
-end Edwards
-
 /-! ## FieldElement51 Validity and Casting -/
 
 namespace curve25519_dalek.backend.serial.u64.field
 open Edwards
 
-/-- Convert a FieldElement51 to the mathematical field element in ZMod p.
-    This is the same as `field_from_limbs` but with dot notation support. -/
+/-- Convert a FieldElement51 to the mathematical field element in ZMod p. -/
 def FieldElement51.toField (fe : FieldElement51) : CurveField :=
   (Field51_as_Nat fe : CurveField)
 
@@ -169,6 +165,14 @@ def FieldElement51.IsValid (fe : FieldElement51) : Prop := ∀ i < 5, fe[i]!.val
 
 instance FieldElement51.instDecidableIsValid (fe : FieldElement51) : Decidable fe.IsValid :=
   show Decidable (∀ i < 5, fe[i]!.val < 2^54) from inferInstance
+
+/-- Lift a tighter limb bound (`< 2^k` for any `k ≤ 54`) to `FieldElement51.IsValid`.
+Eliminates the repeated `Nat.lt_trans (h i hi) (by norm_num : 2^k < 2^54)` boilerplate
+that appears across the Double / Add / Sub specs. -/
+lemma FieldElement51.IsValid_of_lt_pow
+    {fe : FieldElement51} {k : ℕ}
+    (h : ∀ i < 5, fe[i]!.val < 2 ^ k) (hk : k ≤ 54) : fe.IsValid :=
+  fun i hi => Nat.lt_of_lt_of_le (h i hi) (Nat.pow_le_pow_right (by decide) hk)
 
 end curve25519_dalek.backend.serial.u64.field
 

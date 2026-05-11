@@ -699,11 +699,30 @@ def U8.Insts.SubtleConditionallySelectable.conditional_swap
 /- [zeroize::{zeroize::Zeroize for alloc::vec::Vec<Z>}::zeroize]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/
    zeroize-1.8.2/src/lib.rs', lines 551:4-551:25
-   Name pattern: [zeroize::{zeroize::Zeroize<alloc::vec::Vec<@Z>>}::zeroize] -/
+   Name pattern: [zeroize::{zeroize::Zeroize<alloc::vec::Vec<@Z>>}::zeroize]
+
+   Zeroizes all elements, clears the Vec (length → 0), and zeros spare capacity.
+   Modeled as returning an empty Vec (Vec.new). -/
 @[rust_fun "zeroize::{zeroize::Zeroize<alloc::vec::Vec<@Z>>}::zeroize"]
-axiom alloc.vec.Vec.Insts.ZeroizeZeroize.zeroize
-  {Z : Type} (ZeroizeInst : zeroize.Zeroize Z) :
-  alloc.vec.Vec Z → Result (alloc.vec.Vec Z)
+def alloc.vec.Vec.Insts.ZeroizeZeroize.zeroize
+  {Z : Type} (_ZeroizeInst : zeroize.Zeroize Z) :
+  alloc.vec.Vec Z → Result (alloc.vec.Vec Z) :=
+  fun _ => ok ⟨[], by simp⟩
+
+/-- **Spec theorem for `alloc.vec.Vec.Insts.ZeroizeZeroize.zeroize`**:
+- No panic (always succeeds)
+- Returns an empty Vec (length = 0)
+- Models the Rust behavior of zeroizing elements, clearing, and zeroing spare capacity
+-/
+@[step]
+theorem alloc.vec.Vec.Insts.ZeroizeZeroize.zeroize_spec
+    {Z : Type} (ZeroizeInst : zeroize.Zeroize Z)
+    (v : alloc.vec.Vec Z) :
+    alloc.vec.Vec.Insts.ZeroizeZeroize.zeroize ZeroizeInst v ⦃
+      (res : alloc.vec.Vec Z) =>
+      res.length = 0 ⦄ := by
+  unfold alloc.vec.Vec.Insts.ZeroizeZeroize.zeroize
+  simp [spec_ok]
 
 /- [curve25519_dalek::backend::serial::curve_models::
    {core::cmp::PartialEq<
@@ -735,16 +754,84 @@ axiom backend.serial.u64.field.FieldElement51.Insts.CoreCmpEq.assert_receiver_is
 /- [curve25519_dalek::scalar::{core::cmp::PartialEq<
    curve25519_dalek::scalar::Scalar>
    for curve25519_dalek::scalar::Scalar}::ne]:
-   Source: 'curve25519-dalek/src/scalar.rs', lines 294:0-298:1 -/
-axiom scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne
-  : scalar.Scalar → scalar.Scalar → Result Bool
+   Source: 'curve25519-dalek/src/scalar.rs', lines 294:0-298:1
+   Implements the default `PartialEq::ne` by negating `eq`:
+     `ne(self, other) = !self.eq(other) = !ct_eq(self.bytes, other.bytes).into()`
+   The underlying Rust source (lines 294-298) defines `PartialEq` via `ct_eq`
+   and inherits the default `ne = !eq`. -/
+noncomputable def scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne
+  (self : scalar.Scalar) (other : scalar.Scalar) : Result Bool := do
+  let s ← lift (Array.to_slice self.bytes)
+  let s1 ← lift (Array.to_slice other.bytes)
+  let c ← Slice.Insts.SubtleConstantTimeEq.ct_eq
+    { ct_eq := U8.Insts.SubtleConstantTimeEq.ct_eq } s s1
+  let b ← Bool.Insts.CoreConvertFromChoice.from c
+  ok !b
+
+/-- **Spec theorem for `scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne`**:
+- No panic (always returns successfully)
+- Returns `true` if and only if the two Scalars have **different** byte representations,
+  i.e., `result = true ↔ self.bytes ≠ other.bytes`
+- Mirrors the default `PartialEq::ne` implementation: `ne = !eq = !ct_eq(...).into()`
+-/
+@[step]
+theorem scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne_spec
+    (self other : scalar.Scalar) :
+    scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne self other ⦃ (result : Bool) =>
+      result = true ↔ self.bytes ≠ other.bytes ⦄ := by
+  unfold scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne
+  step*
+  unfold Bool.Insts.CoreConvertFromChoice.from
+  simp only [spec, theta]
+  have key : decide (c.val = 1#u8) = true ↔ c = Choice.one := by
+    cases c with | mk val valid => simp [Choice.one]
+  constructor
+  · -- Forward: `!decide (c.val = 1#u8) = true → self.bytes ≠ other.bytes`
+    intro h
+    simp only at h   -- h : decide (c.val = 1#u8) = false
+    intro heq                           -- heq : self.bytes = other.bytes
+    -- Bridge slice equality from array equality, then derive contradiction
+    have hs : s = s1 := by grind [Subtype.ext]
+    have hc : c = Choice.one := c_post.mpr hs
+    have hd : decide (c.val = 1#u8) = true := key.mpr hc
+    rw [hd] at h                        -- h : true = false: contradiction
+    exact absurd h (by decide)
+  · -- Backward: `self.bytes ≠ other.bytes → !decide (c.val = 1#u8) = true`
+    intro hne
+    simp only [Bool.not_eq_eq_eq_not, Bool.not_true, decide_eq_false_iff_not, UScalar.neq_to_neq_val,
+    UScalar.ofNatCore_val_eq]        -- goal: decide (c.val = 1#u8) = false
+    cases h_d : decide (c.val = 1#u8) with
+    | false => grind
+    | true =>
+      exfalso
+      apply hne
+      have hc : c = Choice.one := key.mp h_d
+      have hs : s = s1 := c_post.mp hc
+      grind [Subtype.ext]
 
 /- [curve25519_dalek::scalar::{core::cmp::Eq
    for curve25519_dalek::scalar::Scalar}
    ::assert_receiver_is_total_eq]:
-   Source: 'curve25519-dalek/src/scalar.rs', lines 293:0-293:21 -/
-axiom scalar.Scalar.Insts.CoreCmpEq.assert_receiver_is_total_eq
-  : scalar.Scalar → Result Unit
+   Source: 'curve25519-dalek/src/scalar.rs', lines 293:0-293:21
+
+   Marker method required by the Eq trait to assert that the type has total equality.
+   This is a no-op for Scalar, always returning Unit. -/
+def scalar.Scalar.Insts.CoreCmpEq.assert_receiver_is_total_eq
+  (_self : scalar.Scalar) : Result Unit :=
+  ok ()
+
+/-- **Spec theorem for `scalar.Scalar.Insts.CoreCmpEq.assert_receiver_is_total_eq`**:
+- No panic (always succeeds)
+- Always returns ok ()
+- Marker method required by the Eq trait to assert total equality
+-/
+@[step]
+theorem scalar.Scalar.Insts.CoreCmpEq.assert_receiver_is_total_eq_spec
+    (self : scalar.Scalar) :
+    scalar.Scalar.Insts.CoreCmpEq.assert_receiver_is_total_eq
+      self ⦃ (_ : Unit) => True ⦄ := by
+  unfold scalar.Scalar.Insts.CoreCmpEq.assert_receiver_is_total_eq
+  simp [spec_ok]
 
 /- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_select]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/

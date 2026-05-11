@@ -1,51 +1,36 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
+
 /-!
-# Spec Theorem for `FieldElement51::is_negative`
+# Spec theorem for `curve25519_dalek::field::FieldElement51::is_negative`
 
-Specification and proof for `FieldElement51::is_negative`.
-
-This function checks whether a field element is "negative" in the sense used by
+For a field element `r` in 𝔽_p, represented in radix 2^51 (five `u64` limbs),
+this function checks whether `r` is "negative" in the sense used by
 curve25519-dalek, namely whether the least significant bit of its canonical
 little-endian encoding is set. Concretely, it returns the LSB of the first byte
-of `to_bytes(self)` as a `subtle.Choice`.
+of `to_bytes(self)` as a `subtle.Choice` (0 = even, 1 = odd).
 
 Mathematically, this corresponds to the parity of the canonical representative
 of the residue modulo `p = 2^255 - 19`.
 
-**Source**: curve25519-dalek/src/field.rs
+Source: "curve25519-dalek/src/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-namespace curve25519_dalek.field.FieldElement51
 
-/-!
-Natural language description:
-
-- For a field element `r` in 𝔽_p, represented in radix 2^51 (five u64 limbs),
-  compute the least significant bit of its canonical encoding
-  (equivalently, the parity of `Field51_as_Nat(r) % p`).
-- Returns a `subtle.Choice` (0 = even, 1 = odd).
-
-Spec:
-
-- Function succeeds (no panic).
-- For any field element `r`, the result `c` satisfies
-  `c.val = 1 ↔ (Field51_as_Nat(r) % p) % 2 = 1`.
--/
-
-/-- **Spec and proof concerning `FieldElement51.is_negative`.** -/
-theorem first_bit (bytes : Aeneas.Std.Array U8 32#usize) :
-    U8x32_as_Nat bytes  % 2 = (bytes.val[0]).val %2 := by
-  rw[← Nat.ModEq]
+/-- The parity of `U8x32_as_Nat bytes` equals the parity of its zeroth byte's value. -/
+theorem U8x32_as_Nat_mod_two_eq_zeroth_byte_val_mod_two
+    (bytes : Array U8 32#usize) :
+    U8x32_as_Nat bytes % 2 = (bytes.val[0]).val % 2 := by
+  rw [← Nat.ModEq]
   apply Nat.ModEq.symm
-  rw[Nat.modEq_iff_dvd]
+  rw [Nat.modEq_iff_dvd]
   unfold U8x32_as_Nat
   simp only [Nat.cast_ofNat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
     Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
@@ -54,10 +39,17 @@ theorem first_bit (bytes : Aeneas.Std.Array U8 32#usize) :
     Nat.cast_add, Nat.cast_mul]
   scalar_tac
 
+namespace curve25519_dalek.field.FieldElement51
+
+/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::is_negative`**
+• The function always succeeds (no panic).
+• The result `c` satisfies `c.val = 1` iff the canonical representative of the
+  field element modulo `p = 2^255 - 19` is odd.
+-/
 @[step]
-theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
-    is_negative r ⦃ c =>
-    (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1) ⦄ := by
+theorem is_negative_spec (self : backend.serial.u64.field.FieldElement51) :
+    is_negative self ⦃ (c : subtle.Choice) =>
+      (c.val = 1#u8 ↔ (Field51_as_Nat self % p) % 2 = 1) ⦄ := by
   unfold is_negative
   step as ⟨bytes, h_mod, h_lt⟩
   step as ⟨b0⟩
@@ -82,7 +74,7 @@ theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
     rw [Nat.ModEq] at h_mod
     rw [← h_mod]
     have := Nat.mod_eq_of_lt h_lt
-    simp only [this, first_bit]
+    simp only [this, U8x32_as_Nat_mod_two_eq_zeroth_byte_val_mod_two]
     exact h_i1
   · step*
     simp_all only [UScalar.ofNatCore_val_eq, ReduceNat.reduceNatEq, U8.ofNat_bv,
@@ -92,7 +84,7 @@ theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
     rw [Nat.ModEq] at h_mod
     rw [← h_mod]
     have := Nat.mod_eq_of_lt h_lt
-    simp only [this, first_bit]
+    simp only [this, U8x32_as_Nat_mod_two_eq_zeroth_byte_val_mod_two]
     exact h_i1
 
 end curve25519_dalek.field.FieldElement51

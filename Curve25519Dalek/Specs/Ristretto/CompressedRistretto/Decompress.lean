@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -9,23 +9,19 @@ import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Step1
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Step2
 
-/-! # Spec Theorem for `CompressedRistretto::decompress`
+/-!
+# Spec theorem for `curve25519_dalek::ristretto::CompressedRistretto::decompress`
 
-Specification and proof for `CompressedRistretto::decompress`.
+Implements the Ristretto DECODE function (see §4.3.1 of
+draft-irtf-cfrg-ristretto255-decaf448-08). Takes a `CompressedRistretto`
+(a 32-byte array) and attempts to decode it back to a `RistrettoPoint`,
+returning `none` if the input is not a valid canonical encoding.
 
-This function implements the Ristretto decompression (DECODE) function, which attempts to
-decode a (valid) 32-byte representation back to a RistrettoPoint. The function is defined in the
-
-- [Ristretto specification](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.1).
-
-It takes a CompressedRistretto (a 32-byte array) and attempts to produce the associated RistrettoPoint,
-returning None if the input byte array is not a valid canonical encoding.
-
-**Source**: curve25519-dalek/src/ristretto.rs
+Source: "curve25519-dalek/src/ristretto.rs"
 -/
 
-open Aeneas Aeneas.Std Result Edwards Aeneas.Std.WP
-open curve25519_dalek.ristretto
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open Edwards curve25519_dalek.ristretto
 namespace curve25519_dalek.ristretto.CompressedRistretto
 
 /-- When `decompress_step1` returns `some val`, `val` equals the field element `s.toField`
@@ -43,21 +39,21 @@ private lemma decompress_step1_val_eq (c : CompressedRistretto)
   rw [Option.some.injEq] at h
   rw [← h, hs, Nat.mod_eq_of_lt h_lt_255]
 
-/-- **Spec and proof concerning `ristretto.CompressedRistretto.decompress`**:
-- The function always succeeds for all U8x32 input arrays (no panic)
-- If the input is not valid, then the output is none
-- If the input is valid, then the output is a valid Ristretto point that reflects the
+/-- **Spec theorem for `curve25519_dalek::ristretto::CompressedRistretto::decompress`**
+• The function always succeeds for all U8x32 input arrays (no panic)
+• If the input is not valid, then the output is none
+• If the input is valid, then the output is a valid Ristretto point that reflects the
   output of the pure mathematical decompression function
 -/
 @[step]
-theorem decompress_spec (comp : CompressedRistretto) :
-    decompress comp ⦃ result =>
-    (¬comp.IsValid → result = none) ∧
-    (comp.IsValid →
-        ∃ rist,
-        result = some rist ∧
-        RistrettoPoint.IsValid rist ∧
-        decompress_pure comp = some rist.toPoint) ⦄ := by
+theorem decompress_spec (self : CompressedRistretto) :
+    decompress self ⦃ (result : Option RistrettoPoint) =>
+      (¬self.IsValid → result = none) ∧
+      (self.IsValid →
+          ∃ rist,
+          result = some rist ∧
+          RistrettoPoint.IsValid rist ∧
+          decompress_pure self = some rist.toPoint) ⦄ := by
   unfold decompress
   step as ⟨step1, h1⟩
   obtain ⟨h_tight, h_valid, h_field, h_enc, h_neg_iff, h_bridge⟩ := h1
@@ -69,12 +65,12 @@ theorem decompress_spec (comp : CompressedRistretto) :
     Bool.Insts.CoreConvertFromChoice.from]
   -- Helper: derive decompress_step1 = none from flag failure
   have h_step1_none : ¬(step1.1.val = 1#u8 ∧ step1.2.1.val = 0#u8) →
-      decompress_step1 comp = none := by
+      decompress_step1 self = none := by
     intro h_fail
-    rcases h_opt : decompress_step1 comp with _ | val
+    rcases h_opt : decompress_step1 self with _ | val
     · rfl
     · exfalso
-      rw [decompress_step1_val_eq comp step1.2.2 h_field h_opt] at h_opt
+      rw [decompress_step1_val_eq self step1.2.2 h_field h_opt] at h_opt
       exact h_fail (h_bridge.mp h_opt)
   -- Case split on s_encoding_is_canonical
   by_cases h_canon : step1.1.val = 1#u8
@@ -86,7 +82,8 @@ theorem decompress_spec (comp : CompressedRistretto) :
         decide_eq_true_eq]
       · simp only [decompress_pure, h_step1_none (by simp only [h_s_neg, Nat.not_eq,
         UScalar.ofNatCore_val_eq, ne_eq, one_ne_zero, not_false_eq_true, zero_ne_one, not_lt_zero,
-        zero_lt_one, or_true, or_self, UScalar.val_not_eq_imp_not_eq, and_false]), Option.bind_none,
+        zero_lt_one, or_true, or_self, UScalar.val_not_eq_imp_not_eq, and_false]),
+        Option.bind_none,
         reduceCtorEq] at h
     · -- Non-negative s: proceed to step_2
       have h_s_neg_zero : step1.2.1.val = 0#u8 := by
@@ -103,7 +100,7 @@ theorem decompress_spec (comp : CompressedRistretto) :
         h_step2_bridge, h_step2_valid⟩ :=
         spec_imp_exists (decompress.step_2_spec step1.2.2 h_s_bounds)
       -- Compose step1 + step2 into decompress_pure
-      have h_ds1 : decompress_step1 comp = some step1.2.2.toField :=
+      have h_ds1 : decompress_step1 self = some step1.2.2.toField :=
         h_bridge.mpr ⟨h_canon, h_s_neg_zero⟩
       -- Helper: derive decompress_step2 = none from step2 flag failure
       have h_step2_none : ¬(ok1.val = 1#u8 ∧ t_neg.val = 0#u8 ∧ y_zero.val = 0#u8) →
@@ -124,10 +121,10 @@ theorem decompress_spec (comp : CompressedRistretto) :
         · -- t_is_negative: return none
           simp only [h_t_neg]
           exact ⟨none, rfl, fun _ => rfl, fun ⟨_, h⟩ => by
-            simp only [decompress_pure, h_ds1, Option.bind_some, h_step2_none (by simp only [h_t_neg,
-              Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, one_ne_zero, not_false_eq_true, zero_ne_one,
-              not_lt_zero, zero_lt_one, or_true, or_self, UScalar.val_not_eq_imp_not_eq, false_and,
-              and_false]),
+            simp only [decompress_pure, h_ds1, Option.bind_some,
+              h_step2_none (by simp only [h_t_neg, Nat.not_eq, UScalar.ofNatCore_val_eq,
+              ne_eq, one_ne_zero, not_false_eq_true, zero_ne_one, not_lt_zero, zero_lt_one,
+              or_true, or_self, UScalar.val_not_eq_imp_not_eq, false_and, and_false]),
               reduceCtorEq] at h⟩
         · by_cases h_y_zero : y_zero.val = 1#u8
           · -- y_is_zero: return none

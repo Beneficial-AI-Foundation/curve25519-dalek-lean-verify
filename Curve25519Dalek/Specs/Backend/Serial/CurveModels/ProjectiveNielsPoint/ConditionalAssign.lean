@@ -5,6 +5,8 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Edwards.Representation
+import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
 /-!
 # Spec theorem for `ProjectiveNielsPoint::conditional_assign`
@@ -76,5 +78,53 @@ theorem conditional_assign_spec
   step*
   -- grind closes the remaining four conditional-equality goals after step*
   grind
+
+/-- **Point-level wrapper for `ProjectiveNielsPoint::conditional_assign`**:
+Given valid `self` and `other` and a `Choice`, the output is a valid `ProjectiveNielsPoint`
+whose `toPoint` equals `other.toPoint` if `choice.val = 1#u8`, otherwise `self.toPoint`.
+
+Derived from the Field51-level `conditional_assign_spec` by lifting per-limb val equality
+to term equality via `UScalar.eq_of_val_eq` + `fe_eq_of_limbs`, then case-splitting on
+the `Choice`'s `valid` field. -/
+@[step]
+theorem conditional_assign_point
+    (self other : ProjectiveNielsPoint)
+    (h_self : self.IsValid) (h_other : other.IsValid)
+    (choice : subtle.Choice) :
+    conditional_assign self other choice ⦃ (result : ProjectiveNielsPoint) =>
+      result.IsValid ∧
+      result.toPoint = (if choice.val = 1#u8 then other.toPoint else self.toPoint) ⦄ := by
+  let* ⟨ r, r_post1, r_post2, r_post3, r_post4 ⟩ ← conditional_assign_spec
+  -- Case-split on the Choice's `valid` field: choice.val ∈ {0#u8, 1#u8}.
+  rcases choice.valid with hc0 | hc1
+  · -- choice.val = 0#u8 → result = self.
+    have hne : ¬ (choice.val = 1#u8) := by rw [hc0]; decide
+    simp only [hne, if_false] at r_post1 r_post2 r_post3 r_post4 ⊢
+    have h_ypx : r.Y_plus_X = self.Y_plus_X := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post1 i hi))
+    have h_ymx : r.Y_minus_X = self.Y_minus_X := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post2 i hi))
+    have h_z : r.Z = self.Z := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post3 i hi))
+    have h_t2d : r.T2d = self.T2d := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post4 i hi))
+    have hr_eq : r = self := by
+      cases r; cases self; simp_all
+    rw [hr_eq]
+    exact ⟨h_self, rfl⟩
+  · -- choice.val = 1#u8 → result = other.
+    simp only [hc1, if_true] at r_post1 r_post2 r_post3 r_post4 ⊢
+    have h_ypx : r.Y_plus_X = other.Y_plus_X := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post1 i hi))
+    have h_ymx : r.Y_minus_X = other.Y_minus_X := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post2 i hi))
+    have h_z : r.Z = other.Z := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post3 i hi))
+    have h_t2d : r.T2d = other.T2d := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post4 i hi))
+    have hr_eq : r = other := by
+      cases r; cases other; simp_all
+    rw [hr_eq]
+    exact ⟨h_other, rfl⟩
 
 end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable

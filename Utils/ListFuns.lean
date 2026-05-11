@@ -11,6 +11,9 @@ open Utils.Config
 open Utils.Lib.ListFuns
 open Utils.Lib.Types
 
+-- Empty lines are used as deliberate section dividers
+set_option linter.style.emptyLine false
+
 /-- Run the listfuns command -/
 def runListFuns (p : Parsed) : IO UInt32 := do
   let includeAll := p.hasFlag "all"

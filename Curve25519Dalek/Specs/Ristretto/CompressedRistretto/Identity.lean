@@ -1,37 +1,25 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 
-/-! # Spec Theorem for `CompressedRistretto::identity`
-
-Specification and proof for the `Identity` trait implementation for `CompressedRistretto`.
+/-!
+# Spec theorem for `curve25519_dalek::ristretto::CompressedRistretto::identity`
 
 This function returns the identity element as a `CompressedRistretto`, which is a 32-byte
 array of zeros.
 
-**Source**: curve25519-dalek/src/ristretto.rs
+Source: "curve25519-dalek/src/ristretto.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity
 
-/-
-natural language description:
-
-- Returns the identity element for CompressedRistretto, which is 32 zero bytes
-
-natural language specs:
-
-- The function always succeeds (no panic)
-- The resulting CompressedRistretto is 32 zero bytes
--/
-
-/-- **Spec and proof concerning `ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity`**:
-- No panic (always returns successfully)
-- The resulting CompressedRistretto is 32 zero bytes
+/-- **Spec theorem for `curve25519_dalek::ristretto::CompressedRistretto::identity`**
+• The operation never panics (always returns successfully)
+• The resulting `CompressedRistretto` is 32 zero bytes
 -/
 @[step]
 theorem identity_spec :

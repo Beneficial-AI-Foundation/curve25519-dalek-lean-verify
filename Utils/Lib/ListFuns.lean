@@ -16,19 +16,21 @@ import Utils.Lib.Docstring
 import Utils.Lib.Analysis
 
 open Lean
-
-namespace Utils.Lib.ListFuns
-
 open Utils.Lib.Types
 open Utils.Lib.Docstring
 open Utils.Lib.Analysis
 open Utils.Config
 
+-- Empty lines are used as deliberate section dividers
+set_option linter.style.emptyLine false
+
+namespace Utils.Lib.ListFuns
+
 /-!
 ## Helper Functions
 -/
 
-/-- Check if string `s` contains substring `sub` -/
+/-- Check if string `s` contains substring `sub`. -/
 def containsSubstr (s sub : String) : Bool :=
   (s.splitOn sub).length > 1
 
@@ -36,36 +38,35 @@ def containsSubstr (s sub : String) : Bool :=
 ## Filtering Functions
 -/
 
-/-- Check if a ConstantInfo represents a definition (not a theorem, axiom, etc.) -/
+/-- Check if a ConstantInfo represents a definition (not a theorem, axiom, etc.). -/
 def isDefinition (ci : ConstantInfo) : Bool :=
   match ci with
   | .defnInfo _ => true
   | _ => false
 
-/-- Check if a name starts with an excluded namespace prefix -/
+/-- Check if a name starts with an excluded namespace prefix. -/
 def hasExcludedPrefix (name : Name) : Bool :=
   excludedNamespacePrefixes.any fun pfx =>
     pfx.toName.isPrefixOf name
 
-/-- Check if a name is an extraction artifact (ends with _body, _loop, etc.) -/
+/-- Check if a name is an extraction artifact (ends with _body, _loop, etc.). -/
 def isExtractionArtifactName (name : Name) : Bool :=
   let str := name.toString
   extractionArtifactSuffixes.any fun sfx => str.endsWith sfx
 
-/-- Check if a name is in the hidden functions list -/
+/-- Check if a name is in the hidden functions list. -/
 def isHiddenFunction (name : Name) : Bool :=
   let str := name.toString
   hiddenFunctions.any fun hidden => str == hidden
 
-/-- Check if a name is in the ignored functions list -/
+/-- Check if a name is in the ignored functions list. -/
 def isIgnoredFunction (name : Name) : Bool :=
   let str := name.toString
   ignoredFunctions.any fun ignored => str == ignored
 
-/-- Check if a name passes basic filters (prefix only, not suffix) -/
+/-- Check if a name passes basic filters (prefix only, not suffix). -/
 def passesBasicFilters (name : Name) : Bool :=
   !hasExcludedPrefix name
-
 
 /-!
 ## Relevance Checking
@@ -74,7 +75,7 @@ A function is "relevant" if its source is from the target crate,
 not from external sources like /rustc/ (stdlib) or /cargo/registry/ (deps).
 -/
 
-/-- Check if a source path indicates a relevant (crate-internal) function -/
+/-- Check if a source path indicates a relevant (crate-internal) function. -/
 def isRelevantSource (source : Option String) (crate : String) : Bool :=
   match source with
   | none => false  -- No source info -> not relevant
@@ -88,7 +89,7 @@ def isRelevantSource (source : Option String) (crate : String) : Bool :=
 ## Pipeline Implementation
 -/
 
-/-- Get all definition names from a module -/
+/-- Get all definition names from a module. -/
 def getModuleDefinitions (env : Environment) (moduleName : Name) : Array Name := Id.run do
   let some moduleIdx := env.header.moduleNames.idxOf? moduleName
     | return #[]
@@ -100,11 +101,11 @@ def getModuleDefinitions (env : Environment) (moduleName : Name) : Array Name :=
         result := result.push name
   return result
 
-/-- Get the corresponding _body name for a function -/
+/-- Get the corresponding _body name for a function. -/
 def getBodyName (name : Name) : Name :=
   name.appendAfter "_body"
 
-/-- Intermediate record with raw data before filtering -/
+/-- Intermediate record with raw data before filtering. -/
 structure RawFunctionData where
   name : Name
   docInfo : DocstringInfo
@@ -113,7 +114,7 @@ structure RawFunctionData where
   isHidden : Bool
   deriving Repr
 
-/-- Gather raw data for a function, inheriting docstring from _body if needed -/
+/-- Gather raw data for a function, inheriting docstring from _body if needed. -/
 def gatherRawData (env : Environment) (name : Name) : IO RawFunctionData := do
   let isArtifact := isExtractionArtifactName name
   let hidden := isHiddenFunction name
@@ -132,7 +133,7 @@ def gatherRawData (env : Environment) (name : Name) : IO RawFunctionData := do
     | .error _ => #[]
   return { name, docInfo, rawDeps, isExtractionArtifact := isArtifact, isHidden := hidden }
 
-/-- Build a complete FunctionRecord from raw data -/
+/-- Build a complete FunctionRecord from raw data. -/
 def buildFunctionRecord
     (env : Environment)
     (rawData : RawFunctionData)
@@ -166,7 +167,7 @@ def buildFunctionRecord
     specStatement := specParts.statement
   }
 
-/-- Main pipeline: build all FunctionRecords from a module -/
+/-- Main pipeline: build all FunctionRecords from a module. -/
 def buildFunctionRecords
     (env : Environment)
     (moduleName : Name := funsModule)
@@ -195,7 +196,7 @@ def buildFunctionRecords
   -- Step 6: Sort alphabetically
   return records.qsort (·.leanName.toString < ·.leanName.toString)
 
-/-- Get only the relevant functions -/
+/-- Get only the relevant functions. -/
 def getRelevantFunctions
     (env : Environment)
     (moduleName : Name := funsModule)
@@ -208,12 +209,12 @@ def getRelevantFunctions
 ## Environment Loading
 -/
 
-/-- Load the project environment (configured via Utils.Config) -/
+/-- Load the project environment (configured via Utils.Config). -/
 def loadEnvironment : IO Environment := do
   Lean.initSearchPath (← Lean.findSysroot)
   importModules #[{ module := mainModule }] {}
 
-/-- Get all function names as strings (used by SyncStatus) -/
+/-- Get all function names as strings (used by SyncStatus). -/
 def getFunsDefinitionsAsStrings (env : Environment) : IO (Array String) := do
   let records ← getRelevantFunctions env
   return records.map (·.leanName.toString)
