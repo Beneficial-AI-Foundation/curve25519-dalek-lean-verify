@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo
 -/
@@ -16,15 +16,18 @@ import Curve25519Dalek.Specs.Window.LookupTable.Select
 import Curve25519Dalek.ExternallyVerified
 import Mathlib
 
-/-! # Spec Theorem for `variable_base::mul_loop`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::scalar_mul::variable_base::mul_loop`
 
-Specification for the Horner radix-16 signed-digit main loop of variable-base scalar
-multiplication. Iterates `i = 63, 62, ..., 1` counting down; at each step performs 4
-doublings on `tmp1` then adds `select(lookup_table, scalar_digits[i-1])` to accumulate
-one more radix-16 digit.
+Horner radix-16 signed-digit main loop of variable-base scalar multiplication.
+Tail-recursive loop given counter `i`, a lookup table, signed digits, and a current
+accumulator `tmp1` representing `partial_i • P`:
+- If `i = 0`: returns `tmp1`.
+- Otherwise: doubles `tmp1` four times (× 16), converts to extended, selects the
+  `(i-1)`-th digit's contribution via `LookupTable.select`, adds it to `tmp1`, and
+  recurses on `i - 1`.
+Loop invariant: `tmp1.toPoint = (I8x64_partial_radix16 scalar_digits i) • P.toPoint`.
 
-**Source**: curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs, lines 36-49
-(loop 0 of `variable_base::mul`).
+Source: "curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -66,30 +69,11 @@ lemma I8x64_partial_radix16_recurrence
   rw [h_idx]
   ring
 
-/-
-natural language description:
-
-• Tail-recursive loop for variable-base scalar multiplication. Given counter `i`, table,
-  signed digits, and current accumulator `tmp1` representing `partial_i • P`, the loop:
-    - If `i = 0`: returns `tmp1`.
-    - Else: doubles `tmp1` four times (× 16), converts to extended, selects the
-      `(i-1)`-th digit's contribution via `LookupTable.select`, adds it to `tmp1`, and
-      recurses on `i - 1`.
-
-• Loop invariant:
-    tmp1.toPoint = (I8x64_partial_radix16 scalar_digits i) • P.toPoint.
-
-natural language specs:
-
-• The function always succeeds (no panic).
-• The result is a valid CompletedPoint.
-• The result represents the full radix-16 sum: `tmp.toPoint = (I8x64_as_Radix16 digits) • P`.
--/
-
-/-- **Spec and proof concerning `variable_base.mul_loop`**:
-- No panic (always returns successfully)
-- Returns a `CompletedPoint` whose Edwards point equals the full radix-16 reconstruction
-  of `scalar_digits`, scaled by `P.toPoint`.
+/-- **Spec theorem for `curve25519_dalek::backend::serial::scalar_mul::variable_base::mul_loop`**
+- No panic (always returns successfully).
+- The result is a valid `CompletedPoint`.
+- The result's Edwards point equals the full radix-16 reconstruction of `scalar_digits`,
+  scaled by `P.toPoint`.
 -/
 @[step]
 theorem mul_loop_spec
