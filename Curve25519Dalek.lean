@@ -209,6 +209,8 @@ import Curve25519Dalek.Specs.Scalar.Scalar.Zero
 import Curve25519Dalek.Specs.Window.LookupTable.From
 import Curve25519Dalek.Specs.Window.LookupTable.Select
 import Curve25519Dalek.Tactics
+import Curve25519Dalek.Tactics.ExpandArray
+import Curve25519Dalek.Tactics.ExpandArrayTest
 import Curve25519Dalek.Types
 import Curve25519Dalek.TypesAux
 import Curve25519Dalek.TypesExternal
