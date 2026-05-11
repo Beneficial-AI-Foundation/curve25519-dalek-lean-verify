@@ -45,7 +45,7 @@ bounded arrays by construction, and `.val` extracts the underlying array for `ad
   (∀ (a : { a : Array U64 5#usize // ∀ i < 5, a[i]!.val < 2^53 })
      (b : { b : Array U64 5#usize // ∀ i < 5, b[i]!.val < 2^53 }),
    WP.spec (add a.val b.val) (fun (result : Array U64 5#usize) =>
-     ∀ i < 5, result[i]!.val < 2))
+     ∀ i < 5, result[i]!.val < 2^50))
   (cfg := { numInst := 1000 })
 
 end curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51

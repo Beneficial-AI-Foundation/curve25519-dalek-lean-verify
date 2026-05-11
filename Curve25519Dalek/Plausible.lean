@@ -44,6 +44,74 @@ instance : Shrinkable Std.U32   where shrink u := Nat.shrink u.val |>.map mkUSca
 instance : Shrinkable Std.U64   where shrink u := Nat.shrink u.val |>.map mkUScalar
 instance : Shrinkable Std.Usize where shrink u := Nat.shrink u.val |>.map mkUScalar
 
+/-! ## Signed scalar types
+
+`Std.I8/I16/I32/I64/Isize` are all `IScalar ty = { bv : BitVec ty.numBits }`.
+Signed integers use two's complement representation with range [-2^(N-1), 2^(N-1)-1].
+`BitVec.ofInt` handles the conversion. Shrinking moves toward 0 from both
+positive and negative values by halving the absolute value and preserving sign. -/
+
+private def mkIScalar {ty : IScalarTy} (m : Int) : IScalar ty :=
+  { bv := BitVec.ofInt _ m }
+
+-- Shrink an Int toward 0 by halving the absolute value and preserving sign.
+private def shrinkInt (n : Int) : List Int :=
+  if n = 0 then []
+  else if n > 0 then
+    (Nat.shrink n.natAbs).map Int.ofNat
+  else
+    (Nat.shrink n.natAbs).map fun m => -(Int.ofNat m)
+
+-- Generate an IScalar with edge-case bias toward 0, min, and max values.
+-- We use concrete bounds for each type to avoid proof obligations.
+private def genI8 : Gen Std.I8 := do
+  let min : Int := -128
+  let max : Int := 127
+  let rand := do let ⟨v, _⟩ ← Gen.choose Int min max (by decide); pure v
+  let m ← Gen.frequency rand [(85, rand), (5, pure 0), (5, pure min), (5, pure max)]
+  return mkIScalar m
+
+private def genI16 : Gen Std.I16 := do
+  let min : Int := -32768
+  let max : Int := 32767
+  let rand := do let ⟨v, _⟩ ← Gen.choose Int min max (by decide); pure v
+  let m ← Gen.frequency rand [(85, rand), (5, pure 0), (5, pure min), (5, pure max)]
+  return mkIScalar m
+
+private def genI32 : Gen Std.I32 := do
+  let min : Int := -2147483648
+  let max : Int := 2147483647
+  let rand := do let ⟨v, _⟩ ← Gen.choose Int min max (by decide); pure v
+  let m ← Gen.frequency rand [(85, rand), (5, pure 0), (5, pure min), (5, pure max)]
+  return mkIScalar m
+
+private def genI64 : Gen Std.I64 := do
+  let min : Int := -9223372036854775808
+  let max : Int := 9223372036854775807
+  let rand := do let ⟨v, _⟩ ← Gen.choose Int min max (by decide); pure v
+  let m ← Gen.frequency rand [(85, rand), (5, pure 0), (5, pure min), (5, pure max)]
+  return mkIScalar m
+
+private def genIsize : Gen Std.Isize := do
+  let min : Int := -9223372036854775808
+  let max : Int := 9223372036854775807
+  let rand := do let ⟨v, _⟩ ← Gen.choose Int min max (by decide); pure v
+  let m ← Gen.frequency rand [(85, rand), (5, pure 0), (5, pure min), (5, pure max)]
+  return mkIScalar m
+
+instance : Arbitrary Std.I8    where arbitrary := genI8
+instance : Arbitrary Std.I16   where arbitrary := genI16
+instance : Arbitrary Std.I32   where arbitrary := genI32
+instance : Arbitrary Std.I64   where arbitrary := genI64
+instance : Arbitrary Std.Isize where arbitrary := genIsize
+
+-- Shrink by halving toward 0, working with the signed interpretation.
+instance : Shrinkable Std.I8    where shrink i := shrinkInt i.val |>.map mkIScalar
+instance : Shrinkable Std.I16   where shrink i := shrinkInt i.val |>.map mkIScalar
+instance : Shrinkable Std.I32   where shrink i := shrinkInt i.val |>.map mkIScalar
+instance : Shrinkable Std.I64   where shrink i := shrinkInt i.val |>.map mkIScalar
+instance : Shrinkable Std.Isize where shrink i := shrinkInt i.val |>.map mkIScalar
+
 /-! ## Generic `Aeneas.Std.Array T n` instance
 
 Builds a list of exactly `n.val` elements by structural recursion on `n`, so the
@@ -298,6 +366,17 @@ instance {α : Type*} {x : Result α} {p : Post α} [∀ a, Decidable (p a)] :
 #check (inferInstance : Arbitrary backend.serial.u64.field.FieldElement51)
 #check (inferInstance : Arbitrary edwards.EdwardsPoint)
 #check (inferInstance : Arbitrary ristretto.RistrettoPoint)
+
+-- Arbitrary instances exist for all primitive scalar types (unsigned and signed).
+#check (inferInstance : Arbitrary Std.U8)
+#check (inferInstance : Arbitrary Std.U64)
+#check (inferInstance : Arbitrary Std.I8)
+#check (inferInstance : Arbitrary Std.I16)
+#check (inferInstance : Arbitrary Std.I64)
+
+-- Shrinkable instances exist for signed integers.
+#check (inferInstance : Shrinkable Std.I8)
+#check (inferInstance : Shrinkable Std.I64)
 
 -- WP.spec is Decidable for a simple postcondition.
 example : Decidable (WP.spec (Result.ok (⟨0⟩ : Std.U64)) (fun x => x = ⟨0⟩)) :=
