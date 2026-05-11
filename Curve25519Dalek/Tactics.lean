@@ -5,6 +5,8 @@ Authors: Oliver Butterley
 -/
 import Lean
 import Mathlib.Tactic
+import Aeneas
+import Curve25519Dalek.Tactics.Attr
 
 /-! # Custom Tactics
 
@@ -12,6 +14,7 @@ This file contains custom tactics used throughout the verification project.
 -/
 
 open Lean Elab Tactic Meta
+open Aeneas Aeneas.Std
 
 /--
 Expand a universal quantifier hypothesis `h : ∀ i < n, P i` into individual hypotheses
@@ -33,3 +36,130 @@ elab "expand " h:ident " with " n:num : tactic => do
   for i in [:n] do
     let newName := h.getId.appendAfter s!"_{i}"
     evalTactic (← `(tactic| have $(mkIdent newName) := $h $(quote i) (by omega)))
+
+-- The `array_post_nf` simp attribute is registered in
+-- `Curve25519Dalek/Tactics/Attr.lean` (Lean 4 forbids using a `register_simp_attr`
+-- attribute in the same file it's declared). Tag upstream lemmas
+-- (core / std / Aeneas) here so the simp set is self-contained. Project-local
+-- helpers in `Curve25519Dalek/Aux.lean` are tagged at their definition sites.
+attribute [array_post_nf]
+  Array.getElem!_Nat_eq Array.set_val_eq
+  List.length_set List.Vector.length_val
+  List.getElem_set_self List.getElem_set_ne
+  UScalar.ofNatCore_val_eq getElem!_pos ne_eq
+  Nat.reduceLT Nat.reduceEqDiff Nat.succ_ne_self
+  Nat.lt_add_one Nat.ofNat_pos Nat.one_lt_ofNat
+  OfNat.ofNat_ne_zero OfNat.ofNat_ne_one
+  OfNat.zero_ne_ofNat OfNat.one_ne_ofNat
+  one_ne_zero zero_ne_one
+  not_false_eq_true
+
+/-- Build the simp call from a (possibly empty) array of extra args.
+Used by both forms of `array_post_nf` below.
+
+We concatenate `extras` with the auto-collected equational hypotheses into
+a single array, then splice once with `$args,*`. Splicing two arrays
+separately (`$extras,*, $eqs,*`) would leave a stray comma when one side
+is empty, which is a syntax error in `simp only [...]`. -/
+private def runArrayPostNf
+    (extras : Array (TSyntax `Lean.Parser.Tactic.simpLemma))
+    (loc : Option (TSyntax `Lean.Parser.Tactic.location)) : TacticM Unit :=
+  withMainContext do
+    let lctx ← getLCtx
+    let mut eqLemmas : TSyntaxArray ``Lean.Parser.Tactic.simpLemma := #[]
+    for decl in lctx do
+      if decl.isImplementationDetail then continue
+      let type ← instantiateMVars decl.type
+      if type.isAppOf ``Eq then
+        let lem ← `(Lean.Parser.Tactic.simpLemma|
+                     $(mkIdent decl.userName):term)
+        eqLemmas := eqLemmas.push lem
+    let allArgs : TSyntaxArray ``Lean.Parser.Tactic.simpLemma :=
+      extras ++ eqLemmas
+    evalTactic (← `(tactic|
+      try simp only [array_post_nf, $allArgs,*] $[$loc:location]?))
+
+/--
+`array_post_nf` normalizes Aeneas array read-after-write expressions of the form
+`((arr.set i a).set j b ...)[k]! = e` arising from `progress`/`step*` chains.
+Encapsulates the recurring `simp only [Array.set_val_eq, List.getElem_set_*, …,
+limbs_N_post, …]` boilerplate scattered across `Curve25519Dalek/Specs/`.
+
+Behavior (stage 1):
+1. Collect every local hypothesis whose type is a propositional equality
+   (`_ = _`). This catches `progress`/`step*` post-condition equations
+   (currently named `*_post`/`*_post<N>`, but the test is shape-based so
+   it survives Aeneas naming changes).
+2. Fire `simp only [array_post_nf, <extras>, <those hypotheses>]` — the
+   registered simp set (see `Curve25519Dalek/Tactics/Attr.lean`), any
+   user-supplied extras, plus the collected equations.
+
+Closes the goal if normalization makes it `rfl`; otherwise leaves whatever
+residual for `scalar_tac`/`omega`/`grind` to pick up.
+
+Deliberately does NOT call `subst_vars`, `simp_all`, `*`, or any arithmetic
+tactic — the simp arguments are explicit and bounded.
+
+Usage:
+```
+have h_l0 : limbs9.val[0]! = i18 := by array_post_nf
+-- pass extra simp lemmas (byte/bit ops not in the base set):
+have h_l1 : ... := by array_post_nf [UScalar.val_and, Nat.shiftRight_eq_div_pow]
+-- when a residual remains:
+· array_post_nf; scalar_tac
+-- target hypotheses (or all, with `at *`) like `simp only ... at`:
+array_post_nf at h
+array_post_nf [UScalar.val_or] at *
+```
+-/
+syntax (name := arrayPostNf) "array_post_nf"
+  (" [" Lean.Parser.Tactic.simpLemma,* "]")?
+  (Lean.Parser.Tactic.location)? : tactic
+
+elab_rules : tactic
+  | `(tactic| array_post_nf $[[$extras,*]]? $[$loc:location]?) => do
+    let extraArr := extras.map (·.getElems) |>.getD #[]
+    runArrayPostNf extraArr loc
+
+/-- Helper: build a `simp_all only [...]` call. Iterates the simp set to
+fixpoint across goal and hypotheses. Use only when the dependency between
+hypotheses needs the iterative simplification — costs more HB than
+`array_post_nf` on the goal alone. -/
+private def runArrayPostNfAll
+    (extras : Array (TSyntax `Lean.Parser.Tactic.simpLemma)) : TacticM Unit :=
+  withMainContext do
+    let lctx ← getLCtx
+    let mut eqLemmas : TSyntaxArray ``Lean.Parser.Tactic.simpLemma := #[]
+    for decl in lctx do
+      if decl.isImplementationDetail then continue
+      let type ← instantiateMVars decl.type
+      if type.isAppOf ``Eq then
+        let lem ← `(Lean.Parser.Tactic.simpLemma|
+                     $(mkIdent decl.userName):term)
+        eqLemmas := eqLemmas.push lem
+    let allArgs : TSyntaxArray ``Lean.Parser.Tactic.simpLemma :=
+      extras ++ eqLemmas
+    evalTactic (← `(tactic|
+      try simp_all only [array_post_nf, $allArgs,*]))
+
+/--
+`array_post_nf_all` is the `simp_all only`-flavored variant of
+`array_post_nf`. Same simp set, same auto-collected equational hypotheses,
+but iterates to fixpoint over the goal AND every hypothesis (per Lean's
+`simp_all` semantics).
+
+Prefer `array_post_nf` when you only need to normalize the goal —
+`simp_all` walks every hypothesis on every iteration, which can blow up
+heartbeats with a large simp set.
+
+Use `array_post_nf_all` when (a) hypotheses need normalization to feed
+later tactics, or (b) the dependency chain requires iterative
+substitution that `simp only ... at *` would miss.
+-/
+syntax (name := arrayPostNfAll) "array_post_nf_all"
+  (" [" Lean.Parser.Tactic.simpLemma,* "]")? : tactic
+
+elab_rules : tactic
+  | `(tactic| array_post_nf_all $[[$extras,*]]?) => do
+    let extraArr := extras.map (·.getElems) |>.getD #[]
+    runArrayPostNfAll extraArr
