@@ -6,21 +6,21 @@ Authors: Oliver Butterley, Alessandro D'Angelo, Liao Zhang
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # vartime_double_base_mul
+/-! # Spec theorem for `vartime_double_base_mul`
 
-Specification and proof for `vartime_double_base_mul`.
+Performs variable-time double-base scalar multiplication on the chosen backend.
 
-This function performs variable-time double-base multiplication.
-
-**Source**: curve25519-dalek/src/backend/mod.rs:L240-L245
-
+Source: "curve25519-dalek/src/backend/mod.rs"
 ## TODO
 - Write draft specification
 - Write formal specification
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek
-open backend
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+
+namespace curve25519_dalek.backend
 
 -- Specification theorem to be written here
+
+end curve25519_dalek.backend
