@@ -831,6 +831,6 @@ theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
       (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k
   step*
-  exact ⟨‹_›, by agrind⟩
+  refine ⟨‹_›, by grind [Array.getElem!_Nat_eq]⟩
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
