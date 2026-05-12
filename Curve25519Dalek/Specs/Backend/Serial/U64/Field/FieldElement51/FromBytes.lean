@@ -244,7 +244,7 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
   have hs : ∀ sx, sx = bytes.to_slice → ofByteList sx.val = ofByteList bytes.val := by
     intro _ hsx; simp [hsx, Array.to_slice]
   intro i; fin_cases i
-  · grind [Array.make, ofByteArray]
+  · simp_all [Array.make, ofByteArray]; grind
   · simp_all [Array.make, ofByteArray]; grind
   · simp_all [Array.make, ofByteArray]; grind
   · clear i1_post -- TODO: why is this required for grind to succeed?
