@@ -8,9 +8,6 @@ import Curve25519Dalek.Tactics.ExpandArray
 
 /-! # Tests for `expand_array`
 
-Each test exercises a distinct behaviour. The realistic regression test for
-`expand_array` is `FieldElement51.reduce_spec` itself; the cases here cover the
-direct surface of the tactic.
 -/
 
 open Aeneas.Std
@@ -39,9 +36,9 @@ example
     (h2 : out2 = out1.set 1#usize v1)
     (h3 : result = out2.set 2#usize v2)
     (hother : other[0]!.val + other[1]!.val = 100) :
-    result[0]!.val = v0.val ∧ other[0]!.val + other[1]!.val = 100 := by
+    ((result) : List U64)[0]!.val = v0.val ∧ other[0]!.val + other[1]!.val = 100 := by
   expand_array result
-  simp_lists [*]
+  exact ⟨by assumption, by assumption⟩
 
 /-- Single-index form `expand_array x N` extracts just index `N`. -/
 example
@@ -51,14 +48,13 @@ example
     (h1 : arr1 = limbs.set 0#usize v0)
     (h2 : arr2 = arr1.set 1#usize v1)
     (h3 : result = arr2.set 2#usize v2) :
-    (↑(↑result) : List U64)[1]!.val = v1.val := by
+    ((result) : List U64)[1]!.val = v1.val := by
   expand_array result 1
-  exact hresult1
+  assumption
 
 /-! ## Realistic two-pass carry-propagation context
 
-Mirrors `reduce_spec`, exercising the `using [...]` extras and the
-`simp_lists_safe` interaction. -/
+Mirrors `reduce_spec`, exercising the `using [...]` extras and the `simp_lists_safe` interaction. -/
 section TwoPass
 
 attribute [local simp_lists_safe] UScalar.val_and Nat.and_two_pow_sub_one_eq_mod
@@ -92,8 +88,9 @@ example
     (a2_base : U64) (a2_base_post : a2_base = (↑arr5)[2]!)
     (a2 : U64) (a2_post : a2.val = a2_base.val + c1.val)
     (arr6 : Array U64 3#usize) (harr6 : arr6 = arr5.set 2#usize a2) :
-    True := by
+    (↑(↑arr6) : List U64)[1]!.val = (↑(↑limbs) : List U64)[1]!.val % 2 ^ 51 +
+      (↑(↑limbs) : List U64)[0]!.val >>> 51 := by
   expand_array arr6 using [UScalar.val_and]
-  trivial
+  assumption
 
 end TwoPass

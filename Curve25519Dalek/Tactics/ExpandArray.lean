@@ -7,17 +7,13 @@ import Aeneas
 
 /-! # `expand_array` tactic
 
-Given an array `result` built through a chain of `.set` operations,
-`expand_array result` introduces hypotheses `hresult0 : result[0]!.val = <expanded>`, etc.
-for every index of the array.
+Given an array `result` built through a chain of `.set` operations, `expand_array result` introduces
+hypotheses `hresult0 : result[0]!.val = <expanded>`, etc. for every index of the array.
 
 ## Requirements
-- `result` must be a local variable of type `Aeneas.Std.Array α n`
-  with a literal size (the size is extracted automatically)
+- `result` must be a local variable of type `Aeneas.Std.Array α n` with a literal size
 - The `.set` chain must be visible via defining equalities for intermediates
-- Produces one hypothesis per index, named `h<varname><index>`
-- Only the generated hypotheses are modified; all other context (including
-  Aeneas step markers) is left untouched
+- Produces one hypothesis per index, named `h<varname>_<index>`
 -/
 
 open Lean Elab Tactic Meta Aeneas.Std
@@ -118,7 +114,7 @@ private def expandArrayCore (x : TSyntax `ident) (idx : Option (TSyntax `num))
     let mut hIdents : Array (TSyntax `ident) := #[]
     for k in indices do
       let kLit := Syntax.mkNumLit (toString k)
-      let hIdent := mkIdent (Name.mkSimple s!"h{xName}{k}")
+      let hIdent := mkIdent (Name.mkSimple s!"h{xName}_{k}")
       hIdents := hIdents.push hIdent
       evalTactic (←
         `(tactic| have $hIdent : ($x)[$kLit]!.val = ($x)[$kLit]!.val := rfl))
