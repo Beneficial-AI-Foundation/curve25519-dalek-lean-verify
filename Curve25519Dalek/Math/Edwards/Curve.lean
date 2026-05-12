@@ -8,7 +8,7 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
 import Mathlib.Tactic.LinearCombination
-import PrimeCert.PrimeList
+import PrimeCertTest.PrimeListTest
 
 /-!
 # Pure Mathematical Foundations for Edwards Curves
@@ -93,8 +93,8 @@ for all points (x₁, y₁), (x₂, y₂) on E_{a,d}: 1 + d·x₁x₂y₁y₂ �
 This makes the addition law "complete" (no exceptional cases). -/
 theorem complete_addition_denominators_ne_zero
     (C : EdwardsCurve F) (ha : IsSquare C.a) (hd : ¬IsSquare C.d) (p1 p2 : Point C) :
-    let lam := C.d * p1.x * p2.x * p1.y * p2.y
-    (1 + lam ≠ 0) ∧ (1 - lam ≠ 0) := by
+    let lamVal := C.d * p1.x * p2.x * p1.y * p2.y
+    (1 + lamVal ≠ 0) ∧ (1 - lamVal ≠ 0) := by
   /- **Reference**: Bernstein, Birkner, Joye, Lange, Peters.
   "Twisted Edwards Curves". AFRICACRYPT 2008.
   https://eprint.iacr.org/2008/013.pdf, Section 6.
@@ -106,8 +106,8 @@ theorem complete_addition_denominators_ne_zero
     This follows from the completeness theorem since a = -1 is a square (p ≡ 1 mod 4)
     and d is not a square in F_p. -/
 theorem Ed25519.denomsNeZero (p1 p2 : Point Ed25519) :
-    let lam := Ed25519.d * p1.x * p2.x * p1.y * p2.y
-    (1 + lam ≠ 0) ∧ (1 - lam ≠ 0) :=
+    let lamVal := Ed25519.d * p1.x * p2.x * p1.y * p2.y
+    (1 + lamVal ≠ 0) ∧ (1 - lamVal ≠ 0) :=
   complete_addition_denominators_ne_zero Ed25519 neg_one_is_square d_not_square p1 p2
 
 /-! ## Addition Formulas -/
@@ -124,7 +124,7 @@ omit [NeZero (2 : F)] in
 The sum of two points on a twisted Edwards curve stays on the curve, provided the denominators in
 the addition formula are non-zero. -/
 theorem add_closure (C : EdwardsCurve F) (p1 p2 : Point C)
-    (h : let lam := C.d * p1.x * p2.x * p1.y * p2.y; (1 + lam ≠ 0) ∧ (1 - lam ≠ 0)) :
+    (h : let lamVal := C.d * p1.x * p2.x * p1.y * p2.y; (1 + lamVal ≠ 0) ∧ (1 - lamVal ≠ 0)) :
     let (x, y) := add_coords C (p1.x, p1.y) (p2.x, p2.y)
     C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by
   set x₁ := p1.x; set y₁ := p1.y
@@ -219,9 +219,9 @@ instance : SMul ℤ (Point Ed25519) := ⟨zsmul_Ed25519⟩
 
 /-- Simplification lemma for add_coords with explicit pairs. -/
 theorem add_coords_mk (C : EdwardsCurve F) (x₁ y₁ x₂ y₂ : F) :
-    let lam := C.d * x₁ * x₂ * y₁ * y₂;
+    let lamVal := C.d * x₁ * x₂ * y₁ * y₂;
     add_coords C (x₁, y₁) (x₂, y₂) =
-      ((x₁ * y₂ + y₁ * x₂) / (1 + lam), (y₁ * y₂ - C.a * x₁ * x₂) / (1 - lam)) := rfl
+      ((x₁ * y₂ + y₁ * x₂) / (1 + lamVal), (y₁ * y₂ - C.a * x₁ * x₂) / (1 - lamVal)) := rfl
 
 /-- The x-coordinate of p + q on Ed25519. Used for unfolding in specific proofs. -/
 theorem add_x (p q : Point Ed25519) :

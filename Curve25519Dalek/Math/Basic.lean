@@ -8,7 +8,7 @@ import Curve25519Dalek.Types
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
-import PrimeCert.PrimeList
+import PrimeCertTest.PrimeListTest
 import Mathlib.FieldTheory.Finite.Basic
 
 /-! # Common Definitions
