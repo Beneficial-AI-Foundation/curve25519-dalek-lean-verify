@@ -155,20 +155,6 @@ A single "complementary shift OR" primitive `or_split_at` handles every
 `(a / 2^p) ||| (b * 2^(64-p) % U64.size)` pattern; the combined identity
 `bit_slicing_wide` follows by `omega`. -/
 
-/-- OR of disjoint complementary slices at split point `p` (with `p ≤ 64`):
-the low part `a / 2^p` (bits `p..64` of `a`) and the high part
-`b * 2^(64-p) % 2^64` (low `p` bits of `b` shifted up). -/
-private theorem or_split_at (a b : U64) (p : Nat) (hp : p ≤ 64) :
-    (a.val / 2 ^ p) ||| ((b.val * 2 ^ (64 - p)) % U64.size)
-      = a.val / 2 ^ p + (b.val % 2 ^ p) * 2 ^ (64 - p) := by
-  have hU : U64.size = 2 ^ 64 := by scalar_tac
-  have hpq : 2 ^ p * 2 ^ (64 - p) = 2 ^ 64 := by rw [← pow_add]; congr 1; omega
-  have h1 : b.val * 2 ^ (64 - p) % 2 ^ 64 = (b.val % 2 ^ p) * 2 ^ (64 - p) := by
-    rw [← hpq, Nat.mul_mod_mul_right]
-  have h0 : a.val / 2 ^ p < 2 ^ (64 - p) := by
-    rw [Nat.div_lt_iff_lt_mul (by positivity), mul_comm, hpq]; exact hU ▸ a.hmax
-  rw [hU, h1, or_mul_pow_two_eq_add _ _ (64 - p) h0]
-
 /-- Combined identity: `lo + hi * 2^260 = words_wide`. Each `lo_k` / `hi_k`
 limb expression collapses to a small div/mod sum via `or_split_at`, and the
 whole equation is linear after that. -/

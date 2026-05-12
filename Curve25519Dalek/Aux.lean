@@ -357,6 +357,30 @@ lemma or_mul_pow_two_eq_add (a b k : Nat) (ha : a < 2 ^ k) :
       simp only [h, decide_true, cond_true]
       omega
 
+/-- Casting a `U64` to `U8` truncates to the low 8 bits.
+
+Used by `FieldElement51::to_bytes` and `Scalar52::to_bytes` to relate Aeneas's
+`UScalar.cast` to its natural-number interpretation. -/
+lemma U64_cast_U8 (x : U64) : (UScalar.cast UScalarTy.U8 x).val = x.val % 2 ^ 8 := by
+  bvify 64 at *; bv_decide
+
+/-- OR of disjoint complementary slices at split point `p` (with `p ≤ 64`):
+the low part `a / 2^p` (bits `p..64` of `a`) and the high part
+`b * 2^(64-p) % 2^64` (low `p` bits of `b` shifted up).
+
+Used by `Scalar52::from_bytes` and `Scalar52::from_bytes_wide` to combine
+adjacent U64 words into 52-bit limbs via shift and OR. -/
+lemma or_split_at (a b : U64) (p : Nat) (hp : p ≤ 64) :
+    (a.val / 2 ^ p) ||| ((b.val * 2 ^ (64 - p)) % U64.size)
+      = a.val / 2 ^ p + (b.val % 2 ^ p) * 2 ^ (64 - p) := by
+  have hU : U64.size = 2 ^ 64 := by scalar_tac
+  have hpq : 2 ^ p * 2 ^ (64 - p) = 2 ^ 64 := by rw [← pow_add]; congr 1; omega
+  have h1 : b.val * 2 ^ (64 - p) % 2 ^ 64 = (b.val % 2 ^ p) * 2 ^ (64 - p) := by
+    rw [← hpq, Nat.mul_mod_mul_right]
+  have h0 : a.val / 2 ^ p < 2 ^ (64 - p) := by
+    rw [Nat.div_lt_iff_lt_mul (by positivity), mul_comm, hpq]; exact hU ▸ a.hmax
+  rw [hU, h1, or_mul_pow_two_eq_add _ _ (64 - p) h0]
+
 /-! ## Byte-packing helpers for load8 / from_bytes
 
 These lemmas handle the pattern of ORing 8 shifted bytes into a U64 word.

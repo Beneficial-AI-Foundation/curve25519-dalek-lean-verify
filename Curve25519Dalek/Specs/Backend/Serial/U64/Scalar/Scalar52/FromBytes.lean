@@ -85,47 +85,13 @@ theorem from_bytes_loop_spec (bytes : Array U8 32#usize)
       simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
       grind only [= List.getElem!_set_ne, =_ Array.getElem!_Nat_eq]
 
-/-! ## Part 2: Bit-slicing identity via `bv_decide` primitives
+/-! ## Part 2: Bit-slicing identity
 
-We split the proof of the 5-limb-to-4-word identity into small `bv_decide`
-primitives — one per shift/OR pattern. -/
-
-/-- OR of disjoint bit slices: the low part `a / 2^p` (which contains bits p..64
-of `a`) and the high part `b * 2^q % 2^64` (which contains bits 0..(64-q) of `b`
-shifted up). When `p + (64 - q) = 64`, the slices are disjoint. -/
-private theorem or_split_52 (w0 w1 : U64) :
-    ((w0.val / 2 ^ 52) ||| ((w1.val * 2 ^ 12) % U64.size)) =
-      w0.val / 2 ^ 52 + (w1.val % 2 ^ 52) * 2 ^ 12 := by
-  have hU : U64.size = 2 ^ 64 := by scalar_tac
-  have hw1 : w1.val < 2 ^ 64 := hU ▸ w1.hmax
-  have hw0 : w0.val < 2 ^ 64 := hU ▸ w0.hmax
-  have h1 : w1.val * 2 ^ 12 % 2 ^ 64 = (w1.val % 2 ^ 52) * 2 ^ 12 := by omega
-  have h0 : w0.val / 2 ^ 52 < 2 ^ 12 := by omega
-  rw [hU, h1, or_mul_pow_two_eq_add _ _ 12 h0]
-
-private theorem or_split_40 (w1 w2 : U64) :
-    ((w1.val / 2 ^ 40) ||| ((w2.val * 2 ^ 24) % U64.size)) =
-      w1.val / 2 ^ 40 + (w2.val % 2 ^ 40) * 2 ^ 24 := by
-  have hU : U64.size = 2 ^ 64 := by scalar_tac
-  have hw2 : w2.val < 2 ^ 64 := hU ▸ w2.hmax
-  have hw1 : w1.val < 2 ^ 64 := hU ▸ w1.hmax
-  have h2 : w2.val * 2 ^ 24 % 2 ^ 64 = (w2.val % 2 ^ 40) * 2 ^ 24 := by omega
-  have h1 : w1.val / 2 ^ 40 < 2 ^ 24 := by omega
-  rw [hU, h2, or_mul_pow_two_eq_add _ _ 24 h1]
-
-private theorem or_split_28 (w2 w3 : U64) :
-    ((w2.val / 2 ^ 28) ||| ((w3.val * 2 ^ 36) % U64.size)) =
-      w2.val / 2 ^ 28 + (w3.val % 2 ^ 28) * 2 ^ 36 := by
-  have hU : U64.size = 2 ^ 64 := by scalar_tac
-  have hw3 : w3.val < 2 ^ 64 := hU ▸ w3.hmax
-  have hw2 : w2.val < 2 ^ 64 := hU ▸ w2.hmax
-  have h3 : w3.val * 2 ^ 36 % 2 ^ 64 = (w3.val % 2 ^ 28) * 2 ^ 36 := by omega
-  have h2 : w2.val / 2 ^ 28 < 2 ^ 36 := by omega
-  rw [hU, h3, or_mul_pow_two_eq_add _ _ 36 h2]
+5 limbs from 4 words via the generic `or_split_at` (from `Aux.lean`) plus
+`omega` on the resulting linear arithmetic. -/
 
 /-- The bit-slicing identity: the five 52/48-bit limbs extracted from four
-64-bit words reconstruct the same natural number. Proved by combining the
-OR-split lemmas with `omega` on the resulting linear arithmetic. -/
+64-bit words reconstruct the same natural number. -/
 private theorem bit_slicing_of_words (w0 w1 w2 w3 : U64) :
     let l0 := w0.val % 2 ^ 52
     let l1 := ((w0.val / 2 ^ 52) ||| ((w1.val * 2 ^ 12) % U64.size)) % 2 ^ 52
@@ -139,7 +105,8 @@ private theorem bit_slicing_of_words (w0 w1 w2 w3 : U64) :
   have hw1 : w1.val < 2 ^ 64 := hU ▸ w1.hmax
   have hw2 : w2.val < 2 ^ 64 := hU ▸ w2.hmax
   have hw3 : w3.val < 2 ^ 64 := hU ▸ w3.hmax
-  rw [or_split_52, or_split_40, or_split_28]
+  rw [or_split_at w0 w1 52 (by omega), or_split_at w1 w2 40 (by omega),
+      or_split_at w2 w3 28 (by omega)]
   -- Simplify the outer mods: each inner sum fits in 52 / 48 bits
   rw [show (w0.val / 2 ^ 52 + (w1.val % 2 ^ 52) * 2 ^ 12) % 2 ^ 52 =
         w0.val / 2 ^ 52 + w1.val % 2 ^ 40 * 2 ^ 12 from by omega,
