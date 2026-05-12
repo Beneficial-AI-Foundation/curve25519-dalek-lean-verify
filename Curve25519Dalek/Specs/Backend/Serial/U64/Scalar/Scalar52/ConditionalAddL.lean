@@ -216,7 +216,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
           2 ^ (52 * i.val) * carry1.val := by agrind
       have : 2 ^ (52 * i.val) * carry1.val = 2 ^ (52 * i.val) * (carry.val / 2 ^ 52) +
           2 ^ (52 * i.val) * self[i.val]!.val := by
-        have : addend.val = 0 := haddend_val; agrind
+        have : addend.val = 0 := haddend_val; grind [Array.getElem!_Nat_eq]
       rw [hself1_nat, hpow_split] at hres_inv
       have := Scalar52_limb_le_nat self i.val hi'
       omega
@@ -230,7 +230,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       have : 2 ^ (52 * i.val) * carry1.val =
           2 ^ (52 * i.val) * (carry.val / 2 ^ 52) + 2 ^ (52 * i.val) * self[i.val]!.val +
           2 ^ (52 * i.val) * constants.L[i.val]!.val := by
-        have : addend.val = constants.L[i.val]!.val := haddend_val; agrind
+        have : addend.val = constants.L[i.val]!.val := haddend_val; grind [Array.getElem!_Nat_eq]
       have := Scalar52_limb_le_nat self i.val hi'
       omega
   case isFalse hge =>
@@ -241,7 +241,11 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
         Scalar52_as_Nat constants.L := by simp [Scalar52_as_Nat]
     cases Choice.eq_zero_or_one condition with
     | inl h => simp [*]
-    | inr h => agrind
+    | inr h =>
+      simp only [h, reduceIte] at *
+      have hi5 : (↑i : Nat) = 5 := by assumption
+      rw [hi5, this]
+      omega
 termination_by 5 - i.val
 decreasing_by agrind
 

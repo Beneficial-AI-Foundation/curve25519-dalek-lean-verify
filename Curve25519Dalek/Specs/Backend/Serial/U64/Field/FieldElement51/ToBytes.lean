@@ -676,7 +676,7 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
       simp only [q4_post1, i9_post, q3_post1, i7_post, q2_post1, i5_post,
         q1_post1, i3_post, q_post1, i1_post, i_post,
         i8_post, i6_post, i4_post, i2_post,
-        Nat.shiftRight_eq_div_pow]; agrind)
+        Nat.shiftRight_eq_div_pow]; grind [Array.getElem!_Nat_eq])
     limbs9[0]!.val limbs9[1]!.val limbs9[2]!.val limbs9[3]!.val limbs9[4]!.val
     -- hl0..hl4: each resolves a limb's carry chain (array updates → &&&→% via hmask, >>>→/)
     (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,

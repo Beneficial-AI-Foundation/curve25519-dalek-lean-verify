@@ -48,6 +48,6 @@ theorem conditional_select_spec
         if choice.val = 1#u8 then b.T2d[i]!.val else a.T2d[i]!.val) ⦄ := by
   unfold conditional_select
   step*
-  grind
+  refine ⟨?_, ?_, ?_, ?_⟩ <;> intro i hi <;> split_ifs <;> simp_all
 
 end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
