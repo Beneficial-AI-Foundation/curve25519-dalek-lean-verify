@@ -85,16 +85,19 @@ theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
       List.slice_zero_j, Slice.length, List.length_take, List.Vector.length_val, tsub_zero]
     have hlen1 : s2.val.length = (32#usize).val := by
       have := congrArg List.length s1_post1
+      rw [s2_post]
       simp only [List.length_take, List.Vector.length_val, UScalar.ofNatCore_val_eq] at this ⊢
       omega
     have hlen2 : s5.val.length = (32#usize).val := by
       have := congrArg List.length s4_post1
+      rw [s5_post]
       simp only [List.slice_length, List.Vector.length_val, UScalar.ofNatCore_val_eq] at this ⊢
       omega
     have heq1 : (Array.repeat 32#usize 0#u8).from_slice s2 =
         (⟨(List.range 32).map (fun i => bytes[i]!), by simp⟩ : Array U8 32#usize) :=
       Subtype.ext (by
-        rw [Array.from_slice_val _ _ hlen1, show s2.val = (↑s2 : List _) from rfl, s1_post1]
+        rw [Array.from_slice_val _ _ hlen1, show s2.val = (↑s2 : List _) from rfl,
+          s2_post, s1_post1]
         apply List.ext_getElem
         · simp only [List.length_take, List.length_map, List.length_range, List.Vector.length_val,
             UScalar.ofNatCore_val_eq]
@@ -106,7 +109,8 @@ theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
     have heq2 : (Array.repeat 32#usize 0#u8).from_slice s5 =
         (⟨(List.range 32).map (fun i => bytes[32 + i]!), by simp⟩ : Array U8 32#usize) :=
       Subtype.ext (by
-        rw [Array.from_slice_val _ _ hlen2, show s5.val = (↑s5 : List _) from rfl, s4_post1]
+        rw [Array.from_slice_val _ _ hlen2, show s5.val = (↑s5 : List _) from rfl,
+          s5_post, s4_post1]
         apply List.ext_getElem
         · simp only [List.slice_length, List.length_map, List.length_range, List.Vector.length_val,
             UScalar.ofNatCore_val_eq]
@@ -116,6 +120,6 @@ theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
             List.slice, List.getElem_drop, List.getElem_take]
           symm
           apply getElem!_pos)
-    rw [heq1, heq2]
+    rw [← s2_post, ← s5_post, heq1, heq2]
 
 end curve25519_dalek.ristretto.RistrettoPoint

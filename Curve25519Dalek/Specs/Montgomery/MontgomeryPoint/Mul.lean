@@ -216,9 +216,9 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar)
   step as ⟨ zero, zero_eq, zero_bound⟩
   step as ⟨ one1, one1_eq, one_bound⟩
   step as ⟨ s, hs, hsb⟩
-  step as ⟨ c, ct, cf⟩
+  step as ⟨ c, ct, cf, ct_post, cf_post⟩
   step as ⟨ y, hy⟩
-  by_cases h: c.2.2 = true
+  by_cases h: cf = true
   · simp_all only [Nat.reducePow, forall_const, Bool.true_eq_false, IsEmpty.forall_iff,
         Bool.toNat_true, Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq,
         one_ne_zero, not_false_eq_true, zero_ne_one, not_lt_zero, zero_lt_one, or_true, or_self,
@@ -233,7 +233,7 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar)
         -- We first construct the loop invariant with the simplified scalar.
       refine mul_spec_mkPoint_from_affine result P scalar x _
           hmod_x result_post2 result_post1 hP_bound ?_
-      rw [ct.right.right.right.right.right]
+      rw [ct_post.right.right.right.right.right]
       have := aux_eq_mod_mul scalar
       rw [← this]
       have : false.toNat = 0 := by decide
@@ -242,7 +242,7 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar)
     · simp only [hi, ↓reduceDIte, bind_tc_fail, spec_fail]
       apply hi
       scalar_tac
-  · have : c.2.2 = false := by grind
+  · have hcf : cf = false := by grind
     simp_all only [Nat.reducePow, Bool.false_eq_true, ne_eq, Int.reduceDiv, Int.reduceToNat,
         Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reduceMul,
         List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one,
@@ -263,7 +263,7 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar)
       -- We first construct the loop invariant with the simplified scalar.
     refine mul_spec_mkPoint_from_affine result P scalar x _
         hmod_x result_post2 result_post1 hP_bound ?_
-    rw [cf.right.right.right.right.right]
+    rw [cf_post.right.right.right.right.right]
     have := aux_eq_mod_mul scalar
     simp only [Nat.reducePow, Int.reduceDiv, Int.reduceToNat, Array.getElem!_Nat_eq,
         List.getElem!_eq_getElem?_getD, Nat.reduceMul, List.Vector.length_val,
