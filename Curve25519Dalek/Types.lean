@@ -192,11 +192,6 @@ structure backend.serial.curve_models.AffineNielsPoint where
   y_minus_x : backend.serial.u64.field.FieldElement51
   xy2d : backend.serial.u64.field.FieldElement51
 
-/-- Trait declaration: [curve25519_dalek::traits::ValidityCheck]
-    Source: 'curve25519-dalek/src/traits.rs', lines 426:0-429:1 -/
-structure traits.ValidityCheck (Self : Type) where
-  is_valid : Self → Result Bool
-
 /-- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
     Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34
     Visibility: public -/
