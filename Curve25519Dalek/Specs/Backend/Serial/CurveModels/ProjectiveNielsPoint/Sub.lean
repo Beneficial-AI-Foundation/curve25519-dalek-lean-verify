@@ -6,8 +6,8 @@ Authors: Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
-/-!
-# Spec theorem for `ProjectiveNielsPoint::sub`
+
+/-! # Spec theorem for `curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::sub`
 
 This function implements the mixed subtraction of a ProjectiveNielsPoint from an
 Edwards point in extended coordinates, returning the result in completed
@@ -31,6 +31,7 @@ The concrete formulas are:
 
 Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 -/
+
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
 open curve25519_dalek.backend.serial.u64.field
@@ -583,11 +584,10 @@ private lemma sub_isValid_and_toPoint
       hZ1_ne hZ2_ne h_self_x h_self_y h_other_x h_other_y
       hX_factored hY_factored hZ_factored hT_factored
 
-/-- **Spec theorem for `sub`**
-(`CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint`)
-
-Computes `self - other` as a CompletedPoint: the result is valid
-and represents the difference of the two input points. -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::sub`**
+• No panic for valid EdwardsPoints `self` and `other`
+• The output is a valid CompletedPoint `c`
+• `c.toPoint = self.toPoint - other.toPoint` -/
 @[step]
 theorem sub_spec
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)

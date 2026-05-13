@@ -11,10 +11,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 
-/-!
-# Spec theorem for `CompletedPoint::add`
-
-Specification and proof for `CompletedPoint::add`.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::add`
 
 This function implements the mixed addition of an Edwards point in extended
 coordinates with a point in projective Niels coordinates, returning the result
@@ -49,24 +46,7 @@ open CoreOpsArithAddAssignSharedAFieldElement51
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
-/-
-natural language description:
-
-• Takes an EdwardsPoint (X, Y, Z, T) in extended coordinates and a ProjectiveNielsPoint
-(Y+X, Y−X, Z, 2dXY) and returns a CompletedPoint (X', Y', Z', T') in completed coordinates
-(ℙ¹ × ℙ¹). Arithmetic is performed in the field 𝔽_p where p = 2^255 - 19.
-
-natural language specs:
-
-• The function always succeeds (no panic)
-• Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, Z, 2dXY), the output C = (X', Y', Z', T')
-  satisfies modulo p:
-  - X' ≡ ( (Y+X)·N.Y_plus_X − (Y−X)·N.Y_minus_X ) (mod p)
-  - Y' ≡ ( (Y+X)·N.Y_plus_X + (Y−X)·N.Y_minus_X ) (mod p)
-  - Z' ≡ ( 2·Z·N.Z + T·N.T2d ) (mod p)
-  - T' ≡ ( 2·Z·N.Z − T·N.T2d ) (mod p)
--/
-/-- **Spec and proof concerning `backend.serial.curve_models.CompletedPoint.add`**:
+/-- **Helper for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::add`**
 - No panic (always returns successfully)
 - Given inputs:
   • an EdwardsPoint `self` with coordinates (X, Y, Z, T), and
@@ -78,8 +58,7 @@ the output CompletedPoint (X', Y', Z', T') computed by `add self other` satisfie
 - T' ≡ ( 2·Z·Z_other − T·T2d ) (mod p)
 where p = 2^255 - 19
 These are the standard mixed-addition formulas via projective Niels coordinates,
-returning the result in completed coordinates.
--/
+returning the result in completed coordinates. -/
 theorem add_assign_spec' (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
@@ -699,7 +678,7 @@ private lemma add_spec_algebraic
     hX_factored hY_factored hZ_factored hT_factored h_denom_plus h_denom_minus
 
 
-/-- **Spec theorem for `curve25519_dalek.backend.serial.curve_models.CompletedPoint.add`**
+/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::add`**
 The theorem states that adding a valid EdwardsPoint with a valid ProjectiveNielsPoint:
 1. Always succeeds
 2. The output CompletedPoint is valid (bounds and algebraic properties)

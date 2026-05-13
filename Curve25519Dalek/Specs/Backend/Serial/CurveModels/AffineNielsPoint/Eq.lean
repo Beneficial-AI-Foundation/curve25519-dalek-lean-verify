@@ -6,13 +6,8 @@ Authors: Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
-/-!
-# Spec theorem for `AffineNielsPoint::eq`
 
-Specification and proof for
-`curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<
-curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for
-curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::eq`.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::eq`
 
 This function compares two AffineNielsPoint values component-wise using
 `FieldElement51` equality, short-circuiting on the first mismatch.
@@ -21,7 +16,6 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
 namespace CoreCmpPartialEqFieldElement51
 
@@ -46,9 +40,9 @@ namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
 namespace CoreCmpPartialEqAffineNielsPoint
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::eq`**
-- No panic (always returns successfully)
-- Returns true iff all three coordinate comparisons return true
-- Short-circuits to false as soon as a comparison fails -/
+• No panic (always returns successfully)
+• Returns true iff all three coordinate comparisons return true
+• Short-circuits to false as soon as a comparison fails -/
 @[step]
 theorem eq_spec
     (self other : backend.serial.curve_models.AffineNielsPoint) :
