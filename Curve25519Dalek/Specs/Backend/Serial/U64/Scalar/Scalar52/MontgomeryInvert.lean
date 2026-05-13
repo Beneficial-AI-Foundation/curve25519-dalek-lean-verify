@@ -156,7 +156,7 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
   -- u < R: by contradiction, if u ≥ R then u * u ≥ R * R > R * L, contradicting h_value
   have h_LR : L < R := by unfold R L; omega
   have h_u_lt_R : Scalar52_as_Nat u < R := by
-    by_contra hge; push_neg at hge
+    by_contra hge; push Not at hge
     have := Nat.mul_le_mul hge (Nat.le_trans (Nat.le_of_lt h_LR) hge) -- R * L ≤ u * u
     omega
   let* ⟨ _11, _11_post1, _11_post2, _11_post3 ⟩ ← montgomery_mul_spec

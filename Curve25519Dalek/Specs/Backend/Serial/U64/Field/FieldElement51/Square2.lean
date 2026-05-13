@@ -54,7 +54,12 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
     let* ⟨ a, a_post ⟩ ← Array.update_spec
     let* ⟨ i3, i3_post ⟩ ← Usize.add_spec
     let* ⟨ result, result_post1, result_post2 ⟩ ← square2_loop_spec
-    case h_no_overflow => intro j hj hj2; simp_all [Array.set_val_eq]; exact h_no_overflow j hj (by omega)
+    case h_no_overflow =>
+      intro j hj hj2
+      simp_all only [Array.getElem!_Nat_eq, UScalar.lt_equiv, UScalar.ofNatCore_val_eq,
+        Order.add_one_le_iff, Array.set_val_eq, Nat.not_eq, ne_eq, true_or, or_true,
+        ↓List.getElem!_set_ne]
+      exact h_no_overflow j hj (by omega)
     refine ⟨fun j _ _ ↦ ?_, fun j _ _ ↦ ?_⟩
     · obtain _ | _ := (show j = i ∨ i + 1 ≤ j by omega) <;> simp_all
     · have := result_post2 j (by omega) (by omega)
@@ -66,7 +71,8 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.square2`**:
 - No panic (always returns successfully)
-- The result, when converted to a natural number, is congruent to twice the square of the input modulo p
+- The result, when converted to a natural number, is congruent to twice the square of the input
+  modulo p
 - Input bounds: each limb < 2^54
 - Output bounds: each limb < 2^53
 -/

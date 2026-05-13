@@ -42,12 +42,14 @@ natural language description:
       bitwise shifts.
 
     • **Mechanism**: The algorithm avoids division by adding multiples of `L` to the input `x`
-      until the result is exactly divisible by `R = 2^{260}` (i.e., the lower 260 bits are all zero).
+      until the result is exactly divisible by `R = 2^{260}` (i.e., the lower 260 bits are all
+      zero).
       Since `R = 2^{260}` and limbs are 52 bits, we perform 5 "zeroing" steps (`part1`)
       followed by 4 "result assembly" steps (`part2`).
 
     • **Part 1: The Zeroing Strategy**
-      We iteratively ensure the lowest remaining limb is 0 by adding a carefully chosen multiple of `L`.
+      We iteratively ensure the lowest remaining limb is 0 by adding a carefully chosen multiple
+      of `L`.
       The helper `part1` calculates a "zeroing factor" `p` using the precomputed `LFACTOR`
       (where `LFACTOR * L ≡ -1 (mod 2⁵²)`).
 
@@ -55,7 +57,8 @@ natural language description:
         * **Problem**: `limbs[0]` is non-zero. We cannot shift yet.
         * **Action**: Calculate `p` such that `limbs[0] + p * L ≡ 0 (mod 2⁵²)`.
         * **Result**: The sum's lowest 52 bits become 0.
-        * **Shift**: We discard these zero bits (effectively dividing by 2⁵²). The carry flows to the next limb.
+        * **Shift**: We discard these zero bits (effectively dividing by 2⁵²). The carry flows to
+          the next limb.
 
       *This repeats 5 times (using updated carries) until the entire lower 260 bits are zero.*
 
@@ -99,7 +102,8 @@ private lemma mont_step (x : Int) (p : Int) (carry_out : Int)
     (hp : p = (x * ↑constants.LFACTOR.val) % (2 ^ 52))
     (hcarry : carry_out = (x + p * ↑constants.L[0]!.val) / (2 ^ 52)) :
     x + p * ↑constants.L[0]!.val = carry_out * (2 ^ 52) := by
-  have h_div : x + p * ↑constants.L[0]!.val = carry_out * (2 ^ 52) + (x + p * ↑constants.L[0]!.val) % (2 ^ 52) := by
+  have h_div : x + p * ↑constants.L[0]!.val =
+      carry_out * (2 ^ 52) + (x + p * ↑constants.L[0]!.val) % (2 ^ 52) := by
     rw [hcarry]
     rw [mul_comm ((x + p * ↑constants.L[0]!.val) / 2 ^ 52)]
     rw [Int.mul_ediv_add_emod]

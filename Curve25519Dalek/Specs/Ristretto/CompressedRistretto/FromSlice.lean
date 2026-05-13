@@ -28,7 +28,7 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 @[step]
 theorem core.array.TryFromArrayCopySlice.try_from_spec
     {T : Type} (N : Usize) (copyInst : core.marker.Copy T) (s : Slice T)
-    (hClone : List.mapM copyInst.cloneInst.clone s.val = ok s.val) :
+    (_hClone : List.mapM copyInst.cloneInst.clone s.val = ok s.val) :
     core.array.TryFromArrayCopySlice.try_from N copyInst s
     ⦃ (result : core.result.Result (Array T N) core.array.TryFromSliceError) =>
       (s.length = N → ∃ a : Array T N, result = .Ok a ∧ a.val = s.val) ∧

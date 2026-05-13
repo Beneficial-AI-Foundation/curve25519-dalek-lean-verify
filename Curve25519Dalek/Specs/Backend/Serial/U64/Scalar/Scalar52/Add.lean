@@ -102,7 +102,7 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
   obtain ⟨o, iter1, h_next, h_none_branch, h_some_branch⟩ := next_spec
     { start := i, «end» := 5#usize }
   rw [h_next, bind_tc_ok]
-  simp only [Prod.mk.eta, bind_assoc, bind_tc_ok, Array.getElem!_Nat_eq,
+  simp only [bind_assoc, Array.getElem!_Nat_eq,
     List.getElem!_eq_getElem?_getD]
   match o with
   | none =>

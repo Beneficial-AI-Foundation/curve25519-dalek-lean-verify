@@ -105,7 +105,7 @@ They mirror the Nat-level spec theorems from Aeneas but with BitList postconditi
 theorem List.extract_append_extract {α : Type*} (l : List α) (a b c : Nat)
     (hab : a ≤ b) (hbc : b ≤ c) :
     l.extract a b ++ l.extract b c = l.extract a c := by
-  simp only [List.extract_eq_drop_take]
+  simp only [List.extract_eq_take_drop]
   conv_rhs => rw [show c - a = (b - a) + (c - b) from by omega]
   rw [List.take_add]
   congr 1
@@ -370,11 +370,11 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 24 32 (by omega) (by omega),
         List.extract_append_extract _ 0 32 40 (by omega) (by omega),
         List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
-    rw [List.take_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [List.take_left' (by simp [ofU64_length])]
     rw [List.extract_append_extract _ 0 48 52 (by omega) (by omega)]
-    simp [List.extract_eq_drop_take]
+    simp
   · -- hlimb1
-    rw [hb6, List.drop_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [hb6, List.drop_left' (by simp [ofU64_length])]
     rw [hb7, hb8, hb9, hb10, hb11, hb12]
     rw [List.extract_append_extract _ 0 4 12 (by omega) (by omega),
         List.extract_append_extract _ 0 12 20 (by omega) (by omega),
@@ -382,7 +382,7 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 28 36 (by omega) (by omega),
         List.extract_append_extract _ 0 36 44 (by omega) (by omega),
         List.extract_append_extract _ 0 44 52 (by omega) (by omega)]
-    simp [List.extract_eq_drop_take]
+    simp
   · -- hlimb2
     rw [hb13, hb14, hb15, hb16, hb17, hb18, hb19]
     rw [List.extract_append_extract _ 0 8 16 (by omega) (by omega),
@@ -390,11 +390,11 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 24 32 (by omega) (by omega),
         List.extract_append_extract _ 0 32 40 (by omega) (by omega),
         List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
-    rw [List.take_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [List.take_left' (by simp [ofU64_length])]
     rw [List.extract_append_extract _ 0 48 52 (by omega) (by omega)]
-    simp [List.extract_eq_drop_take]
+    simp
   · -- hlimb3
-    rw [hb19, List.drop_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [hb19, List.drop_left' (by simp [ofU64_length])]
     rw [hb20, hb21, hb22, hb23, hb24, hb25]
     rw [List.extract_append_extract _ 0 4 12 (by omega) (by omega),
         List.extract_append_extract _ 0 12 20 (by omega) (by omega),
@@ -402,7 +402,7 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 28 36 (by omega) (by omega),
         List.extract_append_extract _ 0 36 44 (by omega) (by omega),
         List.extract_append_extract _ 0 44 52 (by omega) (by omega)]
-    simp [List.extract_eq_drop_take]
+    simp
   · -- hlimb4
     rw [hb26, hb27, hb28, hb29, hb30, hb31]
     rw [List.extract_append_extract _ 0 8 16 (by omega) (by omega),
@@ -410,7 +410,7 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 24 32 (by omega) (by omega),
         List.extract_append_extract _ 0 32 40 (by omega) (by omega),
         List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
-    simp [List.extract_eq_drop_take]
+    simp
 
 -- Remove @[step] from the Nat-level shift specs and add to the BitList specs.
 attribute [-step] U64.ShiftRight_IScalar_spec

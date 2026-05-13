@@ -29,7 +29,8 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 305:4-31
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
-namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
+namespace SubtleConditionallySelectable
 
 /-
 natural language description:
@@ -127,4 +128,5 @@ theorem conditional_assign_point
     rw [hr_eq]
     exact ⟨h_other, rfl⟩
 
-end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+end SubtleConditionallySelectable
+end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts

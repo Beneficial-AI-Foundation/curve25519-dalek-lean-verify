@@ -20,7 +20,8 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 297:4-30
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
-namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
+namespace SubtleConditionallySelectable
 
 /-- **Spec theorem for
 `backend.serial.curve_models.ProjectiveNielsPoint.conditional_select`**
@@ -50,4 +51,5 @@ theorem conditional_select_spec
   step*
   refine ⟨?_, ?_, ?_, ?_⟩ <;> intro i hi <;> split_ifs <;> simp_all
 
-end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+end SubtleConditionallySelectable
+end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts

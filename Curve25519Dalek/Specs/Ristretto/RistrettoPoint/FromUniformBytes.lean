@@ -62,14 +62,14 @@ theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
   unfold from_uniform_bytes
   unfold Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add
   step*
-  · simp_all only [Array.to_slice_mut, Array.val_to_slice,
+  · simp_all only [Array.val_to_slice,
       List.slice_zero_j, Slice.length, List.length_take,
       List.Vector.length_val, UScalar.ofNatCore_val_eq,
       Nat.reduceLeDiff, inf_of_le_left, tsub_zero,
       Array.repeat_val, List.reduceReplicate,
       List.length_cons, List.length_nil, zero_add,
       Nat.reduceAdd]
-  · simp_all only [Array.to_slice_mut, Array.val_to_slice,
+  · simp_all only [Array.val_to_slice,
       List.slice_zero_j, Slice.length, List.length_take,
       List.Vector.length_val, UScalar.ofNatCore_val_eq,
       Nat.reduceLeDiff, inf_of_le_left, tsub_zero,
@@ -81,7 +81,7 @@ theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
     simp only [backend.serial.u64.field.FieldElement51.toField]
     rw [(Montgomery.lift_mod_eq_iff _ _).mp r_1_post1,
       (Montgomery.lift_mod_eq_iff _ _).mp r_2_post1]
-    simp_all only [Array.to_slice_mut, Array.val_to_slice,
+    simp_all only [Array.val_to_slice,
       List.slice_zero_j, Slice.length, List.length_take, List.Vector.length_val, tsub_zero]
     have hlen1 : s2.val.length = (32#usize).val := by
       have := congrArg List.length s1_post1

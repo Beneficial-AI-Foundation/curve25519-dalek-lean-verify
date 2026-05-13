@@ -109,12 +109,13 @@ private lemma U128_ofDigits_toLEBytes (x : Std.U128) :
     simp only [UScalarTy.U8_numBits_eq, List.map_map, List.map_inj_left, Function.comp_apply]
     intro a ha
     rfl
-  simp only [Nat.reducePow, UScalarTy.U8_numBits_eq, hmap]
+  simp only [Nat.reducePow, UScalarTy.U8_numBits_eq]
   have hdigits :
       Nat.ofDigits (2^8) (x.bv.toLEBytes.map (fun b => b.toNat))
         = (BitVec.fromLEBytes x.bv.toLEBytes).toNat := by
     rw [hdigits]
-  simp at hdigits
+  simp only [Nat.reducePow, Nat.reduceMod, BitVec.fromLEBytes_toLEBytes,
+    BitVec.toNat_cast, U128.bv_toNat] at hdigits
   exact hmap.symm ▸ hdigits
 
 private lemma U8x32_as_Nat_setSlice_zeroI (bs : List Std.U8) (h_len : bs.length = 16) :

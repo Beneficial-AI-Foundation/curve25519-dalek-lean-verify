@@ -39,8 +39,9 @@ lemma mkPoint_u_zero (a : montgomery.MontgomeryPoint)
     (h : (U8x32_as_Field a) = 0) :
     MontgomeryPoint.mkPoint a = T_point := by
   unfold MontgomeryPoint.mkPoint MontgomeryPoint.u_affine_toPoint
-  simp only [h, beq_self_eq_true]
-  simp
+  simp only [h]
+  simp only [beq_iff_eq, Bool.not_eq_eq_eq_not, Bool.not_true, dite_eq_ite, ite_eq_left_iff,
+    dite_eq_left_iff, Bool.not_eq_false]
   exact fun h => absurd rfl h
 
 private lemma v_coord_birational_match
@@ -235,7 +236,7 @@ theorem to_montgomery_birational_eq
             (Prod.mk.eta (p := math.sqrt_checked
               (v_squared (U8x32_as_Field a)))).symm).mpr h_is_sq
     simp only [MontgomeryPoint.mkPoint, MontgomeryPoint.u_affine_toPoint, h_sqrt_true,
-      Bool.not_true, hu_0_ne, beq_iff_eq]
+      Bool.not_true, beq_iff_eq]
     conv_rhs => simp only [↓reduceDIte]
     simp only [Bool.false_eq_true, ↓reduceDIte]
     split_ifs with h_dite

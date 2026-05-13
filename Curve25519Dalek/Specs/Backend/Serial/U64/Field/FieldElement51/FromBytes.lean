@@ -109,7 +109,7 @@ private lemma sum_extract_eq (l : List U8) (i : Nat) (hi : i + 8 ≤ l.length) :
     ∑ j ∈ Finset.range 8, l[i + j]!.val * 2 ^ (8 * j) =
       Nat.ofDigits 256 ((l.extract i (i + 8)).map (·.val)) := by
   have hlen : (l.extract i (i + 8)).length = 8 := by
-    simp [extract_eq_drop_take, length_take, length_drop]; omega
+    simp [length_take, length_drop]; omega
   rw [ofDigits_map_val_eq_sum, hlen]
   apply Finset.sum_congr rfl; intro j hj; rw [Finset.mem_range] at hj
   rw [extract_getElem! l i j hj, show (256 : Nat) = 2 ^ 8 from by norm_num, ← Nat.pow_mul]
@@ -124,7 +124,7 @@ theorem load8_at_bitList_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ 
   simp only [Slice.getElem!_Nat_eq] at hval
   set rhs := (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64)
   have hlen : rhs.length = 64 := by
-    simp [rhs, extract_eq_drop_take, length_take, length_drop, ofByteList_length]
+    simp [rhs, length_take, length_drop, ofByteList_length]
     omega
   have hval_eq : result.val = toNat rhs := by
     simp only [rhs]
@@ -208,7 +208,7 @@ theorem limb_bound_of_equiv (result : FieldElement51) (bytes : Array U8 32#usize
   intro i
   rw [← toNat_ofU64 result[i]!, (hequiv i).toNat_eq]
   refine (toNat_lt_pow _).trans_le (Nat.pow_le_pow_right (by omega) ?_)
-  simp [List.extract_eq_drop_take, length_take, length_drop, ofByteArray_length]
+  simp [length_take, length_drop, ofByteArray_length]
 
 /-! ## The pure List Bool specification for from_bytes -/
 set_option maxHeartbeats 230000 in

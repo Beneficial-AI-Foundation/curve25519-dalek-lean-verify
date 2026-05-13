@@ -119,7 +119,6 @@ theorem select_loop_spec {P : EdwardsPoint}
       intro hlt
       exact absurd (h_some_branch hlt).1 (by simp)
     have hstart9 : iter.start.val = 9 := by omega
-    simp only [spec_ok]
     refine ⟨h_t_valid, ?_⟩
     rw [h_t_point, hstart9]
     push_cast
@@ -217,7 +216,7 @@ theorem select_loop_spec {P : EdwardsPoint}
         · by_cases hxlt : xabs.val < ((iter.start.val : ℤ))
           · have hxlt' : xabs.val < ((iter.start.val : ℤ) + 1) := by omega
             simp only [hxge, hxlt, hxlt', and_self, if_true]
-          · push_neg at hxlt
+          · push Not at hxlt
             have hxnlt' : ¬ (xabs.val < ((iter.start.val : ℤ) + 1)) := by omega
             have hxnlt : ¬ (xabs.val < (iter.start.val : ℤ)) := not_lt.mpr hxlt
             simp only [hxge, hxnlt, hxnlt', and_false, if_false]
@@ -312,7 +311,7 @@ theorem select_spec {P : EdwardsPoint}
       have hx_nn : 0 ≤ x.val := by
         rw [← hi1_val]
         by_contra hneg
-        push_neg at hneg
+        push Not at hneg
         have := xmask_post3.mpr hneg; omega
       have hxm_bv : xmask.bv = 0#16 := by
         apply BitVec.eq_of_toInt_eq
@@ -362,7 +361,7 @@ theorem select_spec {P : EdwardsPoint}
   rcases hi5_cases with hi5_zero | hi5_one
   · -- Case A: i5 = 0#u8 → neg_mask = Choice.zero (no flip). x.val ≥ 0.
     have hx_nn : 0 ≤ x.val := by
-      by_contra hneg; push_neg at hneg
+      by_contra hneg; push Not at hneg
       have hi1_neg : i1.val < 0 := by rw [hi1_val]; exact hneg
       have hxm_neg : xmask.val = -1 := xmask_post3.mpr hi1_neg
       have := aux_i5_one_of_xmask_neg1 hxm_neg
@@ -381,7 +380,7 @@ theorem select_spec {P : EdwardsPoint}
     exact_mod_cast Int.natAbs_of_nonneg hx_nn
   · -- Case B: i5 = 1#u8 → neg_mask = Choice.one (flip). x.val < 0.
     have hx_neg : x.val < 0 := by
-      by_contra hnn; push_neg at hnn
+      by_contra hnn; push Not at hnn
       have hi1_nn : 0 ≤ i1.val := by rw [hi1_val]; exact hnn
       have hxm_zero : xmask.val = 0 := by
         rcases xmask_post2 with hxm | hxm
