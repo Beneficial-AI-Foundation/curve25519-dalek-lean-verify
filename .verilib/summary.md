@@ -167,41 +167,33 @@ Axioms — propositions assumed without proof.
 - `probe:curve25519_dalek.subtle.CtOption.value` (external)
 - `probe:curve25519_dalek.zeroize.Zeroize.Blanket.zeroize` (external)
 
-## 4. Unverified functions (65)
+## 4. Unverified functions (48)
 
-- `probe:Edwards.add_assoc_Ed25519`
-- `probe:Edwards.complete_addition_denominators_ne_zero`
-- `probe:curve25519-dalek/4.2.0/backend/get_selected_backend()`
+### 4a. Rust functions without complete proofs (44)
+
 - `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&AffineNielsPoint#impl#[AffineNielsPoint][Zeroize]zeroize()`
 - `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&ProjectiveNielsPoint#impl#[ProjectiveNielsPoint][Zeroize]zeroize()`
 - `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&ProjectivePoint#impl<bool>#[ProjectivePoint][ValidityCheck]is_valid()`
 - `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/AffineNielsPoint#impl<AffineNielsPoint>#[AffineNielsPoint][Neg]neg()`
-- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/ProjectiveNielsPoint#impl<ProjectiveNielsPoint>#[ProjectiveNielsPoint][Neg]neg()`
 - `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/impl<AffineNielsPoint>#[AffineNielsPoint][Default]default()`
 - `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/impl<ProjectiveNielsPoint>#[ProjectiveNielsPoint][Default]default()`
-- `probe:curve25519-dalek/4.2.0/backend/serial/scalar_mul/variable_base/mul()`
 - `probe:curve25519-dalek/4.2.0/backend/serial/u64/field/&FieldElement51#impl#[FieldElement51][Zeroize]zeroize()`
 - `probe:curve25519-dalek/4.2.0/backend/serial/u64/field/&FieldElement51#impl<&FieldElement51>#[FieldElement51][`MulAssign<&'a/FieldElement51>`]mul_assign()`
 - `probe:curve25519-dalek/4.2.0/backend/serial/u64/field/impl<&FieldElement51>#[FieldElement51][ConditionallySelectable]conditional_swap()`
 - `probe:curve25519-dalek/4.2.0/backend/serial/u64/scalar/&Scalar52#impl#[Scalar52][Zeroize]zeroize()`
 - `probe:curve25519-dalek/4.2.0/backend/serial/u64/scalar/&Scalar52#impl<usize>#[Scalar52][`Index<usize>`]index()`
 - `probe:curve25519-dalek/4.2.0/backend/serial/u64/scalar/&Scalar52#impl<usize>#[Scalar52][`IndexMut<usize>`]index_mut()`
-- `probe:curve25519-dalek/4.2.0/backend/variable_base_mul()`
-- `probe:curve25519-dalek/4.2.0/edwards/&CompressedEdwardsY#impl<Option<EdwardsPoint>>#[CompressedEdwardsY]decompress()`
 - `probe:curve25519-dalek/4.2.0/edwards/&CompressedEdwardsY#impl<[u8;/{const}]>#[CompressedEdwardsY]to_bytes()`
 - `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&EdwardsPoint>#[EdwardsPoint][`AddAssign<&'a/EdwardsPoint>`]add_assign()`
 - `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&EdwardsPoint>#[EdwardsPoint][`SubAssign<&'a/EdwardsPoint>`]sub_assign()`
 - `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&Scalar>#[EdwardsPoint][`MulAssign<&'a/Scalar>`]mul_assign()`
-- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&Scalar>#[`&EdwardsPoint`][`Mul<&'a/Scalar>`]mul()`
-- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<CompressedEdwardsY>#[EdwardsPoint]compress()`
 - `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<bool>#[EdwardsPoint][ValidityCheck]is_valid()`
 - `probe:curve25519-dalek/4.2.0/edwards/EdwardsPoint#impl<EdwardsPoint>#[EdwardsPoint][Neg]neg()`
-- `probe:curve25519-dalek/4.2.0/edwards/affine/AffinePoint#impl<CompressedEdwardsY>#[AffinePoint]compress()`
 - `probe:curve25519-dalek/4.2.0/edwards/affine/Scalar#impl<&AffinePoint>#[Scalar][`Mul<&AffinePoint>`]mul()`
 - `probe:curve25519-dalek/4.2.0/edwards/affine/Scalar#impl<AffinePoint>#[Scalar][`Mul<AffinePoint>`]mul()`
 - `probe:curve25519-dalek/4.2.0/edwards/affine/impl<AffinePoint>#[AffinePoint][Default]default()`
 - `probe:curve25519-dalek/4.2.0/edwards/decompress/step_1()`
-- `probe:curve25519-dalek/4.2.0/edwards/impl<&Scalar>#[EdwardsPoint]mul_base()`
+- `probe:curve25519-dalek/4.2.0/edwards/decompress/step_2()`
 - `probe:curve25519-dalek/4.2.0/edwards/impl<CompressedEdwardsY>#[CompressedEdwardsY][Default]default()`
 - `probe:curve25519-dalek/4.2.0/edwards/impl<EdwardsPoint>#[EdwardsPoint][Default]default()`
 - `probe:curve25519-dalek/4.2.0/field/&FieldElement51#impl<&FieldElement>#[`backend::serial::u64::field::FieldElement51`][`PartialEq<Self>`]eq()`
@@ -221,18 +213,17 @@ Axioms — propositions assumed without proof.
 - `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Scalar>#[Scalar][`SubAssign<&'a/Scalar>`]sub_assign()`
 - `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<[i8;/{const}]>#[Scalar]non_adjacent_form()`
 - `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<usize>#[Scalar][`Index<usize>`]index()`
-- `probe:curve25519-dalek/4.2.0/scalar/impl<&[Scalar]>#[Scalar]batch_invert()`
 - `probe:curve25519-dalek/4.2.0/scalar/impl<Scalar>#[Scalar][Default]default()`
-- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul_spec`
-- `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop_spec`
-- `probe:curve25519_dalek.edwards.CompressedEdwardsY.decompress_spec`
-- `probe:curve25519_dalek.edwards.CompressedEdwardsY.step_1_spec`
-- `probe:curve25519_dalek.edwards.EdwardsPoint.compress_spec`
-- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_base_spec`
-- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2_spec`
-- `probe:curve25519_dalek.edwards.affine.AffinePoint.compress_spec`
-- `probe:curve25519_dalek.math.decompress_edwards_pure`
+- `probe:curve25519-dalek/4.2.0/traits/&T#impl<bool>#[T][IsIdentity]is_identity()`
+
+### 4b. Lean definitions with sorry (1)
+
 - `probe:curve25519_dalek.math.elligator_ristretto_flavor_pure`
+
+### 4c. Lean theorems with sorry (3)
+
+- `probe:Edwards.add_assoc_Ed25519`
+- `probe:Edwards.complete_addition_denominators_ne_zero`
 - `probe:curve25519_dalek.ristretto.IsEven_iff_in_doubling_image_right`
 
 ## 5. Verified remaining Lean functions (770)
