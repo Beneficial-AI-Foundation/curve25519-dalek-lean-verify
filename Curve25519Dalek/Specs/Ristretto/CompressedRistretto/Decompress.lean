@@ -115,10 +115,66 @@ theorem decompress_spec (self : CompressedRistretto) :
       -- Rewrite with step_2 result
       rw [h_step2_eq]
       simp only [bind_ok]
-      -- TODO: blocked on aeneas let-destructure elaboration issue (FromBytes-275 family),
-      -- see TODO.md. The remaining branches all hit the same `rfl` / let-destructure
-      -- mismatch in `⟨none, rfl, ...⟩` / `⟨some res, rfl, ...⟩`.
-      sorry
+      -- Case split on the three boolean flags from step_2
+      by_cases h_ok1 : (ok1.val = 1#u8)
+      · -- ok1 = 1: subsequent flag c2 = 0 (success-so-far)
+        by_cases h_t_neg : (t_neg.val = 0#u8)
+        · -- t_neg = 0
+          by_cases h_y_zero : (y_zero.val = 0#u8)
+          · -- y_zero = 0: SUCCESS path → ok (some res)
+            have h_t_neg_ne : ¬ t_neg.val = 1#u8 := by
+              rw [h_t_neg]; decide
+            have h_y_zero_ne : ¬ y_zero.val = 1#u8 := by
+              rw [h_y_zero]; decide
+            refine ⟨some res, ?_, ?_, ?_⟩
+            · simp [h_ok1, h_t_neg_ne, h_y_zero_ne]
+            · intro hnv
+              exfalso
+              apply hnv
+              refine ⟨res.toPoint, ?_⟩
+              unfold decompress_pure
+              rw [h_ds1, Option.bind_some]
+              exact (h_step2_bridge res.toPoint).mpr ⟨h_ok1, h_t_neg, h_y_zero, rfl⟩
+            · intro _
+              refine ⟨res, rfl, h_step2_valid ⟨h_ok1, h_t_neg, h_y_zero⟩, ?_⟩
+              unfold decompress_pure
+              rw [h_ds1, Option.bind_some]
+              exact (h_step2_bridge res.toPoint).mpr ⟨h_ok1, h_t_neg, h_y_zero, rfl⟩
+          · -- y_zero ≠ 0: FAIL path
+            have h_y_zero_one : y_zero.val = 1#u8 := by
+              rcases y_zero.valid with h | h
+              · exact absurd h h_y_zero
+              · exact h
+            have h_t_neg_ne : ¬ t_neg.val = 1#u8 := by
+              rw [h_t_neg]; decide
+            have h_step2_none' : decompress_step2 s.toField = none :=
+              h_step2_none (fun ⟨_, _, hz⟩ => h_y_zero (hz))
+            refine ⟨none, ?_, fun _ => rfl, fun ⟨_, h⟩ => ?_⟩
+            · simp [h_ok1, h_t_neg_ne, h_y_zero_one]
+            · simp only [decompress_pure, h_ds1, Option.bind_some, h_step2_none',
+                reduceCtorEq] at h
+        · -- t_neg ≠ 0: FAIL path
+          have h_t_neg_one : t_neg.val = 1#u8 := by
+            rcases t_neg.valid with h | h
+            · exact absurd h h_t_neg
+            · exact h
+          have h_step2_none' : decompress_step2 s.toField = none :=
+            h_step2_none (fun ⟨_, ht, _⟩ => h_t_neg (ht))
+          refine ⟨none, ?_, fun _ => rfl, fun ⟨_, h⟩ => ?_⟩
+          · simp [h_ok1, h_t_neg_one]
+          · simp only [decompress_pure, h_ds1, Option.bind_some, h_step2_none',
+              reduceCtorEq] at h
+      · -- ok1 ≠ 1: FAIL path
+        have h_ok1_zero : ok1.val = 0#u8 := by
+          rcases ok1.valid with h | h
+          · exact h
+          · exact absurd h h_ok1
+        have h_step2_none' : decompress_step2 s.toField = none :=
+          h_step2_none (fun ⟨hok, _, _⟩ => h_ok1 (hok))
+        refine ⟨none, ?_, fun _ => rfl, fun ⟨_, h⟩ => ?_⟩
+        · simp [h_ok1_zero]
+        · simp only [decompress_pure, h_ds1, Option.bind_some, h_step2_none',
+            reduceCtorEq] at h
   · -- Non-canonical encoding: return none
     refine ⟨none, ?_, fun _ => rfl, fun ⟨_, h⟩ => ?_⟩
     · simp only [h_canon, ↓reduceIte, Choice.one, bind_tc_ok, decide_eq_true_eq, true_or]
