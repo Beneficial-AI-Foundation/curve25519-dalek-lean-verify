@@ -47,7 +47,8 @@ open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldEle
 open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.field.FieldElement51
 open Edwards
-namespace curve25519_dalek.edwards.CompressedEdwardsY
+namespace curve25519_dalek.edwards.decompress
+open curve25519_dalek.edwards.CompressedEdwardsY (as_bytes_spec)
 
 /-- **Spec theorem for `curve25519_dalek::edwards::decompress::step_1`**
 • The function always succeeds (no panic) for any 32-byte input
@@ -220,4 +221,4 @@ theorem step_1_spec (repr : CompressedEdwardsY) :
     intro h_flag
     exact (curve_iff _).mpr (flag1_imp h_flag)
 
-end curve25519_dalek.edwards.CompressedEdwardsY
+end curve25519_dalek.edwards.decompress

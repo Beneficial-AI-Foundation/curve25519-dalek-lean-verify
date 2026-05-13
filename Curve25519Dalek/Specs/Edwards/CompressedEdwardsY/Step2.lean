@@ -35,7 +35,7 @@ open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldEle
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51
 open curve25519_dalek.backend.serial.u64.field
 open Edwards
-namespace curve25519_dalek.edwards.CompressedEdwardsY
+namespace curve25519_dalek.edwards.decompress
 
 private lemma toField_neg
     {X xneg : FieldElement51}
@@ -159,4 +159,4 @@ theorem step_2_spec
     intro j hj
     have := x_neg_post2 j hj; omega
 
-end curve25519_dalek.edwards.CompressedEdwardsY
+end curve25519_dalek.edwards.decompress
