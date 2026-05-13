@@ -459,48 +459,48 @@ theorem IsEven_iff_in_doubling_image_left (P : Point Ed25519) :
   rw [h_double_y']
   set x := Q.x
   set y := Q.y
-  set lam := Ed25519.d * x * x * y * y with hlam
+  set lamVal := Ed25519.d * x * x * y * y with hlam
   have hcurve : Ed25519.a * x^2 + y^2 = 1 + Ed25519.d * x^2 * y^2 := Q.on_curve
   rw [ha] at hcurve
   simp only [neg_mul, one_mul] at hcurve
-  have h_yx : y^2 - x^2 = 1 + lam := by linear_combination hcurve
-  have h_denom_ne : 1 - lam ≠ 0 := by
+  have h_yx : y^2 - x^2 = 1 + lamVal := by linear_combination hcurve
+  have h_denom_ne : 1 - lamVal ≠ 0 := by
     have := Ed25519.denomsNeZero Q Q
     convert this.2
-  have : 1 - ((y^2 + x^2) / (1 - lam))^2 = ((1 - lam)^2 - (y^2 + x^2)^2) / (1 - lam)^2 := by
+  have : 1 - ((y^2 + x^2) / (1 - lamVal))^2 = ((1 - lamVal)^2 - (y^2 + x^2)^2) / (1 - lamVal)^2 := by
     field_simp [h_denom_ne]
   rw [this]
-  have h_factor : (1 - lam)^2 - (y^2 + x^2)^2 = (1 - lam - y^2 - x^2) * (1 - lam + y^2 + x^2) := by
+  have h_factor : (1 - lamVal)^2 - (y^2 + x^2)^2 = (1 - lamVal - y^2 - x^2) * (1 - lamVal + y^2 + x^2) := by
     ring
-  have h_lam_eq : lam = y^2 - x^2 - 1 := by
-    have h : y^2 - x^2 - 1 - lam = 0 := by linear_combination h_yx
+  have h_lam_eq : lamVal = y^2 - x^2 - 1 := by
+    have h : y^2 - x^2 - 1 - lamVal = 0 := by linear_combination h_yx
     linear_combination -h
-  have h1mlam : 1 - lam = 2 + x^2 - y^2 := by
+  have h1mlam : 1 - lamVal = 2 + x^2 - y^2 := by
     rw [h_lam_eq]
     ring
-  have h_A : 1 - lam - y^2 - x^2 = 2 - 2*y^2 := by linear_combination h1mlam
-  have h_B : 1 - lam + y^2 + x^2 = 2 + 2*x^2 := by linear_combination h1mlam
+  have h_A : 1 - lamVal - y^2 - x^2 = 2 - 2*y^2 := by linear_combination h1mlam
+  have h_B : 1 - lamVal + y^2 + x^2 = 2 + 2*x^2 := by linear_combination h1mlam
   rw [h_factor, h_A, h_B]
   have h_factor_simp : (2 - 2*y^2) * (2 + 2*x^2) = 4 * (1 - y^2) * (1 + x^2) := by ring
   rw [h_factor_simp]
-  have h_1my : 1 - y^2 = -lam - x^2 := by linear_combination -h_yx
+  have h_1my : 1 - y^2 = -lamVal - x^2 := by linear_combination -h_yx
   rw [h_1my]
-  have h_sign : 4 * (-lam - x^2) * (1 + x^2) = -4 * (lam + x^2) * (1 + x^2) := by ring
+  have h_sign : 4 * (-lamVal - x^2) * (1 + x^2) = -4 * (lamVal + x^2) * (1 + x^2) := by ring
   rw [h_sign]
   have h_neg1_sq : IsSquare (-1 : CurveField) := neg_one_is_square
   have h_4_sq : IsSquare (4 : CurveField) := ⟨2, by ring⟩
   have h_neg4_sq : IsSquare (-4 : CurveField) := IsSquare.mul h_neg1_sq h_4_sq
-  have h_lam_factor : lam + x^2 = x^2 * (Ed25519.d * y^2 + 1) := by
+  have h_lam_factor : lamVal + x^2 = x^2 * (Ed25519.d * y^2 + 1) := by
     rw [hlam]
     ring
   rw [h_lam_factor]
-  have h_lam_x : lam + x^2 = y^2 - 1 := by linear_combination h_lam_eq
+  have h_lam_x : lamVal + x^2 = y^2 - 1 := by linear_combination h_lam_eq
   have h_x2_dy : x^2 * (Ed25519.d * y^2 + 1) = y^2 - 1 := by
-    calc x^2 * (Ed25519.d * y^2 + 1) = lam + x^2 := by rw [← h_lam_factor]
+    calc x^2 * (Ed25519.d * y^2 + 1) = lamVal + x^2 := by rw [← h_lam_factor]
          _ = y^2 - 1 := h_lam_x
   rw [h_x2_dy]
   rw [h1mlam]
-  have h_rw : (2 + x ^ 2 - y ^ 2) ^ 2 = (1 - lam) ^ 2 := by
+  have h_rw : (2 + x ^ 2 - y ^ 2) ^ 2 = (1 - lamVal) ^ 2 := by
     congr 1
     exact h1mlam.symm
   rw [h_rw]
@@ -535,8 +535,8 @@ theorem IsEven_iff_in_doubling_image_left (P : Point Ed25519) :
       · exact ⟨y, pow_two y⟩
       · exact h_one_add_d_sq
   obtain ⟨c, hc⟩ := h_num_sq
-  use c / (1 - lam)
-  rw [div_mul_div_comm, ← sq (1 - lam), div_left_inj' (pow_ne_zero 2 h_denom_ne)]
+  use c / (1 - lamVal)
+  rw [div_mul_div_comm, ← sq (1 - lamVal), div_left_inj' (pow_ne_zero 2 h_denom_ne)]
   exact hc
 
 /-- A point is even if and only if it lies in the image of the doubling map. -/
@@ -769,16 +769,9 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
       ((inv_sqrt_checked W).1 * ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2)) *
         (a_val * (d : CurveField) * (1 + a_val * s ^ 2) ^ 2 -
           (1 - a_val * s ^ 2) ^ 2)) = pt.y := by
-    rw [hy]; congr 1
-    have h1 : (inv_sqrt_checked W).1 * ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2)) *
-      (a_val * ↑d * (1 + a_val * s ^ 2) ^ 2 - (1 - a_val * s ^ 2) ^ 2) =
-      (inv_sqrt_checked W).1 ^ 2 * (1 - a_val * s ^ 2) *
-      (a_val * ↑d * (1 + a_val * s ^ 2) ^ 2 - (1 - a_val * s ^ 2) ^ 2) := by ring
-    have h2 : I * (I * (1 - a_val * s ^ 2)) *
-      (a_val * ↑d * (1 + a_val * s ^ 2) ^ 2 - (1 - a_val * s ^ 2) ^ 2) =
-      I ^ 2 * (1 - a_val * s ^ 2) *
-      (a_val * ↑d * (1 + a_val * s ^ 2) ^ 2 - (1 - a_val * s ^ 2) ^ 2) := by ring
-    rw [h1, h2, h_sq_eq]
+    rw [hy]
+    linear_combination -((1 + a_val * s ^ 2) * (1 - a_val * s ^ 2) *
+      (a_val * ↑d * (1 + a_val * s ^ 2) ^ 2 - (1 - a_val * s ^ 2) ^ 2)) * h_sq_eq
   -- 5. x coordinate: abs_edwards(2s * I' * u2) = abs_edwards(2s * I * u2) (I' = ±I)
   have h_x_match : abs_edwards (2 * s * ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2))) =
       pt.x := by

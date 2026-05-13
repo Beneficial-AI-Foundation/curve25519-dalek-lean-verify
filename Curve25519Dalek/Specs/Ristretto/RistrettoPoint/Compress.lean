@@ -220,6 +220,17 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
       | (have := h.1.X_bounds i hi; omega)
       | (have := h.1.T_bounds i hi; omega)
       | omega)
+  -- HACK: PR #918 step* regression; see Investigations/StepStarRegression.lean
+  -- step* stalls at `let (_, invsqrt) := result`. Manually destructure and re-run.
+  obtain ⟨_, invsqrt⟩ := result
+  simp only at *
+  step*
+  all_goals try (intro i hi; first
+      | exact h.1.Z_bounds i hi
+      | exact h.1.Y_bounds i hi
+      | (have := h.1.X_bounds i hi; omega)
+      | (have := h.1.T_bounds i hi; omega)
+      | omega)
   · intro i hi
     simp only [X_post i hi]
     split_ifs
@@ -265,8 +276,8 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     simpa only [h_a_eq] using h_s1_parity
   -- Build the shared implementation-to-pure bridge once.
   -- Both final goals consume h_key : s1.toField = compress_s self.toPoint.
-  rename_i _ _ _ _ _ _ x_post1 _ x_post2 x_post3 x_post4 x_post5 x_post6
-    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  -- HACK: PR #918 — `obtain` above exposes `invsqrt` and `result_postN` directly
+  -- (used to need `rename_i ... x_post1 _ x_post2 ... x_post5 x_post6` here).
   have hvalid := h.1
   have ⟨hpx, hpy⟩ := edwards.EdwardsPoint.toPoint_of_isValid hvalid
   have hZ_ne := hvalid.Z_ne_zero  -- Z.toField ≠ 0
@@ -323,7 +334,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
       rw [hb_u1_u2_sq, hb_u2_sq, h_u1_proj, hb_u2]
     -- Step 4: QR argument — when u1_u2_sq ≠ 0, I² · u1_u2_sq = 1
     have h_I_sq_mul : u1_u2_sq.toField ≠ 0 →
-        x_post1.2.toField ^ 2 * u1_u2_sq.toField = 1 := by
+        invsqrt.toField ^ 2 * u1_u2_sq.toField = 1 := by
       intro h_ne
       have h_ne_nat : Field51_as_Nat u1_u2_sq % p ≠ 0 := by
         rwa [FieldElement51.toField, ne_eq, ZMod.natCast_eq_zero_iff,
@@ -344,11 +355,11 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
         have h_val := congrArg ZMod.val h_zmod
         rw [ZMod.val_natCast, ZMod.val_one'' (by decide : p ≠ 1)] at h_val
         exact h_val
-      have h_post := (x_post5 ⟨h_ne_nat, h_qr⟩).2
+      have h_post := (result_post4 ⟨h_ne_nat, h_qr⟩).2
       -- Lift Nat % p equation to ZMod
       have hmm : ∀ a, (a % p) ≡ a [MOD p] := fun a => by
         exact Nat.mod_eq_of_lt (Nat.mod_lt a (by decide))
-      have h_modeq : Field51_as_Nat x_post1.2 ^ 2 * Field51_as_Nat u1_u2_sq ≡ 1 [MOD p] :=
+      have h_modeq : Field51_as_Nat invsqrt ^ 2 * Field51_as_Nat u1_u2_sq ≡ 1 [MOD p] :=
         ((hmm _).symm.pow 2).mul (hmm _).symm |>.trans (by exact h_post)
       unfold FieldElement51.toField
       have := lift_mod_eq _ _ h_modeq; push_cast at this; exact this
@@ -371,9 +382,9 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
       · -- Degenerate: I = 0, so s = 0 and compress_den_inv P = 0
         have h_nat : Field51_as_Nat u1_u2_sq % p = 0 := by
           rwa [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero] at hd
-        have hI0 : x_post1.2.toField = 0 := by
+        have hI0 : invsqrt.toField = 0 := by
           rw [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero]
-          exact (x_post4 h_nat).2
+          exact (result_post3 h_nat).2
         -- LHS: I=0 → i1=i2=0 → i21=0 → s=0
         have hi2_0 : i2.toField = 0 := by rw [hb_i2, hI0, zero_mul]
         have hs0 : s.toField = 0 := by
@@ -397,7 +408,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
         have hJ_sq : compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) = 1 := by
           unfold compress_invsqrt; exact inv_sqrt_checked_sq_mul _ h_isq h_ne_aff
         -- Step B: J² = I²·Z⁶ and compress_z_inv P = 1
-        set I := x_post1.2.toField
+        set I := invsqrt.toField
         set Z := self.Z.toField
         have hJ_I : compress_invsqrt P ^ 2 = I ^ 2 * Z ^ 6 := by
           have hI_u := h_I_sq_mul hd

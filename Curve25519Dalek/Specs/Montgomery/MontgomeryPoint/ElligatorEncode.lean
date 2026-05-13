@@ -455,7 +455,7 @@ private lemma elligator_nqr_twist
   -- Apply witness construction
   exact elligator_nqr_isSquare_witness r0 eps_val witness_val h_witness_eq
 
-set_option maxHeartbeats 400000 in -- heavy simp
+set_option maxHeartbeats 1200000 in -- heavy simp
 /-- **Spec theorem for `curve25519_dalek::montgomery::elligator_encode`**
 • The function always succeeds (no panic) for any valid field element input `r_0`
 • `eps_is_sq.val = 1#u8` ↔ eps = d·(d² + A·d + 1) is a quadratic residue mod p,
@@ -505,21 +505,24 @@ theorem elligator_encode_spec
   step as ⟨ fe2, hfe2, hfe2_b⟩
   step as ⟨ inner, hinner, hinner_b⟩
   step as ⟨ eps, heps, heps_b⟩
-  step as ⟨ pp, hp_b, hp_case_1, hp_case_2, hp_case_3, hp_case_4, hp_case_5⟩
+  step as ⟨ pp, hp_b, hp_case_1, hp_case_2, hp_case_3, hp_case_4, hp_case_5, hp_case_6⟩
   step as ⟨ zero, zero_eq, zero_bound⟩
   step as ⟨ Atemp, hAtemp⟩
   step as ⟨ u, hu, hu_b⟩
   · intro i hi
     have := hAtemp i hi
     rw [this]
-    by_cases h : pp.1.val = 1#u8
+    by_cases h : pp.val = 1#u8
     · simp only [h, ↓reduceIte, Array.getElem!_Nat_eq,
         List.getElem!_eq_getElem?_getD, Nat.reducePow, gt_iff_lt]
-      grind
+      have hzb := zero_bound i hi
+      simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] at hzb
+      omega
     · simp only [h, ↓reduceIte, Array.getElem!_Nat_eq,
         List.getElem!_eq_getElem?_getD, Nat.reducePow, gt_iff_lt]
-      clear *- A_bound
-      grind
+      have hab := A_bound i hi
+      simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] at hab
+      omega
   step as ⟨ u_neg, hu_neg, hu_neg_b⟩
   step as ⟨ p1, hp1⟩
   step as ⟨u1, hu1⟩
@@ -558,7 +561,7 @@ theorem elligator_encode_spec
   rw [this] at change_heps
   have change_heps := change_heps.trans (((hd_sq.add hau).add_right 1).mul_left (Field51_as_Nat d))
   -- ── Implementation bridging: QR case → ha_chain for d ──
-  have cases_one : (pp.1.val = 1#u8 → ↑(U8x32_as_Nat a) = d0) := by
+  have cases_one : (pp.val = 1#u8 → ↑(U8x32_as_Nat a) = d0) := by
     intro h_one
     simp only [h_one, true_iff] at hp1
     simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, hp1, Choice.zero, Nat.not_eq,
@@ -589,7 +592,7 @@ theorem elligator_encode_spec
       (U8x32_as_Nat a) (Field51_as_Nat A_neg) (Field51_as_Nat fe1) (Field51_as_Nat d_1)
       ha_chain change_A change_d_1 hfe1_non hfe1_0
   -- ── Implementation bridging: NQR case → u = -d0 - A ──
-  have cases_zero : (pp.1.val = 0#u8 → ↑(U8x32_as_Nat a) = -d0 - Curve25519.A) := by
+  have cases_zero : (pp.val = 0#u8 → ↑(U8x32_as_Nat a) = -d0 - Curve25519.A) := by
     intro h_zero
     simp only [h_zero, Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one,
       not_false_eq_true, one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
@@ -624,7 +627,7 @@ theorem elligator_encode_spec
       (Field51_as_Nat fe1) (Field51_as_Nat d_1)
       hA hd change_A change_d_1 hfe1_non hfe1_0
   -- ── Sub-lemma: IsSquare ↔ ──
-  have iff_sq : (pp.1.val = 1#u8 ↔ IsSquare (d0 * (d0 ^ 2 + Curve25519.A * d0 + 1))) := by
+  have iff_sq : (pp.val = 1#u8 ↔ IsSquare (d0 * (d0 ^ 2 + Curve25519.A * d0 + 1))) := by
     constructor
     · -- Forward: choice = 1 → IsSquare eps
       intro h_one
@@ -668,14 +671,14 @@ theorem elligator_encode_spec
       have : (486662 : CurveField) = Curve25519.A := curveField_486662_eq_A
       rw [this] at change_heps
       rw [← change_heps]
-      exact isSquare_eps_of_choice_one pp.1.val (Field51_as_Nat eps) (Field51_as_Nat one) one_eq
-        (fun cond => (hp_case_5 cond).left) h_one
+      exact isSquare_eps_of_choice_one pp.val (Field51_as_Nat eps) (Field51_as_Nat one) one_eq
+        (fun cond => (hp_case_6 cond).left) h_one
     · -- Backward: IsSquare → choice = 1
-      exact choice_one_of_isSquare_eps pp.1.val
+      exact choice_one_of_isSquare_eps pp.val
         (Field51_as_Nat eps) (Field51_as_Nat d) (Field51_as_Nat A1) (Field51_as_Nat A_neg)
         (Field51_as_Nat fe1) (Field51_as_Nat d_1) (Field51_as_Nat one)
         d0 r0 hd0 one_eq hA change_heps hd change_A change_d_1 hfe1_non hfe1_0
-        (fun h => (hp_case_2 h).left) (fun h => (hp_case_4 h).left)
+        (fun h => (hp_case_3 h).left) (fun h => (hp_case_5 h).left)
   -- ── Final assembly ──
   constructor
   · exact iff_sq
@@ -693,7 +696,7 @@ theorem elligator_encode_spec
           have a_eq := cases_zero h_zero
           have non_d_1 : ¬ Field51_as_Nat d_1 ≡ 0 [MOD p] := by
             intro h
-            have := (hp_case_2 (eq_zero_d_1 h)).left
+            have := (hp_case_3 (eq_zero_d_1 h)).left
             simp [this] at h_zero
           rw [lift_mod_eq_iff, change_d_1] at non_d_1
           -- Get the NQR witness from sqrt_ratio_i
@@ -701,7 +704,7 @@ theorem elligator_encode_spec
               Field51_as_Nat one % p ≠ 0 ∧
               ¬∃ x, x ^ 2 * (Field51_as_Nat one % p) % p = Field51_as_Nat eps % p) := by
             constructor
-            · intro h; have := (hp_case_2 h).left; simp [this] at h_zero
+            · intro h; have := (hp_case_3 h).left; simp [this] at h_zero
             · constructor
               · rw [one_eq]; decide
               · intro h
@@ -709,19 +712,19 @@ theorem elligator_encode_spec
                   Field51_as_Nat one % p ≠ 0 ∧
                   ∃ x, x ^ 2 * (Field51_as_Nat one % p) % p = Field51_as_Nat eps % p) := by
                     constructor
-                    · intro h; have := (hp_case_2 h).left; simp [this] at h_zero
+                    · intro h; have := (hp_case_3 h).left; simp [this] at h_zero
                     · constructor
                       · rw [one_eq]; decide
                       · exact h
-                have := (hp_case_4 this).left
+                have := (hp_case_5 this).left
                 simp [this] at h_zero
-          have hp5 := hp_case_5 h_nqr_cond
+          have hp5 := hp_case_6 h_nqr_cond
           exact elligator_nqr_twist d0 r0 hd0
             (U8x32_as_Nat a) (Field51_as_Nat eps) (Field51_as_Nat d) (Field51_as_Nat A1)
             (Field51_as_Nat A_neg) (Field51_as_Nat fe1) (Field51_as_Nat d_1) (Field51_as_Nat one)
-            pp.1.val a_eq one_eq hA change_heps hd change_A change_d_1 hfe1_non non_d_1
-            (fun h => (hp_case_2 h).left) (fun h => (hp_case_4 h).left)
-            h_zero (Field51_as_Nat pp.2 % p)
+            pp.val a_eq one_eq hA change_heps hd change_A change_d_1 hfe1_non non_d_1
+            (fun h => (hp_case_3 h).left) (fun h => (hp_case_5 h).left)
+            h_zero (Field51_as_Nat hp_b % p)
             (fun _ => hp5.right)
 
 end curve25519_dalek.montgomery

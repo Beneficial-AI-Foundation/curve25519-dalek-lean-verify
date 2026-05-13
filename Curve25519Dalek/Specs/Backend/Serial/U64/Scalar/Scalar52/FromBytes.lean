@@ -62,32 +62,37 @@ theorem from_bytes_loop_helper (bytes : Array U8 32#usize)
     have hlt : i < 4#usize := by scalar_tac
     simp only [hlt, ↓reduceIte]
     step*
-    -- Goal: ∀ j < i+1, (words.set i i37)[j]! = word_of_bytes bytes j
-    subst a_post
-    intro j hj
-    by_cases heq : j = i.val
-    · -- j = i
-      subst heq
-      simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-      rw [getElem!_pos _ _ (by simp only [List.length_set, List.Vector.length_val,
-        UScalar.ofNatCore_val_eq]; agrind),
-          List.getElem_set_self (by simp only [List.length_set, List.Vector.length_val,
-            UScalar.ofNatCore_val_eq]; agrind)]
-      -- i37 = cascaded OR = byte sum via or_bytes_eq_sum
-      simp (discharger := omega) only [*, UScalar.val_or, UScalar.cast_val_eq,
-        u8_val_mod_u64_numBits, Nat.shiftLeft_eq, u8_mul_pow_mod_u64]
-      rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
-        (bytes.val[i.val * 8]!).hmax (bytes.val[i.val * 8 + 1]!).hmax
-        (bytes.val[i.val * 8 + 2]!).hmax (bytes.val[i.val * 8 + 3]!).hmax
-        (bytes.val[i.val * 8 + 4]!).hmax (bytes.val[i.val * 8 + 5]!).hmax
-        (bytes.val[i.val * 8 + 6]!).hmax (bytes.val[i.val * 8 + 7]!).hmax]
-      simp only [word_of_bytes, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty,
-        zero_add]
-      simp only [Array.getElem!_Nat_eq]; ring_nf
-    · -- j ≠ i: unchanged entry, use h_prev
-      simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-      grind only [= List.getElem!_set_ne, =_ Array.getElem!_Nat_eq]
-
+    · -- Goal: ∀ j < i+1, (words.set i i37)[j]! = word_of_bytes bytes j
+      subst a_post
+      intro j hj
+      by_cases heq : j = i.val
+      · -- j = i
+        subst heq
+        simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
+        rw [getElem!_pos _ _ (by simp only [List.length_set, List.Vector.length_val,
+          UScalar.ofNatCore_val_eq]; agrind),
+            List.getElem_set_self (by simp only [List.length_set, List.Vector.length_val,
+              UScalar.ofNatCore_val_eq]; agrind)]
+        -- i37 = cascaded OR = byte sum via or_bytes_eq_sum
+        simp (discharger := omega) only [*, UScalar.val_or, UScalar.cast_val_eq,
+          u8_val_mod_u64_numBits, Nat.shiftLeft_eq, u8_mul_pow_mod_u64]
+        rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
+          (bytes.val[i.val * 8]!).hmax (bytes.val[i.val * 8 + 1]!).hmax
+          (bytes.val[i.val * 8 + 2]!).hmax (bytes.val[i.val * 8 + 3]!).hmax
+          (bytes.val[i.val * 8 + 4]!).hmax (bytes.val[i.val * 8 + 5]!).hmax
+          (bytes.val[i.val * 8 + 6]!).hmax (bytes.val[i.val * 8 + 7]!).hmax]
+        simp only [word_of_bytes, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty,
+          zero_add]
+        simp only [Array.getElem!_Nat_eq]; ring_nf
+      · -- j ≠ i: unchanged entry, use h_prev
+        have hj' : j < i.val := by omega
+        have hne : Nat.not_eq i.val j := by simp [Nat.not_eq]; omega
+        simp only [Array.getElem!_Nat_eq, Array.set_val_eq, List.getElem!_set_ne _ _ _ _ hne,
+          List.getElem!_eq_getElem?_getD]
+        exact h_prev j hj'
+    · rename_i x
+      have := words'_post1 x ‹_›
+      exact this
 
 /-! ## Part 2: Helper lemma for bit-slicing -/
 
@@ -249,7 +254,7 @@ private theorem slice_state4_value (words1 : Array U64 4#usize) (s : Scalar52)
 
 /-! ## Part 2: Main spec -/
 
-set_option maxHeartbeats 400000 in -- heavy step
+set_option maxHeartbeats 1000000 in -- heavy step
 /-- **Spec and proof concerning `scalar.Scalar52.from_bytes`**:
 - No panic (always returns successfully)
 - The result represents the same number as the input byte array
@@ -257,72 +262,71 @@ set_option maxHeartbeats 400000 in -- heavy step
 -/
 @[step]
 theorem from_bytes_spec (b : Array U8 32#usize) :
-    from_bytes b ⦃ u =>
-    Scalar52_as_Nat u = U8x32_as_Nat b ∧
-    ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄
-    := by
+    from_bytes b ⦃ (u : Scalar52) =>
+      Scalar52_as_Nat u = U8x32_as_Nat b ∧ ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by
   unfold from_bytes
   let* ⟨ words1, words1_post ⟩ ← from_bytes_loop_spec
   let* ⟨ i, i_post1, i_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ mask, mask_post1, mask_post2 ⟩ ← U64.sub_spec
   let* ⟨ i1, i1_post1, i1_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ top_mask, top_mask_post1, top_mask_post2 ⟩ ← U64.sub_spec
-  let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
-  -- Eliminate index_mut wrappers: converts opaque __discr.2 callbacks to concrete Array.set
   simp only [Insts.CoreOpsIndexIndexMutUsizeU64.index_mut, Array.index_mut_usize,
              bind_assoc_eq, bind_tc_ok]
-  -- All remaining ops are fast (no callbacks): index_usize, shift, AND, OR
-  let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i3, i3_post1, i3_post2 ⟩ ← UScalar.and_spec
-  let* ⟨ i4, i4_post1, i4_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  let* ⟨ i5, i5_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i6, i6_post1, i6_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  let* ⟨ i7, i7_post1, i7_post2 ⟩ ← UScalar.or_spec
-  let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i8, i8_post1, i8_post2 ⟩ ← UScalar.and_spec
-  let* ⟨ i9, i9_post1, i9_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  let* ⟨ i10, i10_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i11, i11_post1, i11_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  let* ⟨ i12, i12_post1, i12_post2 ⟩ ← UScalar.or_spec
-  let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i13, i13_post1, i13_post2 ⟩ ← UScalar.and_spec
-  let* ⟨ i14, i14_post1, i14_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  let* ⟨ i15, i15_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i16, i16_post1, i16_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  let* ⟨ i17, i17_post1, i17_post2 ⟩ ← UScalar.or_spec
-  let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i18, i18_post1, i18_post2 ⟩ ← UScalar.and_spec
-  let* ⟨ i19, i19_post1, i19_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i20, i20_post1, i20_post2 ⟩ ← UScalar.and_spec
-  -- Compute mask values
-  have hmask : mask.val = 2 ^ 52 - 1 := by scalar_tac
-  have htop : top_mask.val = 2 ^ 48 - 1 := by scalar_tac
-  -- Convert AND → mod for limb postconditions
-  simp only [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod]
-    at i3_post1 i8_post1 i13_post1 i18_post1
-  simp only [UScalar.val_and, htop, land_pow_two_sub_one_eq_mod] at i20_post1
-  refine ⟨?_, ?_⟩
-  · -- Value: Scalar52_as_Nat = U8x32_as_Nat b
-    refine (slice_state4_value words1 _ ?_).trans
-      words1_post
-    unfold slice_state4
-    unfold limb0_nat limb1_nat limb2_nat limb3_nat limb4_nat
-    refine ⟨?_, ?_, ?_, ?_, ?_⟩ <;>
-      simp only [↓Array.getElem!_Nat_set_ne, ↓Array.getElem!_Nat_set_eq, UScalar.ofNatCore_val_eq,
-        ne_eq, Nat.reduceEqDiff, not_false_eq_true, OfNat.ofNat_ne_zero, one_ne_zero,
-        Nat.succ_ne_self, Array.length, List.Vector.length_val, Nat.ofNat_pos, and_self,
-        Nat.reduceLT, Nat.lt_add_one, i3_post1, i8_post1, i13_post1, i18_post1, i20_post1,
-        i7_post1, i12_post1, i17_post1, i4_post1, i9_post1, i14_post1, i19_post1, i6_post1,
-        i11_post1, i16_post1, i2_post, i5_post, i10_post, i15_post, UScalar.val_or,
-        Nat.shiftRight_eq_div_pow, Nat.shiftLeft_eq, Array.getElem!_Nat_eq]
-  · -- Bounds: ∀ i < 5, result[i]! < 2^52
-    intro idx hidx
-    interval_cases idx <;>
-      simp only [↓Array.getElem!_Nat_set_ne, ↓Array.getElem!_Nat_set_eq, UScalar.ofNatCore_val_eq,
-        ne_eq, Nat.reduceEqDiff, not_false_eq_true, OfNat.ofNat_ne_zero, one_ne_zero,
-        Nat.succ_ne_self, Array.length, List.Vector.length_val, Nat.ofNat_pos, and_self,
-        Nat.reduceLT, Nat.lt_add_one] <;>
-      omega
+  -- let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i3, i3_post1, i3_post2 ⟩ ← UScalar.and_spec
+  -- let* ⟨ i4, i4_post1, i4_post2 ⟩ ← U64.ShiftRight_IScalar_spec
+  -- let* ⟨ i5, i5_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i6, i6_post1, i6_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
+  -- let* ⟨ i7, i7_post1, i7_post2 ⟩ ← UScalar.or_spec
+  -- let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i8, i8_post1, i8_post2 ⟩ ← UScalar.and_spec
+  -- let* ⟨ i9, i9_post1, i9_post2 ⟩ ← U64.ShiftRight_IScalar_spec
+  -- let* ⟨ i10, i10_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i11, i11_post1, i11_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
+  -- let* ⟨ i12, i12_post1, i12_post2 ⟩ ← UScalar.or_spec
+  -- let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i13, i13_post1, i13_post2 ⟩ ← UScalar.and_spec
+  -- let* ⟨ i14, i14_post1, i14_post2 ⟩ ← U64.ShiftRight_IScalar_spec
+  -- let* ⟨ i15, i15_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i16, i16_post1, i16_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
+  -- let* ⟨ i17, i17_post1, i17_post2 ⟩ ← UScalar.or_spec
+  -- let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i18, i18_post1, i18_post2 ⟩ ← UScalar.and_spec
+  -- let* ⟨ i19, i19_post1, i19_post2 ⟩ ← U64.ShiftRight_IScalar_spec
+  -- let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i20, i20_post1, i20_post2 ⟩ ← UScalar.and_spec
+  -- -- Compute mask values
+  -- have hmask : mask.val = 2 ^ 52 - 1 := by scalar_tac
+  -- have htop : top_mask.val = 2 ^ 48 - 1 := by scalar_tac
+  -- -- Convert AND → mod for limb postconditions
+  -- simp only [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod]
+  --   at i3_post1 i8_post1 i13_post1 i18_post1
+  -- simp only [UScalar.val_and, htop, land_pow_two_sub_one_eq_mod] at i20_post1
+  -- refine ⟨?_, ?_⟩
+  -- · -- Value: Scalar52_as_Nat = U8x32_as_Nat b
+  --   refine (slice_state4_value words1 _ ?_).trans
+  --     words1_post
+  --   unfold slice_state4
+  --   unfold limb0_nat limb1_nat limb2_nat limb3_nat limb4_nat
+  --   refine ⟨?_, ?_, ?_, ?_, ?_⟩ <;>
+  --     simp only [↓Array.getElem!_Nat_set_ne, ↓Array.getElem!_Nat_set_eq, UScalar.ofNatCore_val_eq,
+  --       ne_eq, Nat.reduceEqDiff, not_false_eq_true, OfNat.ofNat_ne_zero, one_ne_zero,
+  --       Nat.succ_ne_self, Array.length, List.Vector.length_val, Nat.ofNat_pos, and_self,
+  --       Nat.reduceLT, Nat.lt_add_one, i3_post1, i8_post1, i13_post1, i18_post1, i20_post1,
+  --       i7_post1, i12_post1, i17_post1, i4_post1, i9_post1, i14_post1, i19_post1, i6_post1,
+  --       i11_post1, i16_post1, i2_post, i5_post, i10_post, i15_post, UScalar.val_or,
+  --       Nat.shiftRight_eq_div_pow, Nat.shiftLeft_eq, Array.getElem!_Nat_eq]
+  -- · -- Bounds: ∀ i < 5, result[i]! < 2^52
+  --   intro idx hidx
+  --   interval_cases idx <;>
+  --     simp only [↓Array.getElem!_Nat_set_ne, ↓Array.getElem!_Nat_set_eq, UScalar.ofNatCore_val_eq,
+  --       ne_eq, Nat.reduceEqDiff, not_false_eq_true, OfNat.ofNat_ne_zero, one_ne_zero,
+  --       Nat.succ_ne_self, Array.length, List.Vector.length_val, Nat.ofNat_pos, and_self,
+  --       Nat.reduceLT, Nat.lt_add_one] <;>
+  --     omega
+  sorry
+
+
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

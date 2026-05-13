@@ -2,7 +2,7 @@
 # Used by aeneas-cli to run charon and aeneas for Lean code generation
 
 aeneas:
-  commit: "e8bd9d0b"
+  commit: "1b39931d"
   repo: "https://github.com/AeneasVerif/aeneas.git"
 
 crate:

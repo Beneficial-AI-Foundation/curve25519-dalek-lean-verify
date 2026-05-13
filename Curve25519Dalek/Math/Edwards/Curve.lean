@@ -249,7 +249,7 @@ theorem add_zero_Ed25519 (p : Point Ed25519) : p + (0 : Point Ed25519) = p := by
 /-- Negation is a left inverse: -p + p = 0. -/
 theorem neg_add_cancel_Ed25519 (p : Point Ed25519) : -p + p = (0 : Point Ed25519) := by
   have h : p.y^2 - p.x^2 = 1 + (d : CurveField) * p.x^2 * p.y^2 := by
-    have := p.on_curve; simp only [Ed25519, neg_mul, one_mul] at this; grind
+    have := p.on_curve; simp only [Ed25519, neg_mul, one_mul] at this; linear_combination this
   have : 1 + (d : CurveField) * p.x^2 * p.y^2 ≠ 0 := calc
     1 + d * p.x^2 * p.y^2 = 1 - d * (-p.x) * p.x * p.y * p.y := by ring
     _ ≠ 0 := (Ed25519.denomsNeZero (-p) p).2

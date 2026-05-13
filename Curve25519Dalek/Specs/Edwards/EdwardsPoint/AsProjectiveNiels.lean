@@ -74,7 +74,8 @@ theorem as_projective_niels_spec
   · have := hself.X_bounds
     exact this
   · have := hself.T_bounds
-    grind
+    -- mathlib v4.30 drift: grind needs Array.getElem!_Nat_eq hint
+    grind [Array.getElem!_Nat_eq]
   · refine ⟨?_, ?_, ?_, ?_⟩
     · congr 1; exact pointwise_add_Field51_as_Nat self.Y self.X fe fe_post1
     · assumption
@@ -111,11 +112,13 @@ theorem as_projective_niels_spec
             grind
           · simp_all  -- Y_plus_X_bounds: < 2^54
           · -- Y_minus_X_bounds: goal < 2^54, fact fe1_post1 : < 2^52
-            intro i hi; have := fe1_post1 i hi; agrind
+            -- mathlib v4.30 drift: agrind no longer closes; use grind with hint
+            intro i hi; have := fe1_post1 i hi; grind [Array.getElem!_Nat_eq]
           · have := hself.Z_bounds
             simp_all
           · -- T2d_bounds: < 2^52
-            intro i hi; have := fe3_post2 i hi; agrind
+            -- mathlib v4.30 drift: agrind no longer closes; use grind with hint
+            intro i hi; have := fe3_post2 i hi; grind [Array.getElem!_Nat_eq]
         simp only [this, true_and]
         unfold toPoint backend.serial.curve_models.ProjectiveNielsPoint.toPoint
         simp only [hself, ↓reduceDIte, this]
@@ -125,6 +128,7 @@ theorem as_projective_niels_spec
         have := hself.Z_ne_zero
         unfold toField at this
         field_simp
-        grind
+        -- mathlib v4.30 drift: grind can't close; use congr+push_cast+field_simp+ring
+        congr 1 <;> push_cast <;> field_simp <;> ring
 
 end curve25519_dalek.edwards.EdwardsPoint

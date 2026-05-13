@@ -96,7 +96,6 @@ theorem from_loop_spec
       intro hlt
       exact absurd (h_some_branch hlt).1 (by simp)
     have hstart7 : iter.start.val = 7 := by omega
-    simp only [spec_ok]
     refine ⟨?_, ?_⟩
     · intro k
       apply h_prefix_valid k

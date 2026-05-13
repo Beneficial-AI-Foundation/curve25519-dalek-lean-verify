@@ -54,8 +54,11 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
     let* ⟨ a, a_post ⟩ ← Array.update_spec
     let* ⟨ i3, i3_post ⟩ ← Usize.add_spec
     let* ⟨ result, result_post1, result_post2 ⟩ ← square2_loop_spec
-    · refine ⟨fun j _ _ ↦ ?_, by grind⟩
-      obtain _ | _ := (show j = i ∨ i + 1 ≤ j by omega) <;> grind
+    case h_no_overflow => intro j hj hj2; simp_all [Array.set_val_eq]; exact h_no_overflow j hj (by omega)
+    refine ⟨fun j _ _ ↦ ?_, fun j _ _ ↦ ?_⟩
+    · obtain _ | _ := (show j = i ∨ i + 1 ≤ j by omega) <;> simp_all
+    · have := result_post2 j (by omega) (by omega)
+      simp_all
   · simp only [step_simps]
     grind
   termination_by 5 - i.val
@@ -75,12 +78,17 @@ theorem square2_spec (self : Array U64 5#usize) (h_bounds : ∀ i < 5, self[i]!.
   unfold square2
   let* ⟨ square, square_post2, square_post1 ⟩ ← pow2k_spec
   let* ⟨ result, result_post1, result_post2 ⟩ ← square2_loop_spec
-  refine ⟨?_, by grind⟩
-  have : Field51_as_Nat result = 2 * Field51_as_Nat square := by
-    unfold Field51_as_Nat
-    rw [Finset.mul_sum]
-    apply Finset.sum_congr rfl
-    grind
-  grind [Nat.ModEq, Nat.mul_mod]
+  refine ⟨?_, fun i hi ↦ ?_⟩
+  · have : Field51_as_Nat result = 2 * Field51_as_Nat square := by
+      unfold Field51_as_Nat
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro x hx
+      have := result_post1 x (Finset.mem_range.mp hx) (by omega)
+      rw [this]; ring
+    grind [Nat.ModEq, Nat.mul_mod]
+  · have := result_post1 i hi (by omega)
+    have := square_post1 i hi
+    omega
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

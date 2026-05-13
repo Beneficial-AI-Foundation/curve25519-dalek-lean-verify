@@ -157,7 +157,7 @@ private theorem from_le_bytes_val_spec
   apply spec_mono (core.num.U64.from_le_bytes.step_spec bytes)
   intro result hbv
   have h_val : result.val = (BitVec.fromLEBytes (bytes.val.map U8.bv)).toNat := by
-    simp only [UScalar.val, hbv, BitVec.toNat_cast]
+    simp only [UScalar.val, hbv]; simp [BitVec.toNat_cast]
   rw [h_val, fromLEBytes_toNat_list]
   have hlen : (bytes.val.map U8.bv).length = 8 := by
     simp only [List.length_map]; scalar_tac

@@ -58,7 +58,9 @@ theorem invert_spec (r : backend.serial.u64.field.FieldElement51)
       (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52) ⦄ := by
   unfold invert
   -- invert = pow22501 → pow2k(t19, 5) → mul(t20, t3)
-  step with pow22501_spec as ⟨ t19, ht19_mod, ht3_mod, ht19b, ht3b ⟩
+  -- aeneas#963 drift: `as`-pattern now binds the (t19, t3) pair flat instead of wrapped,
+  -- so the previous `obtain ⟨t19, t3⟩ := t19; simp only at ...` is no longer needed.
+  step with pow22501_spec as ⟨ t19, t3, ht19_mod, ht3_mod, ht19b, ht3b ⟩
   step with pow2k_spec as ⟨ t20, ht20, ht20b ⟩
   step with mul_spec as ⟨ res, hres, hresb ⟩
   -- Chain: t20 ≡ r^((2^250-1)*32), res ≡ r^((2^250-1)*32 + 11) = r^(p-2)

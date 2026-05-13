@@ -41,6 +41,7 @@ theorem add_assign_loop_spec (self _rhs : Array U64 5#usize) (i : Usize) (hi : i
     let* ⟨ a, a_post ⟩ ← Array.update_spec
     let* ⟨ i4, i4_post ⟩ ← Usize.add_spec
     let* ⟨ result, result_post1, result_post2 ⟩ ← add_assign_loop_spec
+    case hab => intro j hj hj2; simp_all [Array.set_val_eq]; exact hab j hj (by omega)
     constructor
     · intro j _ _
       obtain _ | _ := (show j = i ∨ i + 1 ≤ j by omega) <;> simp_all

@@ -45,9 +45,8 @@ private lemma U16_ofDigits_toLEBytes (x : U16) :
       Nat.ofDigits (2^8) (x.bv.toLEBytes.map (fun b => b.toNat))
         = (BitVec.fromLEBytes x.bv.toLEBytes).toNat := by
     rw [hdigits]
-  simp only [Nat.reducePow, Nat.reduceMod, BitVec.fromLEBytes_toLEBytes, BitVec.toNat_cast,
-    UScalar.bv_toNat] at hdigits
-  rw [hdigits]
+  simp at hdigits
+  exact hmap.symm ▸ hdigits
 
 private lemma U8x32_as_Nat_setSlice_zeroI (bs : List U8) (h_len : bs.length = 2) :
     U8x32_as_Nat ⟨(List.replicate 32 (0#u8)).setSlice! 0 bs, by simp⟩ =
@@ -93,6 +92,7 @@ theorem from_spec (x : U16) :
     List.length_nil, zero_add, Nat.reduceAdd, Slice.setSlice!_val, List.length_setSlice!,
     ↓reduceDIte]
   have eq1 := U16_ofDigits_toLEBytes x
+  simp only [UScalarTy.U8_numBits_eq] at eq1
   rw [← x_bytes_post] at eq1
   have : x_bytes.length = 2 := by
     simp

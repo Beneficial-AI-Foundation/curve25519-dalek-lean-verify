@@ -253,7 +253,7 @@ private theorem ofU64_of_or_bv (x y z : U64) (k : Nat) (hk : k ≤ 64) (hx : x.v
     ofU64 z = (ofU64 y).take k ++ (ofU64 x).drop k := by
   have heq : z = x ||| y := by
     have : z.bv = (x ||| y).bv := by
-      rw [hbv, UScalar.bv_or]; ext i; simp [Bool.or_comm]
+      rw [hbv, UScalar.bv_or, BitVec.or_comm]; rfl
     have := congrArg BitVec.toNat this; scalar_tac
   rw [heq]; exact ofU64_or_non_overlapping x y k hk hx hy
 
@@ -428,7 +428,13 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     to_bytes self ⦃ (result : Std.Array U8 32#usize) =>
       U8x32_as_Nat result = Scalar52_as_Nat self ∧ U8x32_as_Nat result < L ⦄ := by
     unfold to_bytes
-    step*
+    -- HACK: aeneas#963 didn't fully fix this — still needed.
+    -- Plain `step*` produces a kernel-rejected proof term on this long do-block under
+    -- the new aeneas `do` elaborator (PR aeneas#918). `all_goals (repeat step)` walks each
+    -- bind individually and avoids the bad term; the `rename_i` exposes the first-limb
+    -- hypothesis (formerly auto-named `i`/`i_post`) that the proof tail references.
+    all_goals (repeat step)
+    rename_i i i_post
     -- Simple bytes (30 of 32): each byte = 8-bit extract of its limb
     have ⟨hb0, hb1, hb2, hb3, hb4, hb5, hb7, hb8, hb9, hb10, hb11, hb12, hb13, hb14, hb15, hb16,
         hb17, hb18, hb20, hb21, hb22, hb23, hb24, hb25, hb26, hb27, hb28, hb29, hb30, hb31⟩ :

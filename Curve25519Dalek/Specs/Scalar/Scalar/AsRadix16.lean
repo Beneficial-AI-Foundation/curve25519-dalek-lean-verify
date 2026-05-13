@@ -402,7 +402,6 @@ private theorem isize_shiftRight_4_spec (i : I8) (h_lo : 0 ≤ i.val) (h_hi : i.
   · simp only [IScalar.val]
     rw [BitVec.sshiftRight_eq]
     rw [BitVec.toInt_ofInt]
-    rw [I8.bv_toInt_eq]
     change (i.val >>> (4 : Nat)).bmod (2 ^ 8) = i.val / 16
     have hmatch : i.val >>> (4 : Nat) = i.val / 16 := by
       rw [Int.shiftRight_eq_div_pow]; norm_num
@@ -410,7 +409,7 @@ private theorem isize_shiftRight_4_spec (i : I8) (h_lo : 0 ≤ i.val) (h_hi : i.
     exact Aeneas.Arith.Int.bmod_pow2_eq_of_inBounds 7 (i.val / 16)
       (by norm_num; omega) (by norm_num; omega)
   · simp only [IScalar.val]
-    rw [BitVec.sshiftRight_eq, BitVec.toInt_ofInt, I8.bv_toInt_eq]
+    rw [BitVec.sshiftRight_eq, BitVec.toInt_ofInt]
     change 0 ≤ (i.val >>> (4 : Nat)).bmod (2 ^ 8)
     have hmatch : i.val >>> (4 : Nat) = i.val / 16 := by
       rw [Int.shiftRight_eq_div_pow]; norm_num
@@ -419,7 +418,7 @@ private theorem isize_shiftRight_4_spec (i : I8) (h_lo : 0 ≤ i.val) (h_hi : i.
       (by norm_num; omega) (by norm_num; omega)
     grind
   · simp only [IScalar.val]
-    rw [BitVec.sshiftRight_eq, BitVec.toInt_ofInt, I8.bv_toInt_eq]
+    rw [BitVec.sshiftRight_eq, BitVec.toInt_ofInt]
     change (i.val >>> (4 : Nat)).bmod (2 ^ 8) ≤ 1
     have hmatch : i.val >>> (4 : Nat) = i.val / 16 := by
       rw [Int.shiftRight_eq_div_pow]; norm_num
@@ -443,6 +442,7 @@ private theorem isize_shiftLeft_4_spec (i : I8)
   have hbv : (i.bv.shiftLeft 4 : BitVec 8) = i.bv * (16 : BitVec 8) := by
     apply BitVec.eq_of_toNat_eq
     simp [BitVec.toNat_shiftLeft, BitVec.toNat_mul, Nat.shiftLeft_eq]
+  change (i.bv.shiftLeft 4).toInt = (↑i : ℤ) * 16
   rw [hbv]
   simp only [IScalar.val]
   rw [BitVec.toInt_mul, show (16 : BitVec 8).toInt = 16 from by decide, I8.bv_toInt_eq]
@@ -473,8 +473,8 @@ private lemma inv_step_loop1
       grind
     · by_cases h2 : j = i + 1
       · subst h2
-        simp only [show i + 1 ≠ i from by omega, ite_false]
-        grind
+        simp only [show i + 1 ≠ i from by omega, ite_false, if_true]
+        linear_combination (16 : ℤ) ^ (i + 1) * ha_next
       · simp only [if_neg h1, if_neg h2, add_zero]
         linear_combination (16 : ℤ)^j * ha_other j h1 h2
   rw [Finset.sum_congr rfl key, Finset.sum_add_distrib, Finset.sum_add_distrib,
