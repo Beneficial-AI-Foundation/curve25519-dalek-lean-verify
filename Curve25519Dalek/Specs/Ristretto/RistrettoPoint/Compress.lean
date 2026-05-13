@@ -220,17 +220,6 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
       | (have := h.1.X_bounds i hi; omega)
       | (have := h.1.T_bounds i hi; omega)
       | omega)
-  -- HACK: PR #918 step* regression; see Investigations/StepStarRegression.lean
-  -- step* stalls at `let (_, invsqrt) := result`. Manually destructure and re-run.
-  obtain ⟨_, invsqrt⟩ := result
-  simp only at *
-  step*
-  all_goals try (intro i hi; first
-      | exact h.1.Z_bounds i hi
-      | exact h.1.Y_bounds i hi
-      | (have := h.1.X_bounds i hi; omega)
-      | (have := h.1.T_bounds i hi; omega)
-      | omega)
   · intro i hi
     simp only [X_post i hi]
     split_ifs
@@ -355,7 +344,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
         have h_val := congrArg ZMod.val h_zmod
         rw [ZMod.val_natCast, ZMod.val_one'' (by decide : p ≠ 1)] at h_val
         exact h_val
-      have h_post := (result_post4 ⟨h_ne_nat, h_qr⟩).2
+      have h_post := (__post4 ⟨h_ne_nat, h_qr⟩).2
       -- Lift Nat % p equation to ZMod
       have hmm : ∀ a, (a % p) ≡ a [MOD p] := fun a => by
         exact Nat.mod_eq_of_lt (Nat.mod_lt a (by decide))
@@ -384,7 +373,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
           rwa [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero] at hd
         have hI0 : invsqrt.toField = 0 := by
           rw [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero]
-          exact (result_post3 h_nat).2
+          exact (__post3 h_nat).2
         -- LHS: I=0 → i1=i2=0 → i21=0 → s=0
         have hi2_0 : i2.toField = 0 := by rw [hb_i2, hI0, zero_mul]
         have hs0 : s.toField = 0 := by

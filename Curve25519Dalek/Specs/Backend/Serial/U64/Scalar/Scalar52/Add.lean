@@ -234,8 +234,10 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
         _ = ∑ j ∈ Finset.Ico (i.val) 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +
             2 ^ (52 * i.val) * (carry.val / 2 ^ 52) := by
           have hlt : i.val < 5 := by agrind
-          rw [Finset.sum_eq_sum_Ico_succ_bot hlt]
-          agrind
+          have hval : val = i := Option.some.inj h_o_eq
+          subst hval
+          rw [Finset.sum_eq_sum_Ico_succ_bot hlt, hfin, hsum''i]
+          linear_combination hpow + 2 ^ (52 * val.val) * hc1val
     termination_by 5 - i.val
     decreasing_by
       simp only at h_start_val

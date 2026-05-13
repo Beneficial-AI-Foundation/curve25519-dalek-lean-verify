@@ -281,7 +281,7 @@ theorem select_spec {P : EdwardsPoint}
   have hi3_val : i3.val = x.val + xmask.val := by rw [i3_post, hi2_val]
   have hxabs_val : xabs.val = x.val.natAbs := by
     have hxabs_bv_toInt : xabs.val = (i3.bv ^^^ xmask.bv).toInt := by
-      change xabs.bv.toInt = _; fcongr 1
+      change xabs.bv.toInt = _; fcongr 1; exact xabs_post2
     rw [hxabs_bv_toInt]
     rcases xmask_post2 with hm | hm
     · -- xmask.val = -1, so x.val < 0, and xmask.bv = allOnes 16.
@@ -340,7 +340,7 @@ theorem select_spec {P : EdwardsPoint}
   have aux_i5_one_of_xmask_neg1 (h : xmask.val = -1) : i5 = 1#u8 := by
     have hxm_bv := aux_xmask_bv_neg1 h
     have hi4_bv : i4.bv = 1#16 := by
-      simp only [i4_post2, hxm_bv]; decide
+      simp only [i4_post2, hxm_bv]; rfl
     apply UScalar.eq_of_val_eq
     change i5.bv.toNat = (1#u8 : U8).bv.toNat
     rw [i5_post]; change (i4.bv.signExtend 8).toNat = _
@@ -348,7 +348,7 @@ theorem select_spec {P : EdwardsPoint}
   have aux_i5_zero_of_xmask_zero (h : xmask.val = 0) : i5 = 0#u8 := by
     have hxm_bv := aux_xmask_bv_zero h
     have hi4_bv : i4.bv = 0#16 := by
-      simp only [i4_post2, hxm_bv]; decide
+      simp only [i4_post2, hxm_bv]; rfl
     apply UScalar.eq_of_val_eq
     change i5.bv.toNat = (0#u8 : U8).bv.toNat
     rw [i5_post]; change (i4.bv.signExtend 8).toNat = _
