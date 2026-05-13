@@ -27,7 +27,7 @@ namespace CoreCmpPartialEqFieldElement51
 
 /-- Helper: the Bool `eq` returns true iff the canonical byte encodings are equal. -/
 @[step]
-theorem eq_spec_aux (a b : backend.serial.u64.field.FieldElement51) :
+theorem eq_spec (a b : backend.serial.u64.field.FieldElement51) :
     eq a b ⦃ (r : Bool) =>
       r = true ↔ a.to_bytes = b.to_bytes ⦄ := by
   unfold eq
@@ -58,11 +58,11 @@ theorem eq_spec
         self.y_minus_x.to_bytes = other.y_minus_x.to_bytes ∧
         self.xy2d.to_bytes = other.xy2d.to_bytes ⦄ := by
   unfold eq
-  let* ⟨ b, b_post ⟩ ← u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec_aux
+  let* ⟨ b, b_post ⟩ ← u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec
   spec_split
-  · let* ⟨ b1, b1_post ⟩ ← u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec_aux
+  · let* ⟨ b1, b1_post ⟩ ← u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec
     spec_split
-    · let* ⟨ b, b_post ⟩ ← u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec_aux
+    · let* ⟨ b, b_post ⟩ ← u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec
       agrind
     · simp only [step_simps]
       agrind

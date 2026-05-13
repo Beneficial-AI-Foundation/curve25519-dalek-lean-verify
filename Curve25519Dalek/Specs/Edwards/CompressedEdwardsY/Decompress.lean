@@ -35,6 +35,7 @@ Source: "curve25519-dalek/src/edwards.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field Edwards
 namespace curve25519_dalek.edwards.CompressedEdwardsY
+open curve25519_dalek.edwards.decompress (step_1_spec step_2_spec)
 
 /-- **Spec theorem for `curve25519_dalek::edwards::CompressedEdwardsY::decompress`**
 • The function always succeeds (no panic)
