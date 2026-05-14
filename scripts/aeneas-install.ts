@@ -106,21 +106,34 @@ const OCAML_DEPS = [
   "unionFind", "domainslib", "progress",
 ];
 
-async function setupOcaml(): Promise<Record<string, string>> {
+async function setupOcaml(root: string): Promise<Record<string, string>> {
   const switchName = "5.2.0";
+  const logsDir = path.join(root, ".logs");
+  fs.mkdirSync(logsDir, { recursive: true });
+
   const switches = await run("opam", ["switch", "list", "--short"], { silent: true });
   const exists = switches.split("\n").some((s) => s.trim() === switchName);
 
   if (!exists) {
     console.log("  Creating OCaml 5.2.0 switch...");
-    await runStreaming("opam", ["switch", "create", switchName]);
+    await runStreaming("opam", ["switch", "create", switchName], {
+      logFile: path.join(logsDir, "opam-switch-create.log"),
+    });
   }
 
   const env = await getOpamEnv(switchName);
 
+  console.log("  Updating opam...");
+  await runStreaming("opam", ["update"], {
+    env,
+    logFile: path.join(logsDir, "opam-update.log"),
+  });
+
   console.log("  Installing OCaml dependencies...");
-  await run("opam", ["update"], { silent: true, env });
-  await run("opam", ["install", "-y", ...OCAML_DEPS], { silent: true, env });
+  await runStreaming("opam", ["install", "-y", ...OCAML_DEPS], {
+    env,
+    logFile: path.join(logsDir, "opam-install.log"),
+  });
 
   return env;
 }
@@ -155,7 +168,8 @@ async function setupRepo(repo: string, repoDir: string, commit: string): Promise
   if (fs.existsSync(repoDir)) {
     const spinner = ora("Updating repository...").start();
     await run("git", ["fetch", "origin"], { cwd: repoDir, silent: true });
-    await run("git", ["checkout", commit], { cwd: repoDir, silent: true });
+    // Reset any local modifications before switching commits
+    await run("git", ["reset", "--hard", commit], { cwd: repoDir, silent: true });
     spinner.succeed(`Aeneas at ${commit}`);
   } else {
     const spinner = ora(`Cloning ${repo}...`).start();
@@ -202,7 +216,7 @@ async function main(): Promise<void> {
   await checkDependencies();
 
   console.log(chalk.bold("\nSetting up OCaml..."));
-  const opamEnv = await setupOcaml();
+  const opamEnv = await setupOcaml(root);
   console.log(chalk.green("  OCaml environment ready\n"));
 
   await setupRepo(config.aeneas.repo, repoDir, commit);

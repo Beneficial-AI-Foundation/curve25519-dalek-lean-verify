@@ -31,8 +31,11 @@ async function main(): Promise<void> {
     throw new Error("Aeneas binary not found. Run 'npm run aeneas-install' first.");
   }
 
+  // Charon reads [package.metadata.charon] from ./Cargo.toml in its cwd,
+  // but always outputs the LLBC to the workspace root regardless of cwd.
+  const crateDir = path.join(root, config.crate.dir);
   const llbcFile = `${config.crate.name}.llbc`;
-  const llbcPath = path.join(root, llbcFile);
+  const llbcPath = path.join(root, llbcFile); // charon outputs to workspace root
   const destDir = path.join(root, config.aeneas_args.dest);
   const logsDir = path.join(root, ".logs");
 
@@ -41,10 +44,10 @@ async function main(): Promise<void> {
 
   const charonArgs: string[] = ["cargo"];
 
-  if (config.charon.preset)  charonArgs.push(`--preset=${config.charon.preset}`);
-  if (config.charon.package) charonArgs.push(`--package=${config.charon.package}`);
+  if (config.charon.preset) charonArgs.push(`--preset=${config.charon.preset}`);
 
-  // Cargo args go after --
+  // Running from the crate directory, so --package is not needed.
+  // Cargo args (feature flags etc.) go after --
   if (config.charon.cargo_args.length > 0) {
     charonArgs.push("--", ...config.charon.cargo_args);
   }
@@ -57,7 +60,7 @@ async function main(): Promise<void> {
   fs.mkdirSync(logsDir, { recursive: true });
 
   await runStreaming(charonBin, charonArgs, {
-    cwd: root,
+    cwd: crateDir,  // read [package.metadata.charon] from crate's Cargo.toml
     logFile: path.join(logsDir, "charon.log"),
   });
 
@@ -73,15 +76,32 @@ async function main(): Promise<void> {
     "-backend", "lean",  // we only ever target the Lean backend
     ...config.aeneas_args.options.map((o) => `-${o}`),
     "-dest", destDir,
-    llbcFile,
+    llbcPath,  // absolute path since aeneas runs from root, LLBC is in crateDir
   ];
 
   fs.mkdirSync(destDir, { recursive: true });
 
-  await runStreaming(aeneasBin, aeneasArgs, {
-    cwd: root,
-    logFile: path.join(logsDir, "aeneas.log"),
-  });
+  // Aeneas may exit non-zero while still producing output (known errors like
+  // "join of nested borrows not supported" or internal errors on certain
+  // constructs are non-fatal for our codebase).  We check for the output
+  // files explicitly rather than relying solely on the exit code.
+  try {
+    await runStreaming(aeneasBin, aeneasArgs, {
+      cwd: root,
+      logFile: path.join(logsDir, "aeneas.log"),
+    });
+  } catch {
+    // Check if output files were generated despite the error
+    const missingFiles = config.tweaks.files.filter(
+      (f) => !fs.existsSync(path.join(destDir, f)),
+    );
+    if (missingFiles.length > 0) {
+      throw new Error(
+        `Aeneas failed and did not generate: ${missingFiles.join(", ")}. See .logs/aeneas.log`,
+      );
+    }
+    console.log(chalk.yellow("  Aeneas exited with errors but output files were generated (see .logs/aeneas.log)\n"));
+  }
 
   console.log(chalk.green(`  Lean files generated in ${config.aeneas_args.dest}/\n`));
 
