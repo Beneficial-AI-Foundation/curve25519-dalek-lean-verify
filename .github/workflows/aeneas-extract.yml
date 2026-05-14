@@ -12,6 +12,8 @@ on:
       - 'aeneas-config.yml'
       - 'Curve25519Dalek/Funs.lean'
       - 'Curve25519Dalek/Types.lean'
+      - 'scripts/**'
+      - 'package.json'
       - '.github/workflows/aeneas-extract.yml'
   pull_request:
     branches: [ '**' ]
@@ -39,10 +41,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
+          cache: 'npm'
 
-      - name: Install aeneas-cli
-        run: npm install -g aeneas-cli@0.1.0
+      - name: Install npm dependencies
+        run: npm ci
 
       - name: Cache OCaml environment
         uses: actions/cache@v5
@@ -56,8 +59,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache Aeneas repository
-        id: cache-aeneas
+      - name: Cache Aeneas build
         uses: actions/cache@v5
         with:
           path: .aeneas
@@ -65,8 +67,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-aeneas-
 
-      - name: Install Aeneas
-        run: aeneas-cli install
+      - name: Install Aeneas + Charon
+        run: npm run aeneas-install
 
       - name: Cache Rust build artifacts
         uses: actions/cache@v5
@@ -82,7 +84,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Run Aeneas extraction
-        run: aeneas-cli extract
+        run: npm run aeneas-extract
 
       - name: Check for modifications in generated files
         id: check-diff
