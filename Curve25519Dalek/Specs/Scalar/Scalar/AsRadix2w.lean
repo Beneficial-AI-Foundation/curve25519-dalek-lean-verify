@@ -551,6 +551,7 @@ private theorem as_radix_2w_loop_body_tail_spec
     simp_all [Array.getElem!_Nat_eq]
 
 set_option maxHeartbeats 4000000 in
+-- usual heaviness
 /-- Spec for one iteration of the loop. Takes the loop state and `(iter1, i)`
     (the result of the iterator `next`) and produces `(iter2, carry1, a)` —
     the state for the next iteration of `as_radix_2w_loop`.
@@ -702,7 +703,7 @@ private theorem as_radix_2w_loop_body_spec
         rw [h_N]
         rw [UScalar.val_and, h_mask, land_pow_two_sub_one_eq_mod]
         have hcross : i.val * w.val % 64 + w.val ≥ 64 := by
-          rw [hbit_val, hi1_val] at h_fit; push_neg at h_fit; clear *- h_fit; grind
+          rw [hbit_val, hi1_val] at h_fit; push Not at h_fit; clear *- h_fit; grind
         have hbo192 : i.val * w.val < 192 := by
           rw [hu64_val] at hu64_lt3; grind
         have hlo_lt : scalar64x4[u64_idx.val]!.val / 2^bit_idx.val < 2^(64-bit_idx.val) := by
@@ -734,7 +735,7 @@ private theorem as_radix_2w_loop_body_spec
                 (scalar64x4[u64_idx.val]!.val / 2^bit_idx.val +
                 scalar64x4[u64_idx.val+1]!.val * 2^(64-bit_idx.val)) % 2^w.val := by
           have hwle : w.val ≥ 64 - bit_idx.val := by
-            rw [hi1_val] at h_fit; push_neg at h_fit; omega
+            rw [hi1_val] at h_fit; push Not at h_fit; omega
           rw [show scalar64x4[u64_idx.val+1]!.val * 2^(64-bit_idx.val) =
                   (scalar64x4[u64_idx.val+1]!.val % 2^bit_idx.val) * 2^(64-bit_idx.val) +
                   scalar64x4[u64_idx.val+1]!.val / 2^bit_idx.val * 2^64 from by
@@ -896,9 +897,7 @@ private theorem as_radix_2w_loop_spec_strong
       K N hw_lo hw_hi h_radix h_mask h_N h_N_lt hK_le64 hK_le_digits hiter2_end
       h_start' h_inv' hcarry1 h_bounds' h_tail'
   termination_by K - iter.start.val
-  decreasing_by
-    simp_wf
-    omega
+  decreasing_by omega
 
 /-- **Spec theorem for `curve25519_dalek::scalar::Scalar::as_radix_2w_loop`**
 • No panic: the loop always terminates successfully
@@ -1079,7 +1078,7 @@ private lemma I8x64_as_Radix2w_eq_prefix_sum (w K : ℕ) (digits : Array Std.I8 
   · intro x hx; exact Finset.mem_range.mpr (by rw [Finset.mem_range] at hx; omega)
   · intro j hj64 hjK
     rw [Finset.mem_range] at hj64
-    simp only [Finset.mem_range] at hjK; push_neg at hjK
+    simp only [Finset.mem_range] at hjK; push Not at hjK
     rw [h_tail j hjK hj64, mul_zero]
 
 private lemma I8x64_as_Radix2w_trim (w K : ℕ) (digits : Array Std.I8 64#usize)
@@ -1295,7 +1294,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       UScalar.le_equiv, Nat.not_eq, ne_eq, Nat.reduceEqDiff, not_false_eq_true,
       Nat.reduceLT, or_true, or_self,
       UScalar.val_not_eq_imp_not_eq, Array.repeat_val, List.slice_zero_j, List.take_replicate,
-      min_self, Slice.length, tsub_zero, Usize.ofNatCore_val_eq, List.length_replicate,
+      min_self, Slice.length, tsub_zero, List.length_replicate,
       Nat.reduceMul, Array.val_to_slice,
       UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, U64.ofNat_bv, BitVec.reduceHShiftLeft,
       Nat.reduceShiftLeft, Nat.reduceAdd, Nat.add_one_sub_one, Nat.one_le_ofNat, Nat.reduceDiv]
@@ -1321,7 +1320,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       ge_iff_le, UScalar.le_equiv, Nat.not_eq, ne_eq, Nat.reduceEqDiff, not_false_eq_true,
       Nat.reduceLT, or_true, or_self, UScalar.val_not_eq_imp_not_eq, Array.repeat_val,
       List.slice_zero_j, List.take_replicate, min_self, Slice.length,
-      tsub_zero, Usize.ofNatCore_val_eq, List.length_replicate, Nat.reduceMul, Array.val_to_slice,
+      tsub_zero, List.length_replicate, Nat.reduceMul, Array.val_to_slice,
       UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, U64.ofNat_bv, BitVec.reduceHShiftLeft,
       Nat.reduceShiftLeft, Nat.reduceAdd, Nat.add_one_sub_one, Nat.one_le_ofNat,
       Nat.reduceDiv, zero_add]
@@ -1356,7 +1355,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       Nat.not_eq, ne_eq, not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne,
       or_self, UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val,
       List.slice_zero_j, List.take_replicate, min_self, Slice.length, tsub_zero,
-      Usize.ofNatCore_val_eq, List.length_replicate, Nat.reduceMul, Array.val_to_slice,
+      List.length_replicate, Nat.reduceMul, Array.val_to_slice,
       UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, U64.ofNat_bv]
       have : 2 ^ w.val % U64.size = 2 ^ w.val := by
         apply Nat.mod_eq_of_lt
@@ -1393,7 +1392,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       simp_all only [Array.getElem!_Nat_eq, ge_iff_le, UScalar.le_equiv, UScalar.ofNatCore_val_eq,
       Nat.not_eq, ne_eq, not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne, or_self,
       UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val, List.slice_zero_j,
-      List.take_replicate, min_self, Slice.length, tsub_zero, Usize.ofNatCore_val_eq,
+      List.take_replicate, min_self, Slice.length, tsub_zero,
       List.length_replicate, Nat.reduceMul, Array.val_to_slice, UScalarTy.U64_numBits_eq,
       Bvify.U64.UScalar_bv, U64.ofNat_bv, Nat.succ_add_sub_one]
       exact digits_count_le_64 w.val hw_ge5 h_hi
@@ -1401,7 +1400,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       simp_all only [Array.getElem!_Nat_eq, ge_iff_le, UScalar.le_equiv, UScalar.ofNatCore_val_eq,
       Nat.not_eq, ne_eq, not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne, or_self,
       UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val, List.slice_zero_j,
-      List.take_replicate, min_self, Slice.length, tsub_zero, Usize.ofNatCore_val_eq,
+      List.take_replicate, min_self, Slice.length, tsub_zero,
       List.length_replicate, Nat.reduceMul, Array.val_to_slice, UScalarTy.U64_numBits_eq,
       Bvify.U64.UScalar_bv, U64.ofNat_bv, Nat.succ_add_sub_one]
       exact digits_count_mul_le w.val
@@ -1429,7 +1428,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       simp_all only [Array.getElem!_Nat_eq, ge_iff_le, UScalar.le_equiv, UScalar.ofNatCore_val_eq,
       Nat.not_eq, ne_eq, not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne, or_self,
       UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val, List.slice_zero_j,
-      List.take_replicate, min_self, Slice.length, tsub_zero, Usize.ofNatCore_val_eq,
+      List.take_replicate, min_self, Slice.length, tsub_zero,
       List.length_replicate, Nat.reduceMul, Array.val_to_slice, UScalarTy.U64_numBits_eq,
       Bvify.U64.UScalar_bv, U64.ofNat_bv, Nat.succ_add_sub_one,
       CharP.cast_eq_zero, zero_mul, add_zero, zero_le, Nat.zero_shiftLeft, Nat.zero_mod]
@@ -1442,7 +1441,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       Nat.not_eq, ne_eq, not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne,
       or_self, UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val,
       List.slice_zero_j, List.take_replicate, min_self, Slice.length, tsub_zero,
-      Usize.ofNatCore_val_eq, List.length_replicate, Nat.reduceMul, Array.val_to_slice,
+      List.length_replicate, Nat.reduceMul, Array.val_to_slice,
       UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, U64.ofNat_bv, Nat.succ_add_sub_one,
       CharP.cast_eq_zero, zero_mul,
       add_zero, zero_le, Nat.zero_shiftLeft, Nat.zero_mod, Array.length,
@@ -1455,7 +1454,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
         Nat.not_eq, ne_eq, not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne, or_self,
         UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val, List.slice_zero_j,
         List.take_replicate, min_self, Slice.length, tsub_zero,
-        Usize.ofNatCore_val_eq, List.length_replicate, Nat.reduceMul, Array.val_to_slice,
+        List.length_replicate, Nat.reduceMul, Array.val_to_slice,
         UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, U64.ofNat_bv, Nat.succ_add_sub_one,
         CharP.cast_eq_zero, zero_mul, add_zero, zero_le, Nat.zero_shiftLeft, Nat.zero_mod]
         have : (UScalar.hcast IScalarTy.I8 i2).val = i2.val := by
@@ -1473,7 +1472,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
         not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne, or_self,
         UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val, List.slice_zero_j,
         List.take_replicate, min_self, Slice.length, tsub_zero,
-        Usize.ofNatCore_val_eq, List.length_replicate, Nat.reduceMul, Array.val_to_slice,
+        List.length_replicate, Nat.reduceMul, Array.val_to_slice,
         UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, U64.ofNat_bv, Nat.succ_add_sub_one,
         CharP.cast_eq_zero, zero_mul, add_zero, zero_le, Nat.zero_shiftLeft, Nat.zero_mod]
         have : (UScalar.hcast IScalarTy.I8 i2).val = i2.val := by
