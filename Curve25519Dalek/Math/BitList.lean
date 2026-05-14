@@ -139,7 +139,7 @@ theorem Equiv.drop (h : bs₁ ≈ₗ bs₂) (n : Nat) :
 /-- Equiv is preserved by `List.extract` on both sides. -/
 theorem Equiv.extract (h : bs₁ ≈ₗ bs₂) (start stop : Nat) :
     bs₁.extract start stop ≈ₗ bs₂.extract start stop := by
-  simp only [extract_eq_drop_take]
+  simp only [extract_eq_take_drop]
   exact (h.drop start).take (stop - start)
 
 /-! ### Grind support for chaining Equiv through take/drop -/
@@ -220,7 +220,7 @@ theorem ofNat_drop (k w : Nat) (n : Nat) (hkw : k ≤ w) :
 /-- Extracting a range of bits gives the shifted, narrower representation. -/
 theorem ofNat_extract (w start len : Nat) (n : Nat) (h : start + len ≤ w) :
     (ofNat w n).extract start (start + len) = ofNat len (n / 2 ^ start) := by
-  simp only [extract_eq_drop_take]
+  simp only [extract_eq_take_drop]
   rw [ofNat_drop start w n (by omega)]
   rw [show start + len - start = len from by omega]
   exact ofNat_take len (w - start) (n / 2 ^ start) (by omega)
@@ -264,7 +264,7 @@ theorem ofNat_equiv_of_lt (k w : Nat) (n : Nat) (hkw : k ≤ w) (hn : n < 2 ^ k)
 /-- Extracting from an extract composes: takes the sub-subrange. -/
 theorem extract_extract {α : Type} (l : List α) (a b c d : Nat) (hcd : c + d ≤ b - a) :
     (l.extract a b).extract c (c + d) = l.extract (a + c) (a + c + d) := by
-  simp only [extract_eq_drop_take, drop_take, drop_drop]
+  simp only [extract_eq_take_drop, drop_take, drop_drop]
   have hdc : c + d - c = d := by omega
   have hacd : a + c + d - (a + c) = d := by omega
   have hle : d ≤ b - a - c := by omega
@@ -310,7 +310,7 @@ private theorem flatten_take_uniform {α : Type} (xss : List (List α)) (k n : N
 
 theorem ofByteList_extract (bytes : List U8) (i j : Nat) (_ : j ≤ bytes.length) :
     (ofByteList bytes).extract (8 * i) (8 * j) = ofByteList (bytes.extract i j) := by
-  simp only [extract_eq_drop_take, ofByteList]
+  simp only [extract_eq_take_drop, ofByteList]
   have hunif : ∀ xs ∈ (bytes.map ofU8), xs.length = 8 := by
     intro _ hxs
     rw [mem_map] at hxs
@@ -348,9 +348,9 @@ theorem toNat_ofU64 (x : U64) : toNat (ofU64 x) = x.val :=
 theorem ofNat_toNat (bs : List Bool) :
     ofNat bs.length (toNat bs) = bs := by
   induction bs with
-  | nil => simp only [length_nil, toNat, ofNat]
+  | nil => simp only [ofNat]
   | cons b bs ih =>
-    simp only [length_cons, toNat, ofNat]
+    simp only [toNat, ofNat]
     congr 1
     · -- simp unfolds Bool.toNat arithmetic; simp only lemma list would be impractically long
       cases b <;> simp [Bool.toNat]
@@ -463,7 +463,7 @@ theorem toNat_split_chunks (bs : List Bool) (k n : Nat) (h : k * n ≤ bs.length
     have hsplit : bs.take (k * (n + 1)) = bs.take (k * n) ++
         bs.extract (k * n) (k * n + k) := by
       rw [show k * (n + 1) = k * n + k from by ring]
-      rw [extract_eq_drop_take]
+      rw [extract_eq_take_drop]
       conv_lhs => rw [← take_append_drop (k * n) (bs.take (k * n + k))]
       rw [take_take, drop_take]
       simp only [Nat.min_eq_left (Nat.le_add_right _ _)]

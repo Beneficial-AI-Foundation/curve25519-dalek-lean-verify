@@ -381,7 +381,7 @@ theorem DBL_neq_zero (P : Point) (PZero : P ≠ 0) (nPT : P ≠ T_point) :
     · rename_i x y nonP
       rw [neg_some] at hneg
       simp only [MontgomeryCurveCurve25519, WeierstrassCurve.Affine.negY, zero_mul,
-        sub_zero, some.injEq, true_and] at hneg
+        sub_zero] at hneg
       have eq : 2 * y = 0 := by grind
       simp only [mul_eq_zero] at eq
       have : (2:CurveField) ≠ 0 := by decide
@@ -405,7 +405,7 @@ theorem uDBL (P : Point) (PZero : P ≠ 0) (nPT : P ≠ T_point) :
     · rename_i x y nonP
       rw [neg_some] at hneg
       simp only [MontgomeryCurveCurve25519, WeierstrassCurve.Affine.negY, zero_mul,
-        sub_zero, some.injEq, true_and] at hneg
+        sub_zero] at hneg
       have eq : 2 * y = 0 := by grind
       simp only [mul_eq_zero] at eq
       have : (2:CurveField) ≠ 0 := by decide
