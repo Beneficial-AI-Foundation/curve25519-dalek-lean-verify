@@ -8,7 +8,6 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
 import Mathlib.Tactic.LinearCombination
-import PrimeCertTest.PrimeListTest
 
 /-!
 # Pure Mathematical Foundations for Edwards Curves

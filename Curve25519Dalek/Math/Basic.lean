@@ -8,7 +8,7 @@ import Curve25519Dalek.Types
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
-import PrimeCertTest.PrimeListTest
+import Curve25519Dalek.Math.PrimeCerts
 import Mathlib.FieldTheory.Finite.Basic
 
 /-! # Common Definitions
@@ -126,8 +126,8 @@ theorem Scalar52_wide_limb_le_nat (a : Aeneas.Std.Array U128 9#usize) (i : Nat) 
 
 /-! ## Primality and CurveField -/
 
-instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩
-instance : Fact (Nat.Prime L) := ⟨PrimeCert.prime_ed25519_order⟩
+instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_p⟩
+instance : Fact (Nat.Prime L) := ⟨PrimeCert.prime_L⟩
 
 namespace Edwards
 
