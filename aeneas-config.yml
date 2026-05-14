@@ -100,7 +100,6 @@ charon:
     # MulAssign impls
     - "curve25519_dalek::backend::serial::u64::field::{impl core::ops::arith::MulAssign<_> for _}"
     - "curve25519_dalek::edwards::{impl core::ops::arith::MulAssign<_> for _}"
-    - "curve25519_dalek::montgomery::{impl core::ops::arith::MulAssign<_> for _}"
     - "curve25519_dalek::ristretto::{impl core::ops::arith::MulAssign<_> for _}"
     # ValidityCheck impls
     - "curve25519_dalek::backend::serial::curve_models::{impl curve25519_dalek::traits::ValidityCheck for _}"

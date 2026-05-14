@@ -5591,6 +5591,36 @@ def scalar.Scalar.Insts.CoreOpsArithMulScalarScalar : core.ops.arith.Mul
   mul := scalar.Scalar.Insts.CoreOpsArithMulScalarScalar.mul
 }
 
+/-- [curve25519_dalek::montgomery::{core::ops::arith::MulAssign<&0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::montgomery::MontgomeryPoint}::mul_assign]:
+    Source: 'curve25519-dalek/src/montgomery.rs', lines 455:4-457:5
+    Visibility: public -/
+def
+  montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar.mul_assign
+  (self : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
+  Result montgomery.MontgomeryPoint
+  := do
+  Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul
+    self scalar
+
+/-- [curve25519_dalek::montgomery::{core::ops::arith::MulAssign<curve25519_dalek::scalar::Scalar> for curve25519_dalek::montgomery::MontgomeryPoint}::mul_assign]:
+    Source: 'curve25519-dalek/src/macros.rs', lines 118:12-120:13
+    Visibility: public -/
+def montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign
+  (self : montgomery.MontgomeryPoint) (rhs : scalar.Scalar) :
+  Result montgomery.MontgomeryPoint
+  := do
+  montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar.mul_assign
+    self rhs
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::MulAssign<curve25519_dalek::scalar::Scalar> for curve25519_dalek::montgomery::MontgomeryPoint}]
+    Source: 'curve25519-dalek/src/macros.rs', lines 117:8-121:9 -/
+@[reducible]
+def montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignScalar :
+  core.ops.arith.MulAssign montgomery.MontgomeryPoint scalar.Scalar := {
+  mul_assign :=
+    montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign
+}
+
 /-- [curve25519_dalek::scalar::{core::ops::arith::MulAssign<&'a (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::scalar::Scalar}::mul_assign]:
     Source: 'curve25519-dalek/src/scalar.rs', lines 316:4-318:5
     Visibility: public -/
@@ -5926,6 +5956,15 @@ def Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint :
   montgomery.MontgomeryPoint := {
   mul :=
     Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul
+}
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::MulAssign<&0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::montgomery::MontgomeryPoint}]
+    Source: 'curve25519-dalek/src/montgomery.rs', lines 454:0-458:1 -/
+@[reducible]
+def montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar :
+  core.ops.arith.MulAssign montgomery.MontgomeryPoint scalar.Scalar := {
+  mul_assign :=
+    montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar.mul_assign
 }
 
 /-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::scalar::Scalar)}]
