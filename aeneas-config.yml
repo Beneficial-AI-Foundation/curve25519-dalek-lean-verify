@@ -76,6 +76,43 @@ charon:
     - "curve25519_dalek::ristretto::VartimeRistrettoPrecomputation"
     - "curve25519_dalek::ristretto::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
     - "curve25519_dalek::backend::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
+    # EXCLUDED BY CHOICE
+    # The following excludes aren't required for Charon to function, the have been added here since they are not part of the verification scope
+    # TODO: https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/issues/829   
+    # Zeroize impls (remaining modules)
+    - "curve25519_dalek::backend::serial::curve_models::{impl zeroize::Zeroize for _}"
+    - "curve25519_dalek::backend::serial::u64::field::{impl zeroize::Zeroize for _}"
+    - "curve25519_dalek::montgomery::{impl zeroize::Zeroize for _}"
+    # Default impls
+    - "curve25519_dalek::backend::serial::curve_models::{impl core::default::Default for _}"
+    - "curve25519_dalek::edwards::{impl core::default::Default for _}"
+    - "curve25519_dalek::montgomery::{impl core::default::Default for _}"
+    - "curve25519_dalek::ristretto::{impl core::default::Default for _}"
+    # Neg impls
+    - "curve25519_dalek::backend::serial::curve_models::{impl core::ops::arith::Neg<_> for _}"
+    - "curve25519_dalek::edwards::{impl core::ops::arith::Neg<_> for _}"
+    - "curve25519_dalek::ristretto::{impl core::ops::arith::Neg<_> for _}"
+    # AddAssign impls
+    - "curve25519_dalek::edwards::{impl core::ops::arith::AddAssign<_> for _}"
+    - "curve25519_dalek::ristretto::{impl core::ops::arith::AddAssign<_> for _}"
+    - "curve25519_dalek::scalar::{impl core::ops::arith::AddAssign<_> for _}"
+    # SubAssign impls
+    - "curve25519_dalek::edwards::{impl core::ops::arith::SubAssign<_> for _}"
+    - "curve25519_dalek::ristretto::{impl core::ops::arith::SubAssign<_> for _}"
+    - "curve25519_dalek::scalar::{impl core::ops::arith::SubAssign<_> for _}"
+    # MulAssign impls
+    - "curve25519_dalek::backend::serial::u64::field::{impl core::ops::arith::MulAssign<_> for _}"
+    - "curve25519_dalek::edwards::{impl core::ops::arith::MulAssign<_> for _}"
+    - "curve25519_dalek::ristretto::{impl core::ops::arith::MulAssign<_> for _}"
+    # ValidityCheck impls
+    - "curve25519_dalek::backend::serial::curve_models::{impl curve25519_dalek::traits::ValidityCheck for _}"
+    - "curve25519_dalek::edwards::{impl curve25519_dalek::traits::ValidityCheck for _}"
+    # Other unverified functions
+    - "curve25519_dalek::edwards::affine::{impl core::ops::arith::Mul<_, _> for curve25519_dalek::scalar::Scalar}"
+    - "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::to_bytes"
+    - "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::coset4"
+    - "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::non_adjacent_form"
+    # END EXCLUDED BY CHOICE
   opaque: []
 
 aeneas_args:
