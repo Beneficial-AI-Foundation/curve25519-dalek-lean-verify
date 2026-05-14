@@ -57,7 +57,7 @@ theorem mul_spec
     -- If `bytes[31] ≥ 128` then the top byte alone contributes `≥ 2^248 * 128 = 2^255`,
     -- contradicting `U8x32_as_Nat < 2^255`.
     by_contra h_neg
-    push_neg at h_neg
+    push Not at h_neg
     unfold U8x32_as_Nat at h_scalar_canonical
     rw [Finset.sum_range_succ] at h_scalar_canonical
     have h_high_ge : 2 ^ 255 ≤ 2 ^ (8 * 31) * (scalar.bytes[31]!).val := by

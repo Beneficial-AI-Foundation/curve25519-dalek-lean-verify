@@ -1380,7 +1380,7 @@ private lemma X64_as_Nat_eq_U8x32_as_Nat
     · have h_take_i : i < (List.take (min s2.val.length 4) s2.val).length := by
         simp only [List.length_take]; omega
       grind
-    · push_neg at hi
+    · push Not at hi
       have hmin : min s2.val.length 4 = s2.val.length := by omega
       grind
   have hx64 : X64_as_Nat (res1.2 s2) = U64Slice_as_Nat s2 4 := by
