@@ -96,6 +96,8 @@ theorem mul_loop_spec
       sorry
   | pred n _ =>
       sorry
+  -- TODO: complete this proof (or a completely refactored complete proof).
+  -- See https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/issues/830
 
 lemma aux_eq_mul (scalar : scalar.Scalar) : U8x32_as_Nat scalar.bytes =
     (∑ x ∈ Finset.range ((254 :ℤ )/ 8).toNat, 2 ^ (8 * x) * (scalar.bytes[x]!).val +
