@@ -3,7 +3,6 @@ Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Hoang Le Truong
 -/
-import Curve25519Dalek.Math.BitList
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Aux
 import Curve25519Dalek.ExternallyVerified
@@ -40,55 +39,26 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
     }
 ```
 
-## Approach
-
-We think of the 32 bytes as a single list of 256 booleans (bits), LSB-first:
-  `bits[0], bits[1], ..., bits[255]`.
-Byte `bytes[i]` contributes `bits[8i .. 8i+7]`.
-
-Every operation in `from_bytes` is a simple list operation:
-  - `load8_at(bytes, i)` → extract sublist `bits[8i .. 8i+63]` (64 bits)
-  - `>> k` (right shift)  → drop the first `k` elements from the list
-  - `& low_51_bit_mask`   → take only the first 51 elements (truncate the tail)
-
-Tracing each limb:
-
-  | Limb | load           | shift  | mask    | Result bits       |
-  |------|----------------|--------|---------|-------------------|
-  |  0   | bits[0..64)    | none   | take 51 | bits[0..51)       |
-  |  1   | bits[48..112)  | drop 3 | take 51 | bits[51..102)     |
-  |  2   | bits[96..160)  | drop 6 | take 51 | bits[102..153)    |
-  |  3   | bits[152..216) | drop 1 | take 51 | bits[153..204)    |
-  |  4   | bits[192..256) | drop 12| take 51 | bits[204..255)    |
-
-The 5 limbs extract exactly the 5 consecutive, non-overlapping 51-bit slices
-covering `bits[0..255)`. Bit 255 (the 256th bit) is discarded — this is the `% 2^255`.
-
 ## Proof structure
 
-1. `load8_at_bitList_spec`:
-   `ofU64 result = (ofByteList input.val).extract (8*i) (8*i + 64)`
-
-2. For each limb, the shift+mask chain gives:
-   `ofU64 result[i] ≈ₗ allBits.extract (51*i) (51*i + 51)`
-   using: `ofNat_equiv_of_lt`, `ofNat_mod`, `ofNat_extract`, `extract_extract`
-
-3. `from_bytes_bitList_spec` → `from_bytes_spec` via:
-   `field51_eq_of_bitList` + `limb_bound_of_equiv`
+1. `load8_at_val_spec`: byte-pack lemma —
+   `load8_at(input, i).val = ∑ j ∈ range 8, input[i + j]!.val * 2 ^ (8 j)`.
+2. `limb_slicing`: pure-Nat identity equating the five limb formulas to
+   `U8x32_as_Nat bytes mod 2 ^ 255`.
+3. `load8_at_eq_shift`: byte-sum at offset `i` equals the 64-bit slice
+   `(U8x32_as_Nat bytes / 2 ^ (8 i)) % 2 ^ 64`.
+4. `limb_eq_aux`: the shift+mask reduction
+   `(B / 2 ^ k) % 2 ^ 64 / 2 ^ s % 2 ^ 51 = B / 2 ^ (k + s) % 2 ^ 51`.
+5. `from_bytes_spec`: glues the `step*` posts to the limb-level postcondition.
 -/
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open scoped BigOperators
-open List BitList
 
-/-! ## load8_at specification
+/-! ## load8_at specification (Nat-level only) -/
 
-`load8_at` loads 8 consecutive bytes from a slice and packs them into a U64 in little-endian order.
-In List Bool terms, the result's bits are exactly the 64 bits starting at position `8*i` in the
-slice's bit representation. -/
-
-/-- The Nat-level spec for load8_at: the result is the little-endian combination of 8 bytes. -/
+/-- The Nat-level spec for `load8_at`: the result is the little-endian combination of 8 bytes. -/
 @[step]
 theorem load8_at_val_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ input.val.length) :
     from_bytes.load8_at input i ⦃ (result : U64) =>
@@ -102,154 +72,99 @@ theorem load8_at_val_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ inpu
     (input.val[i.val + 5]!).hmax (input.val[i.val + 6]!).hmax (input.val[i.val + 7]!).hmax]
   simp [Finset.sum_range_succ]
 
-private lemma extract_getElem! (l : List U8) (i j : Nat) (hj : j < 8) :
-    (l.extract i (i + 8))[j]! = l[i + j]! := by grind
+/-! ## Bit-slicing identity (pure Nat) -/
 
-private lemma sum_extract_eq (l : List U8) (i : Nat) (hi : i + 8 ≤ l.length) :
-    ∑ j ∈ Finset.range 8, l[i + j]!.val * 2 ^ (8 * j) =
-      Nat.ofDigits 256 ((l.extract i (i + 8)).map (·.val)) := by
-  have hlen : (l.extract i (i + 8)).length = 8 := by
-    simp [length_take, length_drop]; omega
-  rw [ofDigits_map_val_eq_sum, hlen]
-  apply Finset.sum_congr rfl; intro j hj; rw [Finset.mem_range] at hj
-  rw [extract_getElem! l i j hj, show (256 : Nat) = 2 ^ 8 from by norm_num, ← Nat.pow_mul]
+/-- The five 51-bit limbs of `B mod 2^255` are `(B / 2^(51 k)) mod 2^51` for `k = 0..4`. -/
+private theorem limb_slicing (B : Nat) :
+    B % 2 ^ 51
+    + 2 ^ 51 * ((B / 2 ^ 51) % 2 ^ 51)
+    + 2 ^ 102 * ((B / 2 ^ 102) % 2 ^ 51)
+    + 2 ^ 153 * ((B / 2 ^ 153) % 2 ^ 51)
+    + 2 ^ 204 * ((B / 2 ^ 204) % 2 ^ 51)
+    = B % 2 ^ 255 := by
+  have d0 := Nat.div_add_mod B (2 ^ 51)
+  have d1 := Nat.div_add_mod (B / 2 ^ 51) (2 ^ 51)
+  have d2 := Nat.div_add_mod (B / 2 ^ 102) (2 ^ 51)
+  have d3 := Nat.div_add_mod (B / 2 ^ 153) (2 ^ 51)
+  have d4 := Nat.div_add_mod (B / 2 ^ 204) (2 ^ 51)
+  have dB := Nat.div_add_mod B (2 ^ 255)
+  have hpow : (2 : Nat) ^ 255 = 2 ^ 51 * (2 ^ 51 * (2 ^ 51 * (2 ^ 51 * 2 ^ 51))) := by norm_num
+  have hdd : ∀ a b, a + 51 = b → B / 2 ^ a / 2 ^ 51 = B / 2 ^ b := fun a b h => by
+    rw [Nat.div_div_eq_div_mul, ← pow_add, h]
+  have hd1 := hdd 51 102 rfl
+  have hd2 := hdd 102 153 rfl
+  have hd3 := hdd 153 204 rfl
+  have hd4 := hdd 204 255 rfl
+  omega
 
-/-- The List Bool spec for load8_at: the result bits are the 64 bits starting at byte position i. -/
-@[step]
-theorem load8_at_bitList_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ input.val.length) :
-    from_bytes.load8_at input i ⦃ (result : U64) =>
-      ofU64 result = (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64) ⦄ := by
-  apply spec_mono (load8_at_val_spec input i h)
-  intro result hval
-  simp only [Slice.getElem!_Nat_eq] at hval
-  set rhs := (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64)
-  have hlen : rhs.length = 64 := by
-    simp [rhs, length_take, length_drop, ofByteList_length]
-    omega
-  have hval_eq : result.val = toNat rhs := by
-    simp only [rhs]
-    rw [show 8 * i.val + 64 = 8 * (i.val + 8) from by ring,
-      ofByteList_extract input.val i.val (i.val + 8) (by omega),
-      toNat_ofByteList, ← sum_extract_eq input.val i.val (by omega)]
-    exact hval
-  simp only [ofU64, hval_eq]
-  rw [← hlen, ofNat_toNat rhs]
+/-! ## Bridge: load8_at as a slice of `U8x32_as_Nat bytes` -/
 
-/-! ## BitList-native specs for shift and mask
+/-- A sum of bytes (each `< 2^8`) shifted by their offset positions is bounded by `2^(8n)`. -/
+private lemma byte_sum_lt (bytes : Array U8 32#usize) (i n : Nat) (hn : i + n ≤ 32) :
+    ∑ k ∈ Finset.range n, bytes[i + k]!.val * 2 ^ (8 * k) < 2 ^ (8 * n) := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    have ih' := ih (by omega)
+    have hb : (bytes[i + n]! : U8).val < 2 ^ 8 := by
+      have := (bytes[i + n]! : U8).hmax; scalar_tac
+    have : ((bytes[i + n]! : U8).val + 1) * 2 ^ (8 * n) ≤ 2 ^ 8 * 2 ^ (8 * n) :=
+      Nat.mul_le_mul_right _ hb
+    rw [Finset.sum_range_succ, show (8 * (n + 1) : Nat) = 8 * n + 8 from by ring, pow_add]
+    nlinarith
 
-These replace the Nat-level Aeneas specs with List Bool equivalents,
-so the proof of `from_bytes_bitList_spec` stays entirely in List Bool land. -/
+/-- Sum of `f` over `range 32` decomposes into three blocks around `i..i+8`. -/
+private lemma sum_split_three (f : Nat → Nat) (i : Nat) (hi : i + 8 ≤ 32) :
+    ∑ k ∈ Finset.range 32, f k =
+      (∑ k ∈ Finset.range i, f k)
+      + (∑ k ∈ Finset.range 8, f (i + k))
+      + (∑ k ∈ Finset.range (32 - (i + 8)), f (i + 8 + k)) := by
+  conv_lhs => rw [show (32 : Nat) = (i + 8) + (32 - (i + 8)) from by omega,
+    Finset.sum_range_add, Finset.sum_range_add (n := i) (m := 8)]
 
--- Remove @[step] from the Nat-level specs so the BitList versions are preferred.
-attribute [-step] load8_at_val_spec load8_at_bitList_spec
+/-- An 8-byte little-endian load at offset `i` is the corresponding 64-bit slice
+of the full 32-byte little-endian value. -/
+private theorem load8_at_eq_shift (bytes : Array U8 32#usize) (i : Nat) (hi : i + 8 ≤ 32) :
+    ∑ j ∈ Finset.range 8, bytes[i + j]!.val * 2 ^ (8 * j) =
+      (U8x32_as_Nat bytes / 2 ^ (8 * i)) % 2 ^ 64 := by
+  set lower := ∑ k ∈ Finset.range i, bytes[k]!.val * 2 ^ (8 * k) with hlower_def
+  set middle := ∑ j ∈ Finset.range 8, bytes[i + j]!.val * 2 ^ (8 * j) with hmiddle_def
+  set upper :=
+    ∑ k ∈ Finset.range (32 - (i + 8)), bytes[i + 8 + k]!.val * 2 ^ (8 * k) with hupper_def
+  have hlow_lt : lower < 2 ^ (8 * i) := by simpa using byte_sum_lt bytes 0 i (by omega)
+  have hmid_lt : middle < 2 ^ 64 := by simpa using byte_sum_lt bytes i 8 hi
+  have hsplit :
+      U8x32_as_Nat bytes = lower + 2 ^ (8 * i) * middle + 2 ^ (8 * (i + 8)) * upper := by
+    have hsum := sum_split_three (fun k => 2 ^ (8 * k) * bytes[k]!.val) i hi
+    simp only [U8x32_as_Nat, hsum]
+    have hlow_rw : ∑ k ∈ Finset.range i, 2 ^ (8 * k) * bytes[k]!.val = lower := by
+      simp only [hlower_def]; exact Finset.sum_congr rfl fun _ _ => by ring
+    have hmid_rw : ∑ k ∈ Finset.range 8, 2 ^ (8 * (i + k)) * bytes[i + k]!.val
+        = 2 ^ (8 * i) * middle := by
+      simp only [hmiddle_def, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun j _ => ?_
+      rw [show (8 * (i + j) : Nat) = 8 * i + 8 * j from by ring, pow_add]; ring
+    have hup_rw : ∑ k ∈ Finset.range (32 - (i + 8)),
+        2 ^ (8 * (i + 8 + k)) * bytes[i + 8 + k]!.val = 2 ^ (8 * (i + 8)) * upper := by
+      simp only [hupper_def, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun j _ => ?_
+      rw [show (8 * (i + 8 + j) : Nat) = 8 * (i + 8) + 8 * j from by ring, pow_add]; ring
+    rw [hlow_rw, hmid_rw, hup_rw]
+  rw [hsplit,
+    show (2 : Nat) ^ (8 * (i + 8)) = 2 ^ (8 * i) * 2 ^ 64 from by
+      rw [show (8 * (i + 8) : Nat) = 8 * i + 64 from by ring, pow_add],
+    show lower + 2 ^ (8 * i) * middle + 2 ^ (8 * i) * 2 ^ 64 * upper
+      = lower + (middle + 2 ^ 64 * upper) * 2 ^ (8 * i) from by ring,
+    Nat.add_mul_div_right _ _ (Nat.pos_of_ne_zero (by positivity)),
+    Nat.div_eq_of_lt hlow_lt, Nat.zero_add, Nat.add_mul_mod_self_left]
+  exact (Nat.mod_eq_of_lt hmid_lt).symm
 
-/-- Right-shifting a U64 by k drops k bits from its List Bool representation. -/
-@[step]
-theorem u64_shr_bitList_spec (x : U64) (k : I32) (hk0 : 0 ≤ k.val) (hk : k.val < 64) :
-    (x >>> k) ⦃ (z : UScalar UScalarTy.U64) => ofU64 z ≈ₗ (ofU64 x).drop k.toNat ⦄ := by
-  have hknat : k.toNat < 64 := by scalar_tac
-  step as ⟨z, hval, _⟩
-  simp only [ofU64]
-  rw [hval, Nat.shiftRight_eq_div_pow, ofNat_drop k.toNat 64 x.val (by omega)]
-  exact ofNat_equiv_of_lt _ 64 _ (by omega) (by
-    rw [Nat.div_lt_iff_lt_mul (by positivity), ← Nat.pow_add,
-      show 64 - k.toNat + k.toNat = 64 from by omega]
-    exact x.hmax)
-
-/-- Masking a U64 with `2^n - 1` takes the first n bits. -/
-theorem u64_and_mask_bitList_spec (x mask : U64) (n : Nat)
-    (hn : n ≤ 64) (hmask : mask.val = 2 ^ n - 1) :
-    lift (x &&& mask) ⦃ (z : UScalar UScalarTy.U64) => ofU64 z ≈ₗ (ofU64 x).take n ⦄ := by
-  simp only [lift, spec_ok]
-  have hval : (x &&& mask).val = x.val % 2 ^ n := by
-    rw [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod]
-  simp only [ofU64, hval]
-  rw [ofNat_take n 64 x.val (by omega), ← ofNat_mod n x.val]
-  exact ofNat_equiv_of_lt n 64 (x.val % 2 ^ n) (by omega)
-    (Nat.mod_lt _ (by positivity))
-
-/-- Specialized mask spec for 51-bit mask with literal precondition for step*. -/
-@[step]
-theorem u64_and_mask51_bitList_spec (x mask : U64)
-    (hmask : mask.val = 2251799813685247) :
-    lift (x &&& mask) ⦃ (z : U64) => ofU64 z ≈ₗ (ofU64 x).take 51 ⦄ :=
-  u64_and_mask_bitList_spec x mask 51 (by omega) (by omega)
-
-/-- load8_at in List Bool terms, as a step-compatible spec. -/
-@[step]
-theorem load8_at_bitList_step_spec (input : Slice U8) (i : Usize)
-    (h : i.val + 8 ≤ input.val.length) :
-    from_bytes.load8_at input i ⦃ result =>
-      ofU64 result ≈ₗ
-        (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64) ⦄ :=
-  spec_mono (load8_at_bitList_spec input i h) fun _ heq => heq ▸ BitList.Equiv.refl _
-
-/-! ## Bridge: List Bool spec implies Nat spec -/
-
-/-- Equiv implies the limb value equals the slice value. -/
-theorem field51_eq_of_bitList (result : FieldElement51) (bytes : Array U8 32#usize)
-    (hequiv : ∀ i : Fin 5,
-      ofU64 result[i]! ≈ₗ (ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51)) :
-    Field51_as_Nat result = U8x32_as_Nat bytes % 2 ^ 255 := by
-  unfold Field51_as_Nat
-  have hsum : ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * result[i]!.val =
-      ∑ i ∈ Finset.range 5,
-        toNat ((ofByteArray bytes).extract (51 * i) (51 * i + 51)) * 2 ^ (51 * i) := by
-    apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
-    rw [(toNat_ofU64 result[i]!).symm.trans (hequiv ⟨i, hi⟩).toNat_eq]; ring
-  rw [hsum, ← toNat_split_chunks (ofByteArray bytes) 51 5 (by rw [ofByteArray_length]; norm_num),
-    show 51 * 5 = 255 from by norm_num, toNat_take 255 (ofByteArray bytes), toNat_ofByteArray]
-
-/-- The limb bound follows from Equiv (the extract has length ≤ 51). -/
-theorem limb_bound_of_equiv (result : FieldElement51) (bytes : Array U8 32#usize)
-    (hequiv : ∀ i : Fin 5,
-      ofU64 result[i]! ≈ₗ (ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51)) :
-    ∀ i : Fin 5, result[i]!.val < 2 ^ 51 := by
-  intro i
-  rw [← toNat_ofU64 result[i]!, (hequiv i).toNat_eq]
-  refine (toNat_lt_pow _).trans_le (Nat.pow_le_pow_right (by omega) ?_)
-  simp [length_take, length_drop, ofByteArray_length]
-
-/-! ## The pure List Bool specification for from_bytes -/
-set_option maxHeartbeats 230000 in
--- heavy grind
-/-- The pure List Bool spec for from_bytes, using `BitList.Equiv` (≈ₗ). -/
-@[step]
-theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
-    from_bytes bytes ⦃ (result : FieldElement51) =>
-      ∀ i : Fin 5,
-        ofU64 result[i]! ≈ₗ (ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51) ⦄ := by
-  unfold from_bytes
-  let* ⟨ i, i_post1, i_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  let* ⟨ low_51_bit_mask, low_51_bit_mask_post1, low_51_bit_mask_post2 ⟩ ← U64.sub_spec
-  let* ⟨ s, s_post ⟩ ← Array.to_slice.step_spec
-  let* ⟨ i1, i1_post ⟩ ← load8_at_bitList_step_spec
-  let* ⟨ i2, i2_post ⟩ ← u64_and_mask51_bitList_spec
-  let* ⟨ s1, s1_post ⟩ ← Array.to_slice.step_spec
-  let* ⟨ i3, i3_post ⟩ ← load8_at_bitList_step_spec
-  let* ⟨ i4, i4_post ⟩ ← u64_shr_bitList_spec
-  let* ⟨ i5, i5_post ⟩ ← u64_and_mask51_bitList_spec
-  let* ⟨ s2, s2_post ⟩ ← Array.to_slice.step_spec
-  let* ⟨ i6, i6_post ⟩ ← load8_at_bitList_step_spec
-  let* ⟨ i7, i7_post ⟩ ← u64_shr_bitList_spec
-  let* ⟨ i8, i8_post ⟩ ← u64_and_mask51_bitList_spec
-  let* ⟨ s3, s3_post ⟩ ← Array.to_slice.step_spec
-  let* ⟨ i9, i9_post ⟩ ← load8_at_bitList_step_spec
-  let* ⟨ i10, i10_post ⟩ ← u64_shr_bitList_spec
-  let* ⟨ i11, i11_post ⟩ ← u64_and_mask51_bitList_spec
-  let* ⟨ s4, s4_post ⟩ ← Array.to_slice.step_spec
-  let* ⟨ i12, i12_post ⟩ ← load8_at_bitList_step_spec
-  let* ⟨ i13, i13_post ⟩ ← u64_shr_bitList_spec
-  let* ⟨ i14, i14_post ⟩ ← u64_and_mask51_bitList_spec
-  have hs : ∀ sx, sx = bytes.to_slice → ofByteList sx.val = ofByteList bytes.val := by
-    intro _ hsx; simp [hsx, Array.to_slice]
-  intro i; fin_cases i
-  · simp_all [Array.make, ofByteArray]; grind
-  · simp_all [Array.make, ofByteArray]; grind
-  · simp_all [Array.make, ofByteArray]; grind
-  · clear i1_post -- TODO: why is this required for grind to succeed?
-    simp_all [Array.make, ofByteArray, -drop_one]; grind
-  · simp_all [Array.make, ofByteArray]; grind
+/-- The shift+mask formula reducing `(B / 2^k) % 2^64 / 2^s % 2^51` to `B / 2^(k+s) % 2^51`.
+Requires `s + 51 ≤ 64` so the inner mod doesn't lose bits. -/
+private lemma limb_eq_aux (B k s : Nat) (hs : s + 51 ≤ 64) :
+    (B / 2 ^ k) % 2 ^ 64 / 2 ^ s % 2 ^ 51 = B / 2 ^ (k + s) % 2 ^ 51 := by
+  rw [show (64 : Nat) = s + (64 - s) from by omega, pow_add, Nat.mod_mul_right_div_self,
+    Nat.div_div_eq_div_mul, ← pow_add, Nat.mod_mod_of_dvd _ (Nat.pow_dvd_pow 2 (by omega))]
 
 /-! ## Final spec -/
 
@@ -258,13 +173,82 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
     from_bytes bytes ⦃ (result : FieldElement51) =>
       Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
-  let* ⟨ result, result_post ⟩ ← from_bytes_bitList_spec
-  constructor
-  · rw [field51_eq_of_bitList result bytes _]
-    assumption
-  · intro i hi
-    exact limb_bound_of_equiv result bytes ‹_› ⟨i, hi⟩
-
-attribute [-step] from_bytes_bitList_spec
+  unfold from_bytes
+  let* ⟨ _, shift_post1, _ ⟩ ← U64.ShiftLeft_IScalar_spec
+  let* ⟨ mask, mask_post1, _ ⟩ ← U64.sub_spec
+  let* ⟨ s0, s0_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ ld0, ld0_post ⟩ ← load8_at_val_spec
+  let* ⟨ l0, l0_post1, _ ⟩ ← UScalar.and_spec
+  let* ⟨ s1, s1_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ ld1, ld1_post ⟩ ← load8_at_val_spec
+  let* ⟨ sh1, sh1_post1, _ ⟩ ← U64.ShiftRight_IScalar_spec
+  let* ⟨ l1, l1_post1, _ ⟩ ← UScalar.and_spec
+  let* ⟨ s2, s2_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ ld2, ld2_post ⟩ ← load8_at_val_spec
+  let* ⟨ sh2, sh2_post1, _ ⟩ ← U64.ShiftRight_IScalar_spec
+  let* ⟨ l2, l2_post1, _ ⟩ ← UScalar.and_spec
+  let* ⟨ s3, s3_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ ld3, ld3_post ⟩ ← load8_at_val_spec
+  let* ⟨ sh3, sh3_post1, _ ⟩ ← U64.ShiftRight_IScalar_spec
+  let* ⟨ l3, l3_post1, _ ⟩ ← UScalar.and_spec
+  let* ⟨ s4, s4_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ ld4, ld4_post ⟩ ← load8_at_val_spec
+  let* ⟨ sh4, sh4_post1, _ ⟩ ← U64.ShiftRight_IScalar_spec
+  let* ⟨ l4, l4_post1, _ ⟩ ← UScalar.and_spec
+  have hmask : mask.val = 2 ^ 51 - 1 := by scalar_tac
+  -- Each `ldN` is the 64-bit slice of `U8x32_as_Nat bytes` at byte offset `i`.
+  have hld : ∀ {ld : U64} {sx : Slice U8} (i : Nat), i + 8 ≤ 32 →
+      sx = bytes.to_slice →
+      ld.val = ∑ x ∈ Finset.range 8, sx[i + x]!.val * 2 ^ (8 * x) →
+      ld.val = U8x32_as_Nat bytes / 2 ^ (8 * i) % 2 ^ 64 := by
+    intro ld sx i hi hsx h
+    have : sx.val = bytes.val := by simp [hsx, Array.to_slice]
+    rw [h]; simp only [Slice.getElem!_Nat_eq, this]
+    simpa using load8_at_eq_shift bytes i hi
+  -- Each `lN` is the 51-bit slice of `U8x32_as_Nat bytes` at bit offset `8*i + s = 51*k`.
+  have hl : ∀ {l ld sh : U64} {sx : Slice U8} (i s k : Nat),
+      i + 8 ≤ 32 → s + 51 ≤ 64 → 8 * i + s = 51 * k →
+      sx = bytes.to_slice →
+      ld.val = ∑ x ∈ Finset.range 8, sx[i + x]!.val * 2 ^ (8 * x) →
+      sh.val = ld.val >>> s →
+      l.val = (sh &&& mask).val →
+      l.val = U8x32_as_Nat bytes / 2 ^ (51 * k) % 2 ^ 51 := by
+    intro l ld sh sx i s k hi hs hk hsx hld' hsh hl
+    rw [hl, UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod, hsh,
+      Nat.shiftRight_eq_div_pow, hld i hi hsx hld', limb_eq_aux _ (8 * i) s hs, hk]
+  -- Specialise to each limb. For limb 0 we use `sh := ld0` (no shift).
+  have hl0v : l0.val = U8x32_as_Nat bytes % 2 ^ 51 := by
+    simpa using hl (l := l0) (sh := ld0) 0 0 0 (by omega) (by omega) rfl
+      s0_post ld0_post (by simp) l0_post1
+  have hl1v := hl (l := l1) 6 3 1 (by omega) (by omega) (by norm_num)
+    s1_post ld1_post sh1_post1 l1_post1
+  have hl2v := hl (l := l2) 12 6 2 (by omega) (by omega) (by norm_num)
+    s2_post ld2_post sh2_post1 l2_post1
+  have hl3v := hl (l := l3) 19 1 3 (by omega) (by omega) (by norm_num)
+    s3_post ld3_post sh3_post1 l3_post1
+  have hl4v := hl (l := l4) 24 12 4 (by omega) (by omega) (by norm_num)
+    s4_post ld4_post sh4_post1 l4_post1
+  -- Resolve each `result[k]!` to the corresponding limb.
+  have hk0 : ((Array.make 5#usize [l0, l1, l2, l3, l4]).val[0]! : U64) = l0 := by simp [Array.make]
+  have hk1 : ((Array.make 5#usize [l0, l1, l2, l3, l4]).val[1]! : U64) = l1 := by simp [Array.make]
+  have hk2 : ((Array.make 5#usize [l0, l1, l2, l3, l4]).val[2]! : U64) = l2 := by simp [Array.make]
+  have hk3 : ((Array.make 5#usize [l0, l1, l2, l3, l4]).val[3]! : U64) = l3 := by simp [Array.make]
+  have hk4 : ((Array.make 5#usize [l0, l1, l2, l3, l4]).val[4]! : U64) = l4 := by simp [Array.make]
+  refine ⟨?_, ?_⟩
+  · -- Equality (stronger than `≡`).
+    show Field51_as_Nat _ ≡ _ [MOD p]
+    have : Field51_as_Nat (Array.make 5#usize [l0, l1, l2, l3, l4])
+        = U8x32_as_Nat bytes % 2 ^ 255 := by
+      simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty,
+        zero_add, Nat.reduceMul, pow_zero, one_mul, Array.getElem!_Nat_eq,
+        hk0, hk1, hk2, hk3, hk4, hl0v, hl1v, hl2v, hl3v, hl4v]
+      linarith [limb_slicing (U8x32_as_Nat bytes)]
+    rw [this]
+  · -- Bounds for each limb (each is `_ % 2 ^ 51`).
+    intro i hi
+    simp only [Array.getElem!_Nat_eq]
+    interval_cases i <;>
+    · first | rw [hk0, hl0v] | rw [hk1, hl1v] | rw [hk2, hl2v] | rw [hk3, hl3v] | rw [hk4, hl4v]
+      exact Nat.mod_lt _ (by positivity)
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
