@@ -39,8 +39,10 @@ lemma mkPoint_u_zero (a : montgomery.MontgomeryPoint)
     (h : (U8x32_as_Field a) = 0) :
     MontgomeryPoint.mkPoint a = T_point := by
   unfold MontgomeryPoint.mkPoint MontgomeryPoint.u_affine_toPoint
-  simp only [h, beq_self_eq_true]
-  simp
+  simp only [h]
+  simp only [beq_iff_eq, Bool.not_eq_eq_eq_not, Bool.not_true, dite_eq_ite, ite_eq_left_iff,
+    dite_eq_left_iff, Bool.not_eq_false]
+  exact fun h => absurd rfl h
 
 private lemma v_coord_birational_match
     (e : Edwards.Point Edwards.Ed25519)
@@ -138,7 +140,7 @@ private lemma v_squared_isSquare_of_nonsingular
 
 lemma abs_T_point : abs_montgomery T_point = T_point := by
   unfold T_point abs_montgomery
-  simp
+  simp [math.abs_edwards, math.is_negative]
 
 theorem to_montgomery_birational_zero
     (e : EdwardsPoint)
@@ -216,7 +218,7 @@ theorem to_montgomery_birational_eq
     simp only [hy_ne_1]
     have hy_neg1 : e.toPoint.y = -1 := y_eq_neg_one_of_x_eq_zero e.toPoint hx hy_ne_1
     have h_u_0_zero : (U8x32_as_Field a) = 0 := by
-      rw [← hu_bira, hy_neg1]; ring_nf
+      rw [← hu_bira, hy_neg1]; ring_nf; rfl
     have := mkPoint_u_zero a h_u_0_zero
     simp [this, hx, abs_T_point]
   · unfold fromEdwards
@@ -234,9 +236,11 @@ theorem to_montgomery_birational_eq
             (Prod.mk.eta (p := math.sqrt_checked
               (v_squared (U8x32_as_Field a)))).symm).mpr h_is_sq
     simp only [MontgomeryPoint.mkPoint, MontgomeryPoint.u_affine_toPoint, h_sqrt_true,
-      Bool.not_true, hu_0_ne, beq_iff_eq]
+      Bool.not_true, beq_iff_eq]
     conv_rhs => simp only [↓reduceDIte]
     simp only [Bool.false_eq_true, ↓reduceDIte]
+    split_ifs with h_dite
+    · exact absurd h_dite hu_0_ne
     apply abs_eq_some
     · exact hu_bira
     · have := v_coord_birational_match e.toPoint hy_ne_1 hx

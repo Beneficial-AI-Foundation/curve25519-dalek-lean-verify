@@ -105,7 +105,7 @@ They mirror the Nat-level spec theorems from Aeneas but with BitList postconditi
 theorem List.extract_append_extract {α : Type*} (l : List α) (a b c : Nat)
     (hab : a ≤ b) (hbc : b ≤ c) :
     l.extract a b ++ l.extract b c = l.extract a c := by
-  simp only [List.extract_eq_drop_take]
+  simp only [List.extract_eq_take_drop]
   conv_rhs => rw [show c - a = (b - a) + (c - b) from by omega]
   rw [List.take_add]
   congr 1
@@ -253,7 +253,7 @@ private theorem ofU64_of_or_bv (x y z : U64) (k : Nat) (hk : k ≤ 64) (hx : x.v
     ofU64 z = (ofU64 y).take k ++ (ofU64 x).drop k := by
   have heq : z = x ||| y := by
     have : z.bv = (x ||| y).bv := by
-      rw [hbv, UScalar.bv_or]; ext i; simp [Bool.or_comm]
+      rw [hbv, UScalar.bv_or, BitVec.or_comm]; rfl
     have := congrArg BitVec.toNat this; scalar_tac
   rw [heq]; exact ofU64_or_non_overlapping x y k hk hx hy
 
@@ -370,11 +370,11 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 24 32 (by omega) (by omega),
         List.extract_append_extract _ 0 32 40 (by omega) (by omega),
         List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
-    rw [List.take_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [List.take_left' (by simp [ofU64_length])]
     rw [List.extract_append_extract _ 0 48 52 (by omega) (by omega)]
-    simp [List.extract_eq_drop_take]
+    simp
   · -- hlimb1
-    rw [hb6, List.drop_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [hb6, List.drop_left' (by simp [ofU64_length])]
     rw [hb7, hb8, hb9, hb10, hb11, hb12]
     rw [List.extract_append_extract _ 0 4 12 (by omega) (by omega),
         List.extract_append_extract _ 0 12 20 (by omega) (by omega),
@@ -382,7 +382,7 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 28 36 (by omega) (by omega),
         List.extract_append_extract _ 0 36 44 (by omega) (by omega),
         List.extract_append_extract _ 0 44 52 (by omega) (by omega)]
-    simp [List.extract_eq_drop_take]
+    simp
   · -- hlimb2
     rw [hb13, hb14, hb15, hb16, hb17, hb18, hb19]
     rw [List.extract_append_extract _ 0 8 16 (by omega) (by omega),
@@ -390,11 +390,11 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 24 32 (by omega) (by omega),
         List.extract_append_extract _ 0 32 40 (by omega) (by omega),
         List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
-    rw [List.take_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [List.take_left' (by simp [ofU64_length])]
     rw [List.extract_append_extract _ 0 48 52 (by omega) (by omega)]
-    simp [List.extract_eq_drop_take]
+    simp
   · -- hlimb3
-    rw [hb19, List.drop_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [hb19, List.drop_left' (by simp [ofU64_length])]
     rw [hb20, hb21, hb22, hb23, hb24, hb25]
     rw [List.extract_append_extract _ 0 4 12 (by omega) (by omega),
         List.extract_append_extract _ 0 12 20 (by omega) (by omega),
@@ -402,7 +402,7 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 28 36 (by omega) (by omega),
         List.extract_append_extract _ 0 36 44 (by omega) (by omega),
         List.extract_append_extract _ 0 44 52 (by omega) (by omega)]
-    simp [List.extract_eq_drop_take]
+    simp
   · -- hlimb4
     rw [hb26, hb27, hb28, hb29, hb30, hb31]
     rw [List.extract_append_extract _ 0 8 16 (by omega) (by omega),
@@ -410,7 +410,7 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 24 32 (by omega) (by omega),
         List.extract_append_extract _ 0 32 40 (by omega) (by omega),
         List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
-    simp [List.extract_eq_drop_take]
+    simp
 
 -- Remove @[step] from the Nat-level shift specs and add to the BitList specs.
 attribute [-step] U64.ShiftRight_IScalar_spec
@@ -428,7 +428,13 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     to_bytes self ⦃ (result : Std.Array U8 32#usize) =>
       U8x32_as_Nat result = Scalar52_as_Nat self ∧ U8x32_as_Nat result < L ⦄ := by
     unfold to_bytes
-    step*
+    -- HACK: aeneas#963 didn't fully fix this — still needed.
+    -- Plain `step*` produces a kernel-rejected proof term on this long do-block under
+    -- the new aeneas `do` elaborator (PR aeneas#918). `all_goals (repeat step)` walks each
+    -- bind individually and avoids the bad term; the `rename_i` exposes the first-limb
+    -- hypothesis (formerly auto-named `i`/`i_post`) that the proof tail references.
+    all_goals (repeat step)
+    rename_i i i_post
     -- Simple bytes (30 of 32): each byte = 8-bit extract of its limb
     have ⟨hb0, hb1, hb2, hb3, hb4, hb5, hb7, hb8, hb9, hb10, hb11, hb12, hb13, hb14, hb15, hb16,
         hb17, hb18, hb20, hb21, hb22, hb23, hb24, hb25, hb26, hb27, hb28, hb29, hb30, hb31⟩ :

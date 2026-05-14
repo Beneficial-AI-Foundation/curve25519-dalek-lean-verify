@@ -49,7 +49,7 @@ theorem conditional_select_spec
         if choice.val = 1#u8 then b.xy2d[i]!.val else a.xy2d[i]!.val) ⦄ := by
   unfold conditional_select
   step*
-  grind
+  refine ⟨?_, ?_, ?_⟩ <;> intro i hi <;> split_ifs <;> simp_all
 
 end SubtleConditionallySelectable
 end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts

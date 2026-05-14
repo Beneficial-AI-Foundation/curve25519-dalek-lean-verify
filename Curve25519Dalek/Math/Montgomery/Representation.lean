@@ -145,7 +145,6 @@ def v_squared (u : CurveField) : CurveField := u ^ 3 + Curve25519.A * u ^ 2 + u
     This is a one-way conversion, since the Montgomery
     model does not retain sign information.
 -/
-
 noncomputable def MontgomeryPoint.u_affine_toPoint (u : CurveField) : Point:=
     if  h_y_eq_false:u == 0 then
       T_point
@@ -219,18 +218,26 @@ lemma abs_eq_some (u v u₁ v₁ : CurveField)
   (h₁ : MontgomeryCurveCurve25519.Nonsingular u₁ v₁)
   (hx : u = u₁)
   (hy : abs_edwards v = v₁) :
-  abs_montgomery (WeierstrassCurve.Affine.Point.some h)
-  = (WeierstrassCurve.Affine.Point.some h₁) := by
+  abs_montgomery (WeierstrassCurve.Affine.Point.some (x := u) (y := v) (h := h))
+  = (WeierstrassCurve.Affine.Point.some (x := u₁) (y := v₁) (h := h₁)) := by
   unfold abs_montgomery
   simp_all
 
 lemma is_negative_eq (u v : CurveField)
   (h : MontgomeryCurveCurve25519.Nonsingular u v)
   (hv : is_negative v) :
-  abs_montgomery (WeierstrassCurve.Affine.Point.some h)
-  = -(WeierstrassCurve.Affine.Point.some h) := by
+  abs_montgomery (WeierstrassCurve.Affine.Point.some (x := u) (y := v) (h := h))
+  = -(WeierstrassCurve.Affine.Point.some (x := u) (y := v) (h := h)) := by
   unfold abs_montgomery
-  simp[MontgomeryCurveCurve25519, abs_edwards, hv]
+  simp only [abs_edwards, hv, if_true]
+  change WeierstrassCurve.Affine.Point.some u (-v)
+      (by rw [show (-v) = MontgomeryCurveCurve25519.negY u v by
+              simp [WeierstrassCurve.Affine.negY, MontgomeryCurveCurve25519]]
+          exact (WeierstrassCurve.Affine.nonsingular_neg u v).mpr h)
+    = -WeierstrassCurve.Affine.Point.some u v h
+  rw [WeierstrassCurve.Affine.Point.neg_some h]
+  congr 1
+  simp [WeierstrassCurve.Affine.negY, MontgomeryCurveCurve25519]
 
 lemma cast_zero (res : MontgomeryPoint)
   (hmod : U8x32_as_Nat res % p = 0) :
@@ -239,6 +246,7 @@ lemma cast_zero (res : MontgomeryPoint)
     simpa [Nat.zero_mod] using hmod)
     rw [U8x32_as_Field_eq_cast, this]
     simp only [Nat.reducePow, Nat.reduceSub, Nat.cast_zero]
+    rfl
 
 end MontgomeryPoint
 
@@ -594,13 +602,34 @@ theorem neg_fromEdwards (e : Edwards.Point Edwards.Ed25519) :
     simp only [Edwards.neg_y, h, Edwards.neg_x]
     simp only [↓reduceDIte, neg_eq_zero, mul_neg]
     by_cases hx : e.x = 0
-    · simp only [hx, ↓reduceDIte, T_point,
-        WeierstrassCurve.Affine.Point.neg_some, WeierstrassCurve.Affine.negY,
-        MontgomeryCurveCurve25519, mul_zero, neg_zero, sub_self]
-    · simp only [hx, ↓reduceDIte, MontgomeryCurveCurve25519,
-        WeierstrassCurve.Affine.Point.neg_some, WeierstrassCurve.Affine.negY, zero_mul, sub_zero,
-        WeierstrassCurve.Affine.Point.some.injEq, true_and]
-      agrind
+    · simp only [hx, ↓reduceDIte, T_point, MontgomeryCurveCurve25519]
+      change WeierstrassCurve.Affine.Point.some 0 0 T_point._proof_1
+        = -WeierstrassCurve.Affine.Point.some 0 0 T_point._proof_1
+      rw [WeierstrassCurve.Affine.Point.neg_some]
+      congr 1
+    · simp only [hx, ↓reduceDIte, MontgomeryCurveCurve25519]
+      have h1 : (1 - e.y) ≠ 0 := fun h1 => h (by grind)
+      have h2 : (1 - e.y) * e.x ≠ 0 := mul_ne_zero h1 hx
+      change WeierstrassCurve.Affine.Point.some ((1 + e.y) / (1 - e.y))
+            (Curve25519.roots_B * (1 + e.y) / -((1 - e.y) * e.x)) (by
+              have hh := nonsingular_on_curves_M e h hx
+              dsimp only at hh
+              rw [show Curve25519.roots_B * (1 + e.y) / -((1 - e.y) * e.x)
+                  = -(Curve25519.roots_B * (1 + e.y) / ((1 - e.y) * e.x)) by
+                    field_simp]
+              rw [show (-(Curve25519.roots_B * (1 + e.y) / ((1 - e.y) * e.x)))
+                  = MontgomeryCurveCurve25519.negY
+                      ((1 + e.y) / (1 - e.y))
+                      (Curve25519.roots_B * (1 + e.y) / ((1 - e.y) * e.x)) by
+                    simp [WeierstrassCurve.Affine.negY, MontgomeryCurveCurve25519]]
+              exact (WeierstrassCurve.Affine.nonsingular_neg _ _).mpr hh)
+          = -WeierstrassCurve.Affine.Point.some ((1 + e.y) / (1 - e.y))
+              (Curve25519.roots_B * (1 + e.y) / ((1 - e.y) * e.x))
+              (nonsingular_on_curves_M e h hx)
+      rw [WeierstrassCurve.Affine.Point.neg_some]
+      congr 1
+      simp [WeierstrassCurve.Affine.negY, MontgomeryCurveCurve25519]
+      field_simp
 
 theorem T_point_x {e : Edwards.Point Edwards.Ed25519}
     (h : e.x = 0) :
@@ -747,13 +776,13 @@ theorem fromEdwards_add_of_snd_x_eq_zero (e₁ e₂ : Edwards.Point Edwards.Ed25
         simp [non_one]
         have : ¬ (1 + e₁.y = 0 ∨ 1 - e₁.y = 0) := by grind
         simp_all
-        constructor
+        congr 1
         · have := montgomery_inv_u_eq e₁ non_e1_x non_e non_e₁
           simp [this]
         · field_simp [this.left, this.right]
           ring_nf
           field_simp [roots_B_non_zero]
-          apply x_sq_mul_linear_factor_eq e₁
+          linear_combination x_sq_mul_linear_factor_eq e₁
 
 theorem fromEdwards_add_of_sum_y_eq_one (e₁ e₂ : Edwards.Point Edwards.Ed25519)
     (sum_y : (e₁ + e₂).y = 1) :
@@ -764,6 +793,9 @@ theorem fromEdwards_add_of_sum_y_eq_one (e₁ e₂ : Edwards.Point Edwards.Ed255
   rw [heq, neg_fromEdwards]
   agrind
 
+set_option maxHeartbeats 800000 in
+-- Mathlib v4.30 `Point.some` constructor refactor required restructuring this proof
+-- using `Point.some.injEq` and `change`/`refine`, increasing elaboration cost.
 theorem fromEdwards_add_of_x_eq_of_y_eq_neg (e₁ e₂ : Edwards.Point Edwards.Ed25519)
     (non_e1_x : e₁.x ≠ 0)
     (non_e2_x : e₂.x ≠ 0)
@@ -809,7 +841,7 @@ theorem fromEdwards_add_of_x_eq_of_y_eq_neg (e₁ e₂ : Edwards.Point Edwards.E
     decide
   simp only [this, ↓reduceDIte]
   have : ¬ (-1 = (1 : CurveField)) := by decide
-  simp only [this, ↓reduceIte, T_point, WeierstrassCurve.Affine.Point.some.injEq]
+  simp only [this, ↓reduceIte, T_point]
   simp only [WeierstrassCurve.Affine.slope, WeierstrassCurve.Affine.negY, zero_mul, sub_zero,
     sub_neg_eq_add, ite_pow, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, ite_mul]
   have : 1 - e₁.y ≠ 0 := by grind
@@ -837,12 +869,7 @@ theorem fromEdwards_add_of_x_eq_of_y_eq_neg (e₁ e₂ : Edwards.Point Edwards.E
       rw [pow2_roots_B,adB, this]
       simp only [neg_mul, one_mul]
     have : (a + a) = 2 * a := by ring
-    rw [this]
-    field_simp
-    unfold Curve25519.A
-    constructor
-    · grind
-    · grind
+    congr 1 <;> rw [this] <;> field_simp <;> unfold Curve25519.A <;> grind
   have : ¬ -e₂.y = e₂.y := by
     intro h
     have : 2 * e₂.y = 0 := by grind
@@ -853,7 +880,7 @@ theorem fromEdwards_add_of_x_eq_of_y_eq_neg (e₁ e₂ : Edwards.Point Edwards.E
     · grind
   simp only [this, ↓reduceIte]
   have : 1 + -e₂.y = 1 - e₂.y := by ring
-  rw [this]
+  simp only [this]
   set u1 := (1 - e₂.y) / (1 + e₂.y) with hu1
   set u2 := (1 + e₂.y) / (1 - e₂.y) with hu2
   set v1 := Curve25519.roots_B * (1 - e₂.y) / ((1 + e₂.y) * e₂.x) with hv1
@@ -889,8 +916,12 @@ theorem fromEdwards_add_of_x_eq_of_y_eq_neg (e₁ e₂ : Edwards.Point Edwards.E
     have : Curve25519.A + 2 ≠ 0 := by decide
     field_simp at eq1
     grind => ring
+  refine WeierstrassCurve.Affine.Point.some.injEq .. |>.mpr ⟨this.symm, ?_⟩
+  change 0 = -v1 + -((v1 - v2) / (u1 - u2) *
+    (((v1 - v2) / (u1 - u2)) ^ 2 - Curve25519.A - u1 - u2 - u1))
   rw [this]
-  simp only [feq, zero_sub, mul_neg, neg_neg, true_and]
+  simp only [feq]
+  change 0 = -v1 + -(Curve25519.roots_B / e₂.x * -u1)
   simp only [hv1, hu1]
   field_simp
   ring
@@ -1114,7 +1145,7 @@ lemma fromEdwards_add_of_sum_x_eq_zero_of_sum_y_eq_neg_one_of_y_ne_neg_y
     field_simp at sum_y
     revert sum_y
     decide
-  simp only [T_point, h, ↓reduceDIte, WeierstrassCurve.Affine.Point.some.injEq]
+  simp only [T_point, h, ↓reduceDIte]
   simp only [WeierstrassCurve.Affine.slope, WeierstrassCurve.Affine.negY, zero_mul, sub_zero,
     sub_neg_eq_add, ite_pow, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, ite_mul]
   have : 1 - e₁.y ≠ 0 := by grind
@@ -1137,7 +1168,7 @@ lemma fromEdwards_add_of_sum_x_eq_zero_of_sum_y_eq_neg_one_of_y_ne_neg_y
                 field_simp [roots_B_non_zero]
                 grind
       simp_all only [ne_eq, not_false_eq_true, zero_ne_one, sub_zero, one_ne_zero, add_zero,
-        and_false, div_self, mul_one, one_mul, true_and, false_iff, ↓reduceIte, one_pow]
+        div_self, mul_one, one_mul, ↓reduceIte, one_pow]
       field_simp
       have : e₁.x =e₂.x := by
         rw [← eq1] at sum_y
@@ -1152,11 +1183,11 @@ lemma fromEdwards_add_of_sum_x_eq_zero_of_sum_y_eq_neg_one_of_y_ne_neg_y
       have :e₁.x ^ 2 = -1 := by grind
       have Aeq : 486664 = Curve25519.A + 2 := by
                 unfold Curve25519.A; grind
-      simp only [this, mul_neg, mul_one, pow2_roots_B, adB, Aeq, neg_add_rev, zero_mul, neg_neg]
+      simp only [this, mul_neg, mul_one, pow2_roots_B, adB, Aeq, neg_add_rev, neg_neg]
       have : (-2 + -Curve25519.A) * (1 + 1) ^ 2 ≠ 0 := by
         unfold Curve25519.A
         decide
-      constructor
+      refine WeierstrassCurve.Affine.Point.some.injEq .. |>.mpr ⟨?_, ?_⟩
       · unfold Curve25519.A
         grind
       · field_simp [roots_B_non_zero]
@@ -1164,7 +1195,7 @@ lemma fromEdwards_add_of_sum_x_eq_zero_of_sum_y_eq_neg_one_of_y_ne_neg_y
         agrind
     · grind
   · simp only [heqy, ↓reduceIte]
-    constructor
+    refine WeierstrassCurve.Affine.Point.some.injEq .. |>.mpr ⟨?_, ?_⟩
     · exact montgomery_addX_eq_zero_of_sum_y_eq_neg_one_of_y_ne_neg_y
         non_e1_x non_e2_x non_e1_y non_e2_y1 sum_x sum_y e_y
     · apply montgomery_v_add_eq_zero_of_sum_y_eq_neg_one_of_y_ne
@@ -1411,7 +1442,7 @@ lemma fromEdwards_v_add_of_eq {e₁ e₂ : Edwards.Point Edwards.Ed25519}
     (hy1 : 1 - e₂.y ≠ 0)
     (hy3 : 1 + e₂.y ≠ 0)
     (sum_x : (e₁ + e₂).x ≠ 0)
-    (sum_y : ¬(e₁ + e₂).y = 1)
+    (_sum_y : ¬(e₁ + e₂).y = 1)
     (heqy : e₁.y = e₂.y)
     (heqx : e₁.x = e₂.x) :
     Curve25519.roots_B * (1 + (e₁ + e₂).y) / ((1 - (e₁ + e₂).y) * (e₁ + e₂).x) =
@@ -1432,7 +1463,8 @@ lemma fromEdwards_v_add_of_eq {e₁ e₂ : Edwards.Point Edwards.Ed25519}
   have sum_x0 := fromEdwards_u_add_of_eq_y zero_e2_x hy1 hy3 sum_x heqy
   have : Curve25519.roots_B * (1 + (e₁ + e₂).y) / ((1 - (e₁ + e₂).y) * (e₁ + e₂).x)
   = Curve25519.roots_B *
-      ((1 + (e₁ + e₂).y) / (1 - (e₁ + e₂).y)) / (e₁ + e₂).x := by grind
+      ((1 + (e₁ + e₂).y) / (1 - (e₁ + e₂).y)) / (e₁ + e₂).x := by
+    rw [mul_div_assoc, mul_div_assoc, div_div]
   rw [this, sum_x0]
   set u := (1 + e₂.y) / (1 - e₂.y) with hu
   set v := Curve25519.roots_B * (1 + e₂.y) / ((1 - e₂.y) * e₁.x) with hv
@@ -1768,7 +1800,7 @@ theorem fromEdwards_add_of_x_ne_zero (e₁ e₂ : Edwards.Point Edwards.Ed25519)
         by_cases heq : e₁.y = e₂.y ∧ e₁.x = -e₂.x
         · exact absurd (show (e₁ + e₂).x = 0 from by
             simp [Edwards.add_x, heq.1, heq.2]; field_simp; ring_nf; simp) sum_x
-        · simp only [heq, ↓reduceDIte, WeierstrassCurve.Affine.Point.some.injEq]
+        · simp only [heq, ↓reduceDIte]
           simp only [WeierstrassCurve.Affine.slope, injective_fromEdwards hy1 hy2,
             WeierstrassCurve.Affine.negY, zero_mul, sub_zero, sub_neg_eq_add,
             ite_pow, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, ite_mul]
@@ -1783,14 +1815,15 @@ theorem fromEdwards_add_of_x_ne_zero (e₁ e₂ : Edwards.Point Edwards.Ed25519)
                 -(Curve25519.roots_B * (1 + e₂.y) / ((1 - e₂.y) * e₂.x))) := by
               field_simp [roots_B_non_zero]; grind
             simp only [hv_ne, ↓reduceIte]
-            constructor
+            refine WeierstrassCurve.Affine.Point.some.injEq .. |>.mpr ⟨?_, ?_⟩
             · exact fromEdwards_u_add_of_eq_y zero_e2_x hy1 hy3 sum_x1 heqy
             · exact fromEdwards_v_add_of_eq_y zero_e2_x hy1 hy3 sum_x1 sum_y heqy
           · simp only [heqy, ↓reduceIte]
-            exact ⟨fromEdwards_u_add_of_y_ne e₁ e₂ non_e1_x zero_e2_x h1 h2 sum_y
-                      hy1 hy2 hy3 hy4 heqy,
-                   fromEdwards_v_add_of_y_ne e₁ e₂ non_e1_x zero_e2_x h1 h2 sum_x sum_y
-                     hy1 hy2 hy3 hy4 heqy⟩
+            refine WeierstrassCurve.Affine.Point.some.injEq .. |>.mpr
+              ⟨fromEdwards_u_add_of_y_ne e₁ e₂ non_e1_x zero_e2_x h1 h2 sum_y
+                  hy1 hy2 hy3 hy4 heqy,
+                fromEdwards_v_add_of_y_ne e₁ e₂ non_e1_x zero_e2_x h1 h2 sum_x sum_y
+                  hy1 hy2 hy3 hy4 heqy⟩
 
 lemma fromEdwards_add_of_sum_x_eq_zero_of_y_ne_one_of_y_ne_neg_one
     (e₁ e₂ : Edwards.Point Edwards.Ed25519)
@@ -1830,12 +1863,12 @@ theorem add_fromEdwards (e₁ e₂ : Edwards.Point Edwards.Ed25519) :
   fromEdwards (e₁ + e₂) = fromEdwards e₁ + fromEdwards e₂ := by
   by_cases h1 : e₁.x = 0 <;> by_cases h2 : e₂.x = 0
   · exact fromEdwards_add_of_x_eq_zero e₁ e₂ h1 h2
-  · push_neg at h2
+  · push Not at h2
     rw [add_comm, Edwards.add_comm_Ed25519,
         fromEdwards_add_of_snd_x_eq_zero e₂ e₁ h2 h1]
-  · push_neg at h1
+  · push Not at h1
     exact fromEdwards_add_of_snd_x_eq_zero e₁ e₂ h1 h2
-  · push_neg at h1 h2
+  · push Not at h1 h2
     have hy1 : 1 - e₁.y ≠ 0 :=
       fun h => h1 (by have he := zeroY e₁ (by grind); simp [he])
     have hy2 : 1 - e₂.y ≠ 0 :=
@@ -1849,7 +1882,7 @@ theorem add_fromEdwards (e₁ e₂ : Edwards.Point Edwards.Ed25519) :
               h1 h2 hsx hy1 hy2 hy3 hsy1
         · exact fromEdwards_add_of_sum_x_eq_zero_of_y_ne_one_of_y_ne_neg_one e₁ e₂
               hsx hsy hsy1
-      · push_neg at hsx
+      · push Not at hsx
         exact fromEdwards_add_of_x_ne_zero e₁ e₂ h1 h2 hsx
 
 theorem comm_mul_fromEdwards {n : ℕ} (e : Edwards.Point Edwards.Ed25519) :

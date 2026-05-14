@@ -56,7 +56,8 @@ theorem conditional_assign_spec
         if choice.val = 1#u8 then other.xy2d[i]!.val else self.xy2d[i]!.val) ⦄ := by
   unfold conditional_assign
   step*
-  grind
+  -- HACK: aeneas#963 didn't fully fix this — still needed.
+  refine ⟨?_, ?_, ?_⟩ <;> intro i hi <;> split_ifs <;> simp_all
 
 end SubtleConditionallySelectable
 end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts

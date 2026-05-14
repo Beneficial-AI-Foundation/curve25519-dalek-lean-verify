@@ -125,9 +125,12 @@ theorem double_spec_aux
         (∑ i ∈ Finset.range 5, 2^(51 * i) * XX[i]!.val) ≡
         (∑ i ∈ Finset.range 5, 2^(51 * i) * q.Y[i]!.val) ^ 2 +
         (∑ i ∈ Finset.range 5, 2^(51 * i) * q.X[i]!.val) ^ 2 [MOD p] := by
+      -- HACK: aeneas#963 didn't fully fix this — still needed.
+      -- PR #918 do-elaborator regression makes `grind only` time out here;
+      -- the goals are literally YY_post1 and XX_post1, so use `exact` directly.
       apply Nat.ModEq.add
-      · grind only
-      · grind only
+      · exact YY_post1
+      · exact XX_post1
     apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
     ring_nf at *
     rw [← Nat.ModEq] at fe_post2
@@ -142,9 +145,12 @@ theorem double_spec_aux
       intro i hi
       simp_all [Finset.mem_range, Nat.mul_add]
     rw [h_YY_plus_XX]
+    -- HACK: aeneas#963 didn't fully fix this — still needed.
+    -- PR #918 do-elaborator regression makes `grind only` time out here;
+    -- the goals are literally YY_post1 and XX_post1, so use `exact` directly.
     apply Nat.ModEq.add
-    · grind only
-    · grind only
+    · exact YY_post1
+    · exact XX_post1
   · -- (Z' + X^2) % p = Y^2 % p
     rw [← Nat.ModEq] at *; ring_nf at *;
     apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post1.symm)

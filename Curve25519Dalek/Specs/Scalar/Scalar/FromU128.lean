@@ -109,21 +109,26 @@ private lemma U128_ofDigits_toLEBytes (x : Std.U128) :
     simp only [UScalarTy.U8_numBits_eq, List.map_map, List.map_inj_left, Function.comp_apply]
     intro a ha
     rfl
-  simp only [Nat.reducePow, UScalarTy.U8_numBits_eq, hmap]
+  simp only [Nat.reducePow, UScalarTy.U8_numBits_eq]
   have hdigits :
       Nat.ofDigits (2^8) (x.bv.toLEBytes.map (fun b => b.toNat))
         = (BitVec.fromLEBytes x.bv.toLEBytes).toNat := by
     rw [hdigits]
-  simp only [Nat.reducePow, Nat.reduceMod, BitVec.fromLEBytes_toLEBytes, BitVec.toNat_cast,
-    UScalar.bv_toNat] at hdigits
-  rw [hdigits]
+  simp only [Nat.reducePow, Nat.reduceMod, BitVec.fromLEBytes_toLEBytes,
+    BitVec.toNat_cast, U128.bv_toNat] at hdigits
+  exact hmap.symm ▸ hdigits
 
 private lemma U8x32_as_Nat_setSlice_zeroI (bs : List Std.U8) (h_len : bs.length = 16) :
     U8x32_as_Nat ⟨(List.replicate 32 (0#u8)).setSlice! 0 bs, by simp⟩ =
     Nat.ofDigits (2^8) (List.ofFn (fun i : Fin 16 => (bs[i]!).val)) := by
   unfold U8x32_as_Nat List.setSlice!
-  simp [Finset.sum_range_succ, h_len, Nat.ofDigits]
-  ring_nf
+  simp only [List.take_zero, List.nil_append, List.length_replicate, tsub_zero, zero_add, h_len,
+    List.take_of_length_le h_len.le, show min (16 : Nat) 32 = 16 from rfl, List.drop_replicate]
+  simp only [Finset.sum_range_succ, Finset.sum_range_zero]
+  simp_lists
+  simp only [Nat.ofDigits, List.ofFn_succ, List.ofFn_zero, Fin.val_zero, Fin.val_succ, Fin.isValue,
+    Nat.cast_id, show ((0#u8).val : Nat) = 0 from rfl]
+  ring
 
 private lemma hmap (bs : List Std.U8) (h_len : bs.length = 16) :
     bs.map (·.val) = List.ofFn (fun i : Fin 16 => (bs[i]!).val) := by
@@ -162,6 +167,7 @@ theorem from_spec (x : Std.U128) :
     List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil,
     zero_add, Nat.reduceAdd, Slice.setSlice!_val, List.length_setSlice!, ↓reduceDIte]
   have eq1 := U128_ofDigits_toLEBytes x
+  simp only [UScalarTy.U8_numBits_eq] at eq1
   rw [← x_bytes_post] at eq1
   have : (x_bytes).length = 16 := by
     simp

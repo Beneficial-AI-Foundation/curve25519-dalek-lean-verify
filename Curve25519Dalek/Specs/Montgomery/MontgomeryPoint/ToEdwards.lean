@@ -127,7 +127,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       simp only [Array.getElem!_Nat_eq]
     have h_i1_eq : i1.val = y_bytes[31]!.val := by
       have h := congrArg UScalar.val i1_post
-      grind only
+      rw [← coerce_eq]; exact h
     have h_i1_lt : i1.val < 128 := by
       grind only
     have h_i2_lo : i2.val % 128 = i1.val := by

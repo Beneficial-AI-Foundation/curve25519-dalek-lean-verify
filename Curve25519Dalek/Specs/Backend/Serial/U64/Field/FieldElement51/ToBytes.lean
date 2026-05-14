@@ -40,7 +40,7 @@ theorem U64_cast_U8 (x : U64) : (UScalar.cast UScalarTy.U8 x).val = x.val % 2^8 
   simp only [UScalar.cast, UScalarTy.U64_numBits_eq, UScalarTy.U8_numBits_eq,
     Aeneas.Bvify.U64.UScalar_bv, BitVec.truncate_eq_setWidth]
   simp only [UScalar.val]
-  simp only [UScalarTy.U8_numBits_eq, BitVec.toNat_setWidth, UScalar.bv_toNat,
+  simp only [UScalarTy.U8_numBits_eq, BitVec.toNat_setWidth,
     UScalarTy.U64_numBits_eq, Aeneas.Bvify.U64.UScalar_bv]
 
 -- This is specific to the problem below
@@ -261,7 +261,8 @@ private lemma canonical_reduction_mod_p
     (hl1 : l1 = (f1 + (f0 + 19 * q) / 2 ^ 51) % 2 ^ 51)
     (hl2 : l2 = (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51)
     (hl3 : l3 = (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51)
-    (hl4 : l4 = (f4 + (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51) :
+    (hl4 : l4 =
+      (f4 + (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51) :
     (l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4) % (2 ^ 255 - 19) =
       (f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4) % (2 ^ 255 - 19) ∧
     l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 < 2 ^ 255 - 19 := by
@@ -312,7 +313,8 @@ private lemma canonical_reduction_mod_p
     rw [hl4, Nat.mul_comm c4]; exact Nat.mod_add_div _ _
   -- Main telescoping: L + c4 * 2^255 = F + 19*q
   have htel : l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 +
-      c4 * 2 ^ 255 = F + 19 * q := by linear_combination ht0 + 2^51 * ht1 + 2^102 * ht2 + 2^153 * ht3 + 2^204 * ht4
+      c4 * 2 ^ 255 = F + 19 * q := by
+    linear_combination ht0 + 2^51 * ht1 + 2^102 * ht2 + 2^153 * ht3 + 2^204 * ht4
   -- L < 2^255 (each limb < 2^51 from masking)
   have hl0b : l0 < 2 ^ 51 := by rw [hl0]; exact Nat.mod_lt _ (by norm_num)
   have hl1b : l1 < 2 ^ 51 := by rw [hl1]; exact Nat.mod_lt _ (by norm_num)
@@ -348,7 +350,8 @@ The algorithm:
 
 Specification:
 - The function succeeds (no panic)
-- The natural number interpretation of the byte array is congruent to the field element value modulo p
+- The natural number interpretation of the byte array is congruent to the field element value
+  modulo p
 - The byte array represents the unique canonical form (0 ≤ value < p)
 -/
 @[step]
@@ -676,7 +679,7 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
       simp only [q4_post1, i9_post, q3_post1, i7_post, q2_post1, i5_post,
         q1_post1, i3_post, q_post1, i1_post, i_post,
         i8_post, i6_post, i4_post, i2_post,
-        Nat.shiftRight_eq_div_pow]; agrind)
+        Nat.shiftRight_eq_div_pow]; grind [Array.getElem!_Nat_eq])
     limbs9[0]!.val limbs9[1]!.val limbs9[2]!.val limbs9[3]!.val limbs9[4]!.val
     -- hl0..hl4: each resolves a limb's carry chain (array updates → &&&→% via hmask, >>>→/)
     (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,

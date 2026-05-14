@@ -47,7 +47,7 @@ def getSpecName (name : Name) : Name := name.appendAfter specSuffix
 def getDirectDeps (env : Environment) (name : Name) : Except String (Array Name) := do
   let some constInfo := env.find? name
     | throw s!"Constant '{name}' not found in environment"
-  let some value := constInfo.value?
+  let some value := constInfo.value? (allowOpaque := true)
     | throw s!"Constant '{name}' has no value (it may be an axiom, opaque, or primitive)"
   return value.getUsedConstants
 
@@ -63,9 +63,9 @@ def hasSpecTheorem (env : Environment) (name : Name) : Bool :=
 def proofContainsSorry (env : Environment) (name : Name) : Bool :=
   match env.find? name with
   | some constInfo =>
-    match constInfo.value? with
+    match constInfo.value? (allowOpaque := true) with
     | some value => value.getUsedConstants.any (· == ``sorryAx)
-    | none => true  -- No value means axiom/opaque, treat as not verified
+    | none => true  -- No value means primitive/axiom, treat as not verified
   | none => true
 
 /-- Check if a function is verified (has spec theorem without direct sorry) -/

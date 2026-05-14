@@ -102,7 +102,7 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
   obtain ⟨o, iter1, h_next, h_none_branch, h_some_branch⟩ := next_spec
     { start := i, «end» := 5#usize }
   rw [h_next, bind_tc_ok]
-  simp only [Prod.mk.eta, bind_assoc, bind_tc_ok, Array.getElem!_Nat_eq,
+  simp only [bind_assoc, Array.getElem!_Nat_eq,
     List.getElem!_eq_getElem?_getD]
   match o with
   | none =>
@@ -118,7 +118,7 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
       zero_add, zero_eq_mul, Nat.pow_eq_zero, OfNat.ofNat_ne_zero, ne_eq, not_false_eq_true,
       and_true, Nat.div_eq_zero_iff, false_or]; agrind
   | some val =>
-    simp only
+    simp only [step_simps]
     step*
     · -- Overflow check for carry1 (i3 + i4 ≤ U64.max)
       have : carry.val >>> 52 ≤ 1 := by have := hcarry' i (by agrind); omega
@@ -135,8 +135,8 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     have hcarry1 : iter1.start.val = 5 → carry1.val < 2 ^ 52 := by
       intro hi5
       have : val.val = 4 := by grind
-      have : a[4]!.val < 2 ^ 51 := by agrind [Scalar52_top_limb_lt_of_as_Nat_lt]
-      have : b[4]!.val < 2 ^ 51 := by agrind [Scalar52_top_limb_lt_of_as_Nat_lt]
+      have : a[4]!.val < 2 ^ 51 := by exact Scalar52_top_limb_lt_of_as_Nat_lt a ha'
+      have : b[4]!.val < 2 ^ 51 := by exact Scalar52_top_limb_lt_of_as_Nat_lt b hb'
       have : carry.val >>> 52 ≤ 1 := by have := hcarry' val (by agrind); omega
       simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
         UScalar.ofNatCore_val_eq, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, UScalar.val_and,
@@ -234,8 +234,10 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
         _ = ∑ j ∈ Finset.Ico (i.val) 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +
             2 ^ (52 * i.val) * (carry.val / 2 ^ 52) := by
           have hlt : i.val < 5 := by agrind
-          rw [Finset.sum_eq_sum_Ico_succ_bot hlt]
-          agrind
+          have hval : val = i := Option.some.inj h_o_eq
+          subst hval
+          rw [Finset.sum_eq_sum_Ico_succ_bot hlt, hfin, hsum''i]
+          linear_combination hpow + 2 ^ (52 * val.val) * hc1val
     termination_by 5 - i.val
     decreasing_by
       simp only at h_start_val

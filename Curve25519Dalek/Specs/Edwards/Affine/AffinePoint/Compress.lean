@@ -152,6 +152,6 @@ theorem compress_spec (self : AffinePoint) (hself : self.IsValid) :
       grind only
     -- Combine: s.set 31 i3 adds 2^248 * 128 = 2^255 to U8x32_as_Nat s
     rw [s1_post, h_set, h_i3_val, i2_post, h_orig];
-    agrind
+    grind [Array.getElem!_Nat_eq]
 
 end curve25519_dalek.edwards.affine.AffinePoint

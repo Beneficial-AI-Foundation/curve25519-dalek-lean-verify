@@ -55,7 +55,7 @@ theorem decompress_spec (self : CompressedRistretto) :
           RistrettoPoint.IsValid rist ∧
           decompress_pure self = some rist.toPoint) ⦄ := by
   unfold decompress
-  step as ⟨step1, h1⟩
+  step as ⟨s_canon, s_neg, s, h1⟩
   obtain ⟨h_tight, h_valid, h_field, h_enc, h_neg_iff, h_bridge⟩ := h1
   -- Convert WP goal to existential form so bind_ok can fire
   rw [spec_equiv_exists]
@@ -64,18 +64,18 @@ theorem decompress_spec (self : CompressedRistretto) :
     subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor,
     Bool.Insts.CoreConvertFromChoice.from]
   -- Helper: derive decompress_step1 = none from flag failure
-  have h_step1_none : ¬(step1.1.val = 1#u8 ∧ step1.2.1.val = 0#u8) →
+  have h_step1_none : ¬(s_canon.val = 1#u8 ∧ s_neg.val = 0#u8) →
       decompress_step1 self = none := by
     intro h_fail
     rcases h_opt : decompress_step1 self with _ | val
     · rfl
     · exfalso
-      rw [decompress_step1_val_eq self step1.2.2 h_field h_opt] at h_opt
+      rw [decompress_step1_val_eq self s h_field h_opt] at h_opt
       exact h_fail (h_bridge.mp h_opt)
   -- Case split on s_encoding_is_canonical
-  by_cases h_canon : step1.1.val = 1#u8
+  by_cases h_canon : s_canon.val = 1#u8
   · -- Canonical encoding
-    by_cases h_s_neg : step1.2.1.val = 1#u8
+    by_cases h_s_neg : s_neg.val = 1#u8
     · -- Negative s: return none
       refine ⟨none, ?_, fun _ => rfl, fun ⟨_, h⟩ => ?_⟩
       · simp only [h_canon, ↓reduceIte, Choice.zero, h_s_neg, or_true, Choice.one, bind_tc_ok,
@@ -86,27 +86,28 @@ theorem decompress_spec (self : CompressedRistretto) :
         Option.bind_none,
         reduceCtorEq] at h
     · -- Non-negative s: proceed to step_2
-      have h_s_neg_zero : step1.2.1.val = 0#u8 := by
-        rcases step1.2.1.valid with h | h <;> [exact h; exact absurd h h_s_neg]
+      have h_s_neg_zero : s_neg.val = 0#u8 := by
+        rcases s_neg.valid with h | h <;> [exact h; exact absurd h h_s_neg]
       -- Evaluate first Choice chain: reduces ok-binds via Bind.bind + bind_ok
       simp only [Bind.bind, h_canon, h_s_neg_zero, Choice.zero, Choice.one,
         bind_ok, ↓reduceIte]
+      norm_num
       -- Now the computation has reached step_2
       -- Get step_2 result via its spec
-      have h_s_bounds : ∀ i < 5, step1.2.2[i]!.val < 2 ^ 52 := by
+      have h_s_bounds : ∀ i < 5, s[i]!.val < 2 ^ 52 := by
         intro i hi; exact lt_trans (h_tight i hi) (by norm_num)
       have ⟨⟨ok1, t_neg, y_zero, res⟩,
         h_step2_eq, ⟨h_ok1_iff, h_t_neg_iff, h_y_zero_iff⟩,
         h_step2_bridge, h_step2_valid⟩ :=
-        spec_imp_exists (decompress.step_2_spec step1.2.2 h_s_bounds)
+        spec_imp_exists (decompress.step_2_spec s h_s_bounds)
       -- Compose step1 + step2 into decompress_pure
-      have h_ds1 : decompress_step1 self = some step1.2.2.toField :=
+      have h_ds1 : decompress_step1 self = some s.toField :=
         h_bridge.mpr ⟨h_canon, h_s_neg_zero⟩
       -- Helper: derive decompress_step2 = none from step2 flag failure
       have h_step2_none : ¬(ok1.val = 1#u8 ∧ t_neg.val = 0#u8 ∧ y_zero.val = 0#u8) →
-          decompress_step2 step1.2.2.toField = none := by
+          decompress_step2 s.toField = none := by
         intro h_fail
-        rcases h_opt : decompress_step2 step1.2.2.toField with _ | pt
+        rcases h_opt : decompress_step2 s.toField with _ | pt
         · rfl
         · exfalso
           exact h_fail ⟨((h_step2_bridge pt).mp h_opt).1,
@@ -114,51 +115,66 @@ theorem decompress_spec (self : CompressedRistretto) :
       -- Rewrite with step_2 result
       rw [h_step2_eq]
       simp only [bind_ok]
-      by_cases h_ok1 : ok1.val = 1#u8
-      · -- invsqrt succeeded
-        simp only [h_ok1, ↓reduceIte, bind_ok]
-        by_cases h_t_neg : t_neg.val = 1#u8
-        · -- t_is_negative: return none
-          simp only [h_t_neg]
-          exact ⟨none, rfl, fun _ => rfl, fun ⟨_, h⟩ => by
-            simp only [decompress_pure, h_ds1, Option.bind_some,
-              h_step2_none (by simp only [h_t_neg, Nat.not_eq, UScalar.ofNatCore_val_eq,
-              ne_eq, one_ne_zero, not_false_eq_true, zero_ne_one, not_lt_zero, zero_lt_one,
-              or_true, or_self, UScalar.val_not_eq_imp_not_eq, false_and, and_false]),
-              reduceCtorEq] at h⟩
-        · by_cases h_y_zero : y_zero.val = 1#u8
-          · -- y_is_zero: return none
-            have h_t_neg_zero : t_neg.val = 0#u8 := by
-              rcases t_neg.valid with h | h <;> [exact h; exact absurd h h_t_neg]
-            simp only [h_t_neg_zero, h_y_zero]
-            exact ⟨none, rfl, fun _ => rfl, fun ⟨_, h⟩ => by
-              simp only [decompress_pure, h_ds1, Option.bind_some,
-                h_step2_none (by simp only [h_y_zero, Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq,
-                  one_ne_zero, not_false_eq_true, zero_ne_one, not_lt_zero, zero_lt_one, or_true,
-                  or_self, UScalar.val_not_eq_imp_not_eq, and_false]), reduceCtorEq] at h⟩
-          · -- ALL VALID: return some res
-            have h_t_neg_zero : t_neg.val = 0#u8 := by
-              rcases t_neg.valid with h | h <;> [exact h; exact absurd h h_t_neg]
-            have h_y_zero_zero : y_zero.val = 0#u8 := by
-              rcases y_zero.valid with h | h <;> [exact h; exact absurd h h_y_zero]
-            simp only [h_t_neg_zero, h_y_zero_zero]
-            have h_ds2 : decompress_step2 step1.2.2.toField = some res.toPoint :=
-              (h_step2_bridge res.toPoint).mpr ⟨h_ok1, h_t_neg_zero, h_y_zero_zero, rfl⟩
-            refine ⟨some res, rfl, ?_, ?_⟩
-            · intro h_not_valid
-              exfalso; apply h_not_valid
-              exact ⟨res.toPoint,
-                by simp only [decompress_pure, h_ds1, Option.bind_some, h_ds2]⟩
+      -- Case split on the three boolean flags from step_2
+      by_cases h_ok1 : (ok1.val = 1#u8)
+      · -- ok1 = 1: subsequent flag c2 = 0 (success-so-far)
+        by_cases h_t_neg : (t_neg.val = 0#u8)
+        · -- t_neg = 0
+          by_cases h_y_zero : (y_zero.val = 0#u8)
+          · -- y_zero = 0: SUCCESS path → ok (some res)
+            have h_t_neg_ne : ¬ t_neg.val = 1#u8 := by
+              rw [h_t_neg]; decide
+            have h_y_zero_ne : ¬ y_zero.val = 1#u8 := by
+              rw [h_y_zero]; decide
+            refine ⟨some res, ?_, ?_, ?_⟩
+            · simp [h_ok1, h_t_neg_ne, h_y_zero_ne]
+            · intro hnv
+              exfalso
+              apply hnv
+              refine ⟨res.toPoint, ?_⟩
+              unfold decompress_pure
+              rw [h_ds1, Option.bind_some]
+              exact (h_step2_bridge res.toPoint).mpr ⟨h_ok1, h_t_neg, h_y_zero, rfl⟩
             · intro _
-              exact ⟨res, rfl,
-                h_step2_valid ⟨h_ok1, h_t_neg_zero, h_y_zero_zero⟩,
-                by simp only [decompress_pure, h_ds1, Option.bind_some, h_ds2]⟩
-      · -- invsqrt failed: return none
-        simp only [h_ok1, ↓reduceIte, bind_ok]
-        exact ⟨none, rfl, fun _ => rfl, fun ⟨_, h⟩ => by
-          simp only [decompress_pure, h_ds1, Option.bind_some, h_step2_none (by simp only [h_ok1,
-            false_and, not_false_eq_true]),
-            reduceCtorEq] at h⟩
+              refine ⟨res, rfl, h_step2_valid ⟨h_ok1, h_t_neg, h_y_zero⟩, ?_⟩
+              unfold decompress_pure
+              rw [h_ds1, Option.bind_some]
+              exact (h_step2_bridge res.toPoint).mpr ⟨h_ok1, h_t_neg, h_y_zero, rfl⟩
+          · -- y_zero ≠ 0: FAIL path
+            have h_y_zero_one : y_zero.val = 1#u8 := by
+              rcases y_zero.valid with h | h
+              · exact absurd h h_y_zero
+              · exact h
+            have h_t_neg_ne : ¬ t_neg.val = 1#u8 := by
+              rw [h_t_neg]; decide
+            have h_step2_none' : decompress_step2 s.toField = none :=
+              h_step2_none (fun ⟨_, _, hz⟩ => h_y_zero (hz))
+            refine ⟨none, ?_, fun _ => rfl, fun ⟨_, h⟩ => ?_⟩
+            · simp [h_ok1, h_t_neg_ne, h_y_zero_one]
+            · simp only [decompress_pure, h_ds1, Option.bind_some, h_step2_none',
+                reduceCtorEq] at h
+        · -- t_neg ≠ 0: FAIL path
+          have h_t_neg_one : t_neg.val = 1#u8 := by
+            rcases t_neg.valid with h | h
+            · exact absurd h h_t_neg
+            · exact h
+          have h_step2_none' : decompress_step2 s.toField = none :=
+            h_step2_none (fun ⟨_, ht, _⟩ => h_t_neg (ht))
+          refine ⟨none, ?_, fun _ => rfl, fun ⟨_, h⟩ => ?_⟩
+          · simp [h_ok1, h_t_neg_one]
+          · simp only [decompress_pure, h_ds1, Option.bind_some, h_step2_none',
+              reduceCtorEq] at h
+      · -- ok1 ≠ 1: FAIL path
+        have h_ok1_zero : ok1.val = 0#u8 := by
+          rcases ok1.valid with h | h
+          · exact h
+          · exact absurd h h_ok1
+        have h_step2_none' : decompress_step2 s.toField = none :=
+          h_step2_none (fun ⟨hok, _, _⟩ => h_ok1 (hok))
+        refine ⟨none, ?_, fun _ => rfl, fun ⟨_, h⟩ => ?_⟩
+        · simp [h_ok1_zero]
+        · simp only [decompress_pure, h_ds1, Option.bind_some, h_step2_none',
+            reduceCtorEq] at h
   · -- Non-canonical encoding: return none
     refine ⟨none, ?_, fun _ => rfl, fun ⟨_, h⟩ => ?_⟩
     · simp only [h_canon, ↓reduceIte, Choice.one, bind_tc_ok, decide_eq_true_eq, true_or]

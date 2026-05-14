@@ -178,7 +178,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
           Nat.and_two_pow_sub_one_eq_mod, Order.add_one_le_iff, UScalar.ofNat_self_val,
           Array.set_val_eq, List.length_set, gt_iff_lt]; agrind
     rw [← h_imb] at hself1_limbs
-    step as ⟨res, hres_limbs, hres_inv⟩
+    step as ⟨res, res_scalar, hres_limbs, hres_inv⟩
     refine ⟨hres_limbs, ?_⟩
     rw [h_imb] at hres_inv
     simp only [hi6] at hres_inv
@@ -216,7 +216,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
           2 ^ (52 * i.val) * carry1.val := by agrind
       have : 2 ^ (52 * i.val) * carry1.val = 2 ^ (52 * i.val) * (carry.val / 2 ^ 52) +
           2 ^ (52 * i.val) * self[i.val]!.val := by
-        have : addend.val = 0 := haddend_val; agrind
+        have : addend.val = 0 := haddend_val; grind [Array.getElem!_Nat_eq]
       rw [hself1_nat, hpow_split] at hres_inv
       have := Scalar52_limb_le_nat self i.val hi'
       omega
@@ -230,7 +230,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       have : 2 ^ (52 * i.val) * carry1.val =
           2 ^ (52 * i.val) * (carry.val / 2 ^ 52) + 2 ^ (52 * i.val) * self[i.val]!.val +
           2 ^ (52 * i.val) * constants.L[i.val]!.val := by
-        have : addend.val = constants.L[i.val]!.val := haddend_val; agrind
+        have : addend.val = constants.L[i.val]!.val := haddend_val; grind [Array.getElem!_Nat_eq]
       have := Scalar52_limb_le_nat self i.val hi'
       omega
   case isFalse hge =>
@@ -241,7 +241,11 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
         Scalar52_as_Nat constants.L := by simp [Scalar52_as_Nat]
     cases Choice.eq_zero_or_one condition with
     | inl h => simp [*]
-    | inr h => agrind
+    | inr h =>
+      simp only [h, reduceIte] at *
+      have hi5 : (↑i : Nat) = 5 := by assumption
+      rw [hi5, this]
+      omega
 termination_by 5 - i.val
 decreasing_by agrind
 
@@ -264,25 +268,28 @@ theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
       (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self) ⦄ := by
   unfold conditional_add_l
   step*
+  rename_i _ out_scalar
   rw [constants.L_spec] at *
   refine ⟨by assumption, ?_, ?_, ?_⟩
   · -- result < L
     cases Choice.val_eq_zero_or_one condition with
     | inl =>
       have := Choice.eq_zero_of_val condition (by assumption)
-      have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) =
+      have : Scalar52_as_Nat out_scalar + 2 ^ 260 * (result.val / 2 ^ 52) =
           Scalar52_as_Nat self := by simp [*]
       agrind
     | inr =>
       have := Choice.eq_one_of_val condition (by assumption)
-      have : Scalar52_as_Nat result.2 < 2 ^ 260 := Scalar52_as_Nat_bounded result.2 (by assumption)
+      have : Scalar52_as_Nat out_scalar < 2 ^ 260 :=
+        Scalar52_as_Nat_bounded out_scalar (by assumption)
       grind [Finset.Ico_self]
   · -- condition = Choice.one case
-    have : Scalar52_as_Nat result.2 < 2 ^ 260 := Scalar52_as_Nat_bounded result.2 (by assumption)
+    have : Scalar52_as_Nat out_scalar < 2 ^ 260 :=
+      Scalar52_as_Nat_bounded out_scalar (by assumption)
     grind [Finset.Ico_self, L_lt]
   · -- condition = Choice.zero case
     intro _
-    have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
+    have : Scalar52_as_Nat out_scalar + 2 ^ 260 * (result.val / 2 ^ 52) = Scalar52_as_Nat self := by
       simp [*]
     agrind [L_lt]
 

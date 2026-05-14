@@ -20,7 +20,8 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 297:4-30
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
-namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
+namespace SubtleConditionallySelectable
 
 /-- **Spec theorem for
 `backend.serial.curve_models.ProjectiveNielsPoint.conditional_select`**
@@ -48,6 +49,7 @@ theorem conditional_select_spec
         if choice.val = 1#u8 then b.T2d[i]!.val else a.T2d[i]!.val) ⦄ := by
   unfold conditional_select
   step*
-  grind
+  refine ⟨?_, ?_, ?_, ?_⟩ <;> intro i hi <;> split_ifs <;> simp_all
 
-end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+end SubtleConditionallySelectable
+end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts

@@ -47,7 +47,7 @@ private lemma scalar_digit_63_le_8
     (h_inner : ∀ i < 63, -8 ≤ (digits[i]!).val ∧ (digits[i]!).val < 8) :
     (digits[63]!).val ≤ 8 := by
   by_contra h_neg
-  push_neg at h_neg
+  push Not at h_neg
   have h_s63_ge_9 : 9 ≤ (digits[63]!).val := h_neg
   -- Split the full sum: s_63 * 16^63 + ∑_{i<63} 16^i * s_i = V.
   have h_split : (digits[63]!).val * (16 : ℤ) ^ 63 +

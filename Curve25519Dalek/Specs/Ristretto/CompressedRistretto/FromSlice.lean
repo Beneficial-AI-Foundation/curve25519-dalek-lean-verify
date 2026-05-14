@@ -28,19 +28,16 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 @[step]
 theorem core.array.TryFromArrayCopySlice.try_from_spec
     {T : Type} (N : Usize) (copyInst : core.marker.Copy T) (s : Slice T)
-    (hClone : List.mapM copyInst.cloneInst.clone s.val = ok s.val) :
+    (_hClone : List.mapM copyInst.cloneInst.clone s.val = ok s.val) :
     core.array.TryFromArrayCopySlice.try_from N copyInst s
     ⦃ (result : core.result.Result (Array T N) core.array.TryFromSliceError) =>
       (s.length = N → ∃ a : Array T N, result = .Ok a ∧ a.val = s.val) ∧
       (s.length ≠ N → result = .Err ()) ⦄ := by
   unfold core.array.TryFromArrayCopySlice.try_from
   split
-  · split
-    · simp_all only [ok.injEq, forall_const, ne_eq, not_true_eq_false,
-                     IsEmpty.forall_iff, and_true, spec_ok,
-                     core.result.Result.Ok.injEq, exists_eq_left']
-    · simp_all only [reduceCtorEq]
-    · simp_all only [reduceCtorEq]
+  · simp_all only [forall_const, ne_eq, not_true_eq_false,
+                   IsEmpty.forall_iff, and_true, spec_ok,
+                   core.result.Result.Ok.injEq, exists_eq_left']
   · simp only [spec_ok, reduceCtorEq, false_and, exists_false, implies_true, and_true]
     assumption
 

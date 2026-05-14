@@ -119,7 +119,6 @@ theorem select_loop_spec {P : EdwardsPoint}
       intro hlt
       exact absurd (h_some_branch hlt).1 (by simp)
     have hstart9 : iter.start.val = 9 := by omega
-    simp only [spec_ok]
     refine ⟨h_t_valid, ?_⟩
     rw [h_t_point, hstart9]
     push_cast
@@ -217,7 +216,7 @@ theorem select_loop_spec {P : EdwardsPoint}
         · by_cases hxlt : xabs.val < ((iter.start.val : ℤ))
           · have hxlt' : xabs.val < ((iter.start.val : ℤ) + 1) := by omega
             simp only [hxge, hxlt, hxlt', and_self, if_true]
-          · push_neg at hxlt
+          · push Not at hxlt
             have hxnlt' : ¬ (xabs.val < ((iter.start.val : ℤ) + 1)) := by omega
             have hxnlt : ¬ (xabs.val < (iter.start.val : ℤ)) := not_lt.mpr hxlt
             simp only [hxge, hxnlt, hxnlt', and_false, if_false]
@@ -281,7 +280,7 @@ theorem select_spec {P : EdwardsPoint}
   have hi3_val : i3.val = x.val + xmask.val := by rw [i3_post, hi2_val]
   have hxabs_val : xabs.val = x.val.natAbs := by
     have hxabs_bv_toInt : xabs.val = (i3.bv ^^^ xmask.bv).toInt := by
-      change xabs.bv.toInt = _; fcongr 1
+      change xabs.bv.toInt = _; fcongr 1; exact xabs_post2
     rw [hxabs_bv_toInt]
     rcases xmask_post2 with hm | hm
     · -- xmask.val = -1, so x.val < 0, and xmask.bv = allOnes 16.
@@ -312,7 +311,7 @@ theorem select_spec {P : EdwardsPoint}
       have hx_nn : 0 ≤ x.val := by
         rw [← hi1_val]
         by_contra hneg
-        push_neg at hneg
+        push Not at hneg
         have := xmask_post3.mpr hneg; omega
       have hxm_bv : xmask.bv = 0#16 := by
         apply BitVec.eq_of_toInt_eq
@@ -340,7 +339,7 @@ theorem select_spec {P : EdwardsPoint}
   have aux_i5_one_of_xmask_neg1 (h : xmask.val = -1) : i5 = 1#u8 := by
     have hxm_bv := aux_xmask_bv_neg1 h
     have hi4_bv : i4.bv = 1#16 := by
-      simp only [i4_post2, hxm_bv]; decide
+      simp only [i4_post2, hxm_bv]; rfl
     apply UScalar.eq_of_val_eq
     change i5.bv.toNat = (1#u8 : U8).bv.toNat
     rw [i5_post]; change (i4.bv.signExtend 8).toNat = _
@@ -348,7 +347,7 @@ theorem select_spec {P : EdwardsPoint}
   have aux_i5_zero_of_xmask_zero (h : xmask.val = 0) : i5 = 0#u8 := by
     have hxm_bv := aux_xmask_bv_zero h
     have hi4_bv : i4.bv = 0#16 := by
-      simp only [i4_post2, hxm_bv]; decide
+      simp only [i4_post2, hxm_bv]; rfl
     apply UScalar.eq_of_val_eq
     change i5.bv.toNat = (0#u8 : U8).bv.toNat
     rw [i5_post]; change (i4.bv.signExtend 8).toNat = _
@@ -362,7 +361,7 @@ theorem select_spec {P : EdwardsPoint}
   rcases hi5_cases with hi5_zero | hi5_one
   · -- Case A: i5 = 0#u8 → neg_mask = Choice.zero (no flip). x.val ≥ 0.
     have hx_nn : 0 ≤ x.val := by
-      by_contra hneg; push_neg at hneg
+      by_contra hneg; push Not at hneg
       have hi1_neg : i1.val < 0 := by rw [hi1_val]; exact hneg
       have hxm_neg : xmask.val = -1 := xmask_post3.mpr hi1_neg
       have := aux_i5_one_of_xmask_neg1 hxm_neg
@@ -381,7 +380,7 @@ theorem select_spec {P : EdwardsPoint}
     exact_mod_cast Int.natAbs_of_nonneg hx_nn
   · -- Case B: i5 = 1#u8 → neg_mask = Choice.one (flip). x.val < 0.
     have hx_neg : x.val < 0 := by
-      by_contra hnn; push_neg at hnn
+      by_contra hnn; push Not at hnn
       have hi1_nn : 0 ≤ i1.val := by rw [hi1_val]; exact hnn
       have hxm_zero : xmask.val = 0 := by
         rcases xmask_post2 with hxm | hxm

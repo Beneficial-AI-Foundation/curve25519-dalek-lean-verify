@@ -91,7 +91,8 @@ theorem step_1_spec (repr : CompressedEdwardsY) :
   let* ⟨ fe, fe_post1, fe_post2 ⟩ ← EDWARDS_D_spec
   let* ⟨ fe1, fe1_post1, fe1_post2 ⟩ ← mul_spec
   let* ⟨ v, v_post1, v_post2 ⟩ ← add_spec
-  let* ⟨ sqrt_res, X_lbounds, X_parity, sq_case1, sq_case2, sq_case3, sq_case4 ⟩ ←
+  -- aeneas#963: uncurried postcondition destructure
+  let* ⟨ sqrt_flag, X, X_lbounds, X_parity, sq_case1, sq_case2, sq_case3, sq_case4 ⟩ ←
     sqrt_ratio_i_spec
   -- Bridges: lift u, v, YY, fe, fe1 to CurveField
   have hZ_CF : (Field51_as_Nat Z : CurveField) = 1 := by
@@ -139,12 +140,12 @@ theorem step_1_spec (repr : CompressedEdwardsY) :
     · intro h; linear_combination -h
     · intro h; linear_combination -h
   -- Key: flag = 1 implies x² * v = u (core of postcondition 8)
-  have flag1_imp : sqrt_res.1.val = 1#u8 → sqrt_res.2.toField ^ 2 * v.toField = u.toField := by
+  have flag1_imp : sqrt_flag.val = 1#u8 → X.toField ^ 2 * v.toField = u.toField := by
     intro h_flag
     by_cases hu : Field51_as_Nat u % p = 0
     · -- Case 1: u_nat = 0
       have ⟨_, hr_zero⟩ := sq_case1 hu
-      have hx0 : sqrt_res.2.toField = 0 := (toField_zero _).mpr hr_zero
+      have hx0 : X.toField = 0 := (toField_zero _).mpr hr_zero
       have hu0 : u.toField = 0 := (toField_zero _).mpr hu
       rw [hx0, hu0]; ring
     · by_cases hv : Field51_as_Nat v % p = 0
@@ -156,7 +157,7 @@ theorem step_1_spec (repr : CompressedEdwardsY) :
         · -- Case 3: sq_case3 gives r² * v ≡ u [MOD p]
           have ⟨_, hr_eq⟩ := sq_case3 ⟨hu, hv, hex⟩
           -- Lift to CurveField
-          change (Field51_as_Nat sqrt_res.2 : CurveField) ^ 2 * (Field51_as_Nat v : CurveField) =
+          change (Field51_as_Nat X : CurveField) ^ 2 * (Field51_as_Nat v : CurveField) =
             (Field51_as_Nat u : CurveField)
           have h := lift_mod_eq _ _ hr_eq
           push_cast at h
@@ -181,11 +182,11 @@ theorem step_1_spec (repr : CompressedEdwardsY) :
     exact X_lbounds
   · -- 6. (Field51_as_Nat X % p) % 2 = 0
     exact X_parity
-  · -- 7. sqrt_res.1.val = 1 ↔ ∃ x', curve_eq(x', y)
+  · -- 7. sqrt_flag.val = 1 ↔ ∃ x', curve_eq(x', y)
     constructor
     · -- Forward: flag = 1 → ∃ x'
       intro h_flag
-      refine ⟨sqrt_res.2.toField, ?_⟩
+      refine ⟨X.toField, ?_⟩
       exact (curve_iff _).mpr (flag1_imp h_flag)
     · -- Backward: ∃ x' → flag = 1
       rintro ⟨x', hx'⟩

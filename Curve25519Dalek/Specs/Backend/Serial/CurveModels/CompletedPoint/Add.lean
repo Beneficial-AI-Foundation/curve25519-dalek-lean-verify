@@ -99,11 +99,11 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
   simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow,
     exists_eq_left']
   constructor
-  · grind
+  · grind [Array.getElem!_Nat_eq]
   · intro i hi
     have :(a[i]!).val + (b[i]!).val < 2 ^ 54 + 2 ^ 52:= by
       have := ha i hi; have := hb i hi; omega
-    grind
+    grind [Array.getElem!_Nat_eq]
 
 theorem add_spec' {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :

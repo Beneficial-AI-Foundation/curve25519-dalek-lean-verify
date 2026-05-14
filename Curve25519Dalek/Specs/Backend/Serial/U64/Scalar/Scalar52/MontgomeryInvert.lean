@@ -131,7 +131,7 @@ natural language specs:
       - This is equivalent to: montgomery_mul(u, u') = R mod L
 -/
 
-set_option maxHeartbeats 600000 in -- heavy step and simp
+set_option maxHeartbeats 1200000 in -- heavy step and simp
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_invert`**:
 - Precondition: u must be non-zero modulo L (i.e., represent a non-zero value in Montgomery form)
 - No panic (always returns successfully for non-zero inputs)
@@ -156,7 +156,7 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
   -- u < R: by contradiction, if u ≥ R then u * u ≥ R * R > R * L, contradicting h_value
   have h_LR : L < R := by unfold R L; omega
   have h_u_lt_R : Scalar52_as_Nat u < R := by
-    by_contra hge; push_neg at hge
+    by_contra hge; push Not at hge
     have := Nat.mul_le_mul hge (Nat.le_trans (Nat.le_of_lt h_LR) hge) -- R * L ≤ u * u
     omega
   let* ⟨ _11, _11_post1, _11_post2, _11_post3 ⟩ ← montgomery_mul_spec

@@ -45,7 +45,9 @@ theorem pow_p58_spec (self : FieldElement51) (h_bounds : ∀ i, i < 5 → (self[
       Field51_as_Nat result % p = (Field51_as_Nat self ^ pow_p58_exp) % p ∧
       (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow_p58
-  step with pow22501_spec as ⟨ t19, ht19_mod, _, ht19b, _ ⟩
+  -- aeneas#963 drift: `as`-pattern now binds the (t19, t3) pair flat instead of wrapped,
+  -- so the previous `obtain ⟨t19, _⟩ := t19; simp only at ht19_mod ht19b` is no longer needed.
+  step with pow22501_spec as ⟨ t19, _, ht19_mod, _, ht19b, _ ⟩
   step with pow2k_spec as ⟨ t20, ht20, ht20b ⟩
   step with mul_spec as ⟨ res, hres, hresb ⟩
   have exp_r : Field51_as_Nat self ≡ (Field51_as_Nat self) ^ 1 [MOD p] := by rw [pow_one]

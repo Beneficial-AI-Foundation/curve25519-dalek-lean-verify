@@ -59,7 +59,7 @@ attribute [-simp] Int.reducePow Nat.reducePow
 def Scalar52_partial_as_Nat (limbs : Array U64 5#usize) (n : Nat) : Nat :=
   ∑ j ∈ Finset.range n, 2 ^ (52 * j) * (limbs[j]!).val
 
-set_option maxHeartbeats 300000 in -- proof could be better
+set_option maxHeartbeats 1200000 in -- proof could be better
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub_loop`**:
 
 The loop computes the subtraction a - b with borrow propagation.
@@ -204,6 +204,9 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
         rw [hi5_val, hborrow1_val]
         have hlimb : a[i.val]!.val = b[i.val]!.val + i3.val + (i1.val - i4.val) := by
           rw [← hi1_val, hi4_val]; omega
+        -- New aeneas elaborator no longer auto-applies `Array.getElem!_Nat_eq`,
+        -- so we normalise the indexing form explicitly before `grind`.
+        simp only [Array.getElem!_Nat_eq] at *
         grind
       · -- Case 2: Underflow occurred
         have hi1_lt_i4 : i1.val < i4.val := by omega
@@ -237,14 +240,22 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
         rw [hpow_succ]
         have hlimb : a[i.val]!.val + 2^52 = b[i.val]!.val + i3.val + (2^52 + i1.val - i4.val) := by
           rw [← hi1_val, hi4_val]; omega
+        -- New aeneas elaborator no longer auto-applies `Array.getElem!_Nat_eq`,
+        -- so we normalise the indexing form explicitly before `grind`.
+        simp only [Array.getElem!_Nat_eq] at *
         grind
     -- Rewrite hypotheses from Array.set form to index_mut_back form
     rw [← h_imb] at hdiff1 hdiff1_rest hinv1
-    step as ⟨result, hres1, hres2⟩
-    grind
+    -- New aeneas `do` elaborator (PR #963) uncurries the (Scalar52 × U64) result,
+    -- so we now have one binder per tuple component followed by the two conjuncts.
+    step as ⟨res_arr, res_carry, hres1, hres2⟩
+    refine ⟨hres1, ?_⟩
+    exact hres2
   case isFalse hge =>
-    refine ⟨by grind, ?_⟩
+    refine ⟨by grind [Array.getElem!_Nat_eq], ?_⟩
     unfold Scalar52_partial_as_Nat Scalar52_as_Nat at *
+    -- New aeneas elaborator no longer auto-applies `Array.getElem!_Nat_eq`.
+    simp only [Array.getElem!_Nat_eq] at *
     grind
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
@@ -269,8 +280,10 @@ theorem sub_spec (a b : Array U64 5#usize)
   -- First, step through mask computation (two steps: shift then subtract)
   step  -- 1 <<< 52
   step  -- mask = i - 1
-  -- Progress through the loop with all required hypotheses
-  step as ⟨loop_res, hdiff_limbs, hdiff_inv⟩
+  -- Progress through the loop with all required hypotheses.
+  -- New aeneas `do` elaborator (PR #963) uncurries tuple-returning steps:
+  -- sub_loop returns `Scalar52 × U64`, so we destructure it as two binders.
+  step as ⟨diff, borrow, hdiff_limbs, hdiff_inv⟩
   · -- hdiff_rest: ZERO[j] = 0 for all j in 0..5
     intro j _ hj5
     interval_cases j <;> simp only [ZERO] <;> decide
@@ -279,8 +292,6 @@ theorem sub_spec (a b : Array U64 5#usize)
     have h1 : (0#u64).bv.toNat = 0 := by decide
     simp only [Scalar52_partial_as_Nat, UScalar.val, h0, h1,
                Finset.range_zero, Finset.sum_empty, zero_add, Nat.zero_div, zero_mul]
-  -- Extract diff and borrow from the loop result
-  obtain ⟨diff, borrow⟩ := loop_res
   -- diff_inv: A + (borrow/2^63) * 2^260 = B + D
   -- Progress through borrow >>> 63 and cast
   step as ⟨i1, hi1_eq, _⟩  -- borrow >>> 63
@@ -299,12 +310,14 @@ theorem sub_spec (a b : Array U64 5#usize)
     have hborrow_div : borrow.val / 2 ^ 63 = 0 := by simp_all [Nat.shiftRight_eq_div_pow]
     have hdiff_val : Scalar52_as_Nat diff = Scalar52_as_Nat a - Scalar52_as_Nat b := by grind
     have : Scalar52_as_Nat a ≥ Scalar52_as_Nat b := by grind
-    -- Progress through conditional_add_l with Choice.zero
-    step as ⟨cond_res, hres_limbs, hres_lt_L, _, hres_eq_zero⟩
+    -- Progress through conditional_add_l with Choice.zero.
+    -- New aeneas `do` elaborator (PR #963) uncurries the (U64 × Scalar52) result,
+    -- so we now have one binder per tuple component followed by the four conjuncts.
+    step as ⟨_cond_carry, cond_arr, hres_limbs, hres_lt_L, _, hres_eq_zero⟩
     have hcz : (subtle.Choice.mk i2 (Or.inl hi2_zero)) = Choice.zero := by
       simp only [Choice.zero, hi2_zero]
     have hres_val := hres_eq_zero hcz
-    refine ⟨?_, by grind, by grind⟩
+    refine ⟨?_, by grind, by grind [Array.getElem!_Nat_eq]⟩
     -- Modular equivalence: res + B ≡ A [MOD L]
     rw [hres_val, hdiff_val]
     have : Scalar52_as_Nat a - Scalar52_as_Nat b + Scalar52_as_Nat b = Scalar52_as_Nat a := by omega
@@ -317,9 +330,11 @@ theorem sub_spec (a b : Array U64 5#usize)
         simp only [*, Nat.shiftRight_eq_div_pow] at *
         grind
       have : Scalar52_as_Nat diff < 2 ^ 260 := Scalar52_as_Nat_bounded diff hdiff_limbs
-      -- Progress through conditional_add_l with Choice.one
-      step as ⟨cond_res, hres_limbs, hres_lt_L, hres_eq_one, _⟩
-      refine ⟨?_, by grind, by grind⟩
+      -- Progress through conditional_add_l with Choice.one.
+      -- New aeneas `do` elaborator (PR #963) uncurries the (U64 × Scalar52) result,
+      -- so we now have one binder per tuple component followed by the four conjuncts.
+      step as ⟨_cond_carry, cond_arr, hres_limbs, hres_lt_L, hres_eq_one, _⟩
+      refine ⟨?_, by grind, by grind [Array.getElem!_Nat_eq]⟩
       · -- Modular equivalence: res + B = A + L ≡ A [MOD L]
         have hL_mod : L ≡ 0 [MOD L] := by rw [Nat.ModEq, Nat.zero_mod, Nat.mod_self]
         have : Scalar52_as_Nat a + L ≡ Scalar52_as_Nat a + 0 [MOD L] := Nat.ModEq.add_left _ hL_mod

@@ -22,9 +22,11 @@ set_option linter.hashCommand false
 
 /-! ## Spec for `add_assign_loop` -/
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
+namespace CoreOpsArithAddAssignSharedAFieldElement51
 
-/-- **Spec for `backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop`**:
+/-- **Spec for
+`backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop`**:
 - Iterates through limbs adding `b[i]` to `a[i]`
 - Does not overflow if limb sums don't exceed `U64.max`. -/
 @[step]
@@ -41,6 +43,12 @@ theorem add_assign_loop_spec (self _rhs : Array U64 5#usize) (i : Usize) (hi : i
     let* ⟨ a, a_post ⟩ ← Array.update_spec
     let* ⟨ i4, i4_post ⟩ ← Usize.add_spec
     let* ⟨ result, result_post1, result_post2 ⟩ ← add_assign_loop_spec
+    case hab =>
+      intro j hj hj2
+      simp_all only [Array.getElem!_Nat_eq, UScalar.lt_equiv, UScalar.ofNatCore_val_eq,
+        Order.add_one_le_iff, Array.set_val_eq, Nat.not_eq, ne_eq, true_or, or_true,
+        ↓List.getElem!_set_ne]
+      exact hab j hj (by omega)
     constructor
     · intro j _ _
       obtain _ | _ := (show j = i ∨ i + 1 ≤ j by omega) <;> simp_all
@@ -68,4 +76,5 @@ theorem add_assign_spec (self _rhs : Array U64 5#usize)
   unfold add_assign
   step*
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51
+end CoreOpsArithAddAssignSharedAFieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts

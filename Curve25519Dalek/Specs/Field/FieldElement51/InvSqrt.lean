@@ -60,7 +60,8 @@ theorem invsqrt_spec
         result.fst.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = i_nat) ⦄ := by
   unfold invsqrt ONE from_limbs
   simp only [bind_tc_ok]
-  step as ⟨c, h_bounds, h_nonneg, h_case1, h_case2, h_case3, h_case4⟩
+  -- aeneas#963: uncurried postcondition destructure
+  step as ⟨c, r, h_bounds, h_nonneg, h_case1, h_case2, h_case3, h_case4⟩
   · intro i _; interval_cases i; all_goals decide
   -- Rewrite Field51_as_Nat of literal ONE to 1 in all case hypotheses
   have h_one : Field51_as_Nat (Array.make 5#usize [1#u64, 0#u64, 0#u64, 0#u64, 0#u64]) % p = 1 :=

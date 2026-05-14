@@ -29,7 +29,8 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 305:4-31
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
-namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
+namespace SubtleConditionallySelectable
 
 /-
 natural language description:
@@ -76,8 +77,8 @@ theorem conditional_assign_spec
         if choice.val = 1#u8 then other.T2d[i]!.val else self.T2d[i]!.val) ⦄ := by
   unfold conditional_assign
   step*
-  -- grind closes the remaining four conditional-equality goals after step*
-  grind
+  -- HACK: aeneas#963 didn't fully fix this — still needed.
+  refine ⟨?_, ?_, ?_, ?_⟩ <;> intro i hi <;> split_ifs <;> simp_all
 
 /-- **Point-level wrapper for `ProjectiveNielsPoint::conditional_assign`**:
 Given valid `self` and `other` and a `Choice`, the output is a valid `ProjectiveNielsPoint`
@@ -127,4 +128,5 @@ theorem conditional_assign_point
     rw [hr_eq]
     exact ⟨h_other, rfl⟩
 
-end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+end SubtleConditionallySelectable
+end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts

@@ -256,7 +256,7 @@ private theorem batch_invert_loop0_spec_strong
     simp only [alloc.vec.Vec.index_mut_slice_index]
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
-    step with Slice.index_mut_usize_spec as ⟨  input, index_mut_back⟩
+    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back⟩
     step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
@@ -264,7 +264,8 @@ private theorem batch_invert_loop0_spec_strong
     -- Auxiliary bounds for montgomery_mul
     have hacc_limbs62 : ∀ j < 5, acc[j]!.val < 2 ^ 62 :=
       fun j hj => Nat.lt_trans (h_acc_limbs j hj) (by norm_num)
-    have htmp_limbs62 : ∀ j < 5, tmp[j]!.val < 2 ^ 62 := by grind
+    have htmp_limbs62 : ∀ j < 5, tmp[j]!.val < 2 ^ 62 :=
+      fun j hj => Nat.lt_trans (tmp_post2 j hj) (by norm_num)
     have hLpos : (0 : ℕ) < L := by unfold L; norm_num
     have hLR : L ≤ R := Nat.le_of_lt (by unfold L R; grind)
     have hval_bound : Scalar52_as_Nat acc * Scalar52_as_Nat tmp < R * L := by
@@ -284,10 +285,10 @@ private theorem batch_invert_loop0_spec_strong
     step
     step as ⟨i1, hi1_val⟩
     have hi1_succ : i1.val = i.val + 1 := by scalar_tac
-    have hinput_nat : U8x32_as_Nat input.1.bytes = vals i.val := by
+    have hinput_nat : U8x32_as_Nat input.bytes = vals i.val := by
       have hslice_at := h_inp_orig i.val le_rfl hi_lt
       unfold SliceScalarAt at hslice_at
-      apply hslice_at input.1
+      apply hslice_at input
       have hlen : i.val < inputs.val.length := by omega
       have h1 := @List.getElem?_eq_getElem _ inputs.val i.val hlen
       rw [h1]
@@ -339,9 +340,10 @@ private theorem batch_invert_loop0_spec_strong
       rw [hi1_succ]
       exact inp_orig_step inputs (Slice.set inputs i input1) vals n.val i.val
         h_inp_orig h_inp_rest
-    have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := by grind
-    have hacc1_lt : Scalar52_as_Nat acc1 < L := by grind
-    simp only [index_mut_back, h_vec_back]
+    have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := acc1_post2
+    have hacc1_lt : Scalar52_as_Nat acc1 < L := acc1_post3
+    have hidx : index_mut_back = inputs.set i := (Prod.mk.inj h_index_mut_back).2
+    simp only [hidx, h_vec_back]
     exact spec_mono
       (batch_invert_loop0_spec_strong
         (Slice.set inputs i input1) n (Slice.set scratch i acc) acc1 i1
@@ -365,8 +367,8 @@ private theorem batch_invert_loop0_spec_strong
     · constructor
       · intro j hj; exact h_inp_mont j (hi_eq ▸ hj)
       · constructor
-        · intro i hi; grind
-        · exact ⟨by grind, h_inputs_len, h_scratch_len⟩
+        · intro i hi; exact h_acc_limbs i hi
+        · exact ⟨h_acc_lt, h_inputs_len, h_scratch_len⟩
   termination_by n.val - i.val
   decreasing_by scalar_tac
 
@@ -549,13 +551,13 @@ private theorem batch_invert_loop1_spec_strong
     have hk_lt : i1.val < n.val := by omega
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
-    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back⟩
-    have h_input_mont : U8x32_as_Nat input.1.bytes ≡ vals i1.val * R [MOD L] := by
+    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back⟩
+    have h_input_mont : U8x32_as_Nat input.bytes ≡ vals i1.val * R [MOD L] := by
       apply h_inp_mont i1.val (by omega)
       have hlen : i1.val < inputs.val.length := h_inputs_len ▸ hk_lt
       have h1 := @List.getElem?_eq_getElem _ inputs.val i1.val hlen
       rw [h1]; simp_all
-    have h_input_lt : U8x32_as_Nat input.1.bytes < L := by
+    have h_input_lt : U8x32_as_Nat input.bytes < L := by
       apply h_inp_mont_lt i1.val (by omega)
       have hlen : i1.val < inputs.val.length := h_inputs_len ▸ hk_lt
       have h1 := @List.getElem?_eq_getElem _ inputs.val i1.val hlen
@@ -641,7 +643,8 @@ private theorem batch_invert_loop1_spec_strong
           (fun b => U8x32_as_Nat b < L) :=
       inp_lt_prefix_step inputs _ i1.val L
         (fun j hj => h_inp_mont_lt j (by omega)) h_inp_rest
-    simp only [index_mut_back]
+    have hidx : index_mut_back = inputs.set i1 := (Prod.mk.inj h_index_mut_back).2
+    simp only [hidx]
     exact spec_mono
       (batch_invert_loop1_spec_strong
         (Slice.set inputs i1 input1) scratch tmp i1 n
@@ -794,14 +797,15 @@ private theorem batch_invert_loop0_bounds_strong
     simp only [alloc.vec.Vec.index_mut_slice_index]
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
-    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back⟩
+    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back⟩
     step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
     step
     have hacc_limbs62 : ∀ j < 5, acc[j]!.val < 2 ^ 62 :=
       fun j hj => Nat.lt_trans (h_acc_limbs j hj) (by norm_num)
-    have htmp_limbs62 : ∀ j < 5, tmp[j]!.val < 2 ^ 62 := by grind
+    have htmp_limbs62 : ∀ j < 5, tmp[j]!.val < 2 ^ 62 :=
+      fun j hj => Nat.lt_trans (tmp_post2 j hj) (by norm_num)
     have hLpos : (0 : ℕ) < L := by unfold L; norm_num
     have hLR : L ≤ R := Nat.le_of_lt (by unfold L R; grind)
     have hval_bound : Scalar52_as_Nat acc * Scalar52_as_Nat tmp < R * L := by
@@ -843,9 +847,10 @@ private theorem batch_invert_loop0_bounds_strong
         exact h_scratch_bounds j hjlt x hx
       · rw [h_scratch_new] at hx
         exact (Option.some.inj hx) ▸ ⟨h_acc_limbs, h_acc_lt⟩
-    have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := by grind
-    have hacc1_lt : Scalar52_as_Nat acc1 < L := by grind
-    simp only [index_mut_back, h_vec_back]
+    have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := acc1_post2
+    have hacc1_lt : Scalar52_as_Nat acc1 < L := acc1_post3
+    have hidx : index_mut_back = inputs.set i := (Prod.mk.inj h_index_mut_back).2
+    simp only [hidx, h_vec_back]
     exact spec_mono
       (batch_invert_loop0_bounds_strong
         (Slice.set inputs i input1) n (Slice.set scratch i acc) acc1 i1
@@ -908,14 +913,15 @@ private theorem batch_invert_loop0_acc_bounds_strong
     simp only [alloc.vec.Vec.index_mut_slice_index]
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
-    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back⟩
+    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back⟩
     step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
     step
     have hacc_limbs62 : ∀ j < 5, acc[j]!.val < 2 ^ 62 :=
       fun j hj => Nat.lt_trans (h_acc_limbs j hj) (by norm_num)
-    have htmp_limbs62 : ∀ j < 5, tmp[j]!.val < 2 ^ 62 := by grind
+    have htmp_limbs62 : ∀ j < 5, tmp[j]!.val < 2 ^ 62 :=
+      fun j hj => Nat.lt_trans (tmp_post2 j hj) (by norm_num)
     have hLpos : (0 : ℕ) < L := by unfold L; norm_num
     have hLR : L ≤ R := Nat.le_of_lt (by unfold L R; grind)
     have hval_bound : Scalar52_as_Nat acc * Scalar52_as_Nat tmp < R * L := by
@@ -939,9 +945,10 @@ private theorem batch_invert_loop0_acc_bounds_strong
       simp [Slice.set_val_eq, List.length_set, h_inputs_len]
     have hscratch1_len : (Slice.set scratch i acc).val.length = n.val := by
       simp [List.length_set, h_scratch_len]
-    have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := by grind
-    have hacc1_lt : Scalar52_as_Nat acc1 < L := by grind
-    simp only [index_mut_back, h_vec_back]
+    have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := acc1_post2
+    have hacc1_lt : Scalar52_as_Nat acc1 < L := acc1_post3
+    have hidx : index_mut_back = inputs.set i := (Prod.mk.inj h_index_mut_back).2
+    simp only [hidx, h_vec_back]
     exact spec_mono
       (batch_invert_loop0_acc_bounds_strong
         (Slice.set inputs i input1) n (Slice.set scratch i acc) acc1 i1
@@ -1000,14 +1007,15 @@ private theorem batch_invert_loop0_inputs_lt_strong
     simp only [alloc.vec.Vec.index_mut_slice_index]
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
-    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back⟩
+    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back⟩
     step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
     step
     have hacc_limbs62 : ∀ j < 5, acc[j]!.val < 2 ^ 62 :=
       fun j hj => Nat.lt_trans (h_acc_limbs j hj) (by norm_num)
-    have htmp_limbs62 : ∀ j < 5, tmp[j]!.val < 2 ^ 62 := by grind
+    have htmp_limbs62 : ∀ j < 5, tmp[j]!.val < 2 ^ 62 :=
+      fun j hj => Nat.lt_trans (tmp_post2 j hj) (by norm_num)
     have hLpos : (0 : ℕ) < L := by unfold L; norm_num
     have hLR : L ≤ R := Nat.le_of_lt (by unfold L R; grind)
     have hval_bound : Scalar52_as_Nat acc * Scalar52_as_Nat tmp < R * L := by
@@ -1046,9 +1054,10 @@ private theorem batch_invert_loop0_inputs_lt_strong
         exact h_inp_lt j hjlt x hx
       · rw [h_inp_elem] at hx
         exact (Option.some.inj hx) ▸ input1_post2
-    have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := by grind
-    have hacc1_lt : Scalar52_as_Nat acc1 < L := by grind
-    simp only [index_mut_back, h_vec_back]
+    have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := acc1_post2
+    have hacc1_lt : Scalar52_as_Nat acc1 < L := acc1_post3
+    have hidx : index_mut_back = inputs.set i := (Prod.mk.inj h_index_mut_back).2
+    simp only [hidx, h_vec_back]
     exact spec_mono
       (batch_invert_loop0_inputs_lt_strong
         (Slice.set inputs i input1) n (Slice.set scratch i acc) acc1 i1
@@ -1149,11 +1158,9 @@ theorem batch_invert_spec
         (loop0_scratch_limbs inputs (Slice.len inputs) scratch acc
           hacc_limbs hacc_lt h_scratch_len h_inputs_len))
   step with h_loop0_combined
-    as ⟨hacc1_res, hacc1_inv, hscratch1_inv, hinp1_mont, hinp1_mont1, hinp1_mont2,
-      hinputs1_len_post, hscratch1_len_post, hinp1_mont_lt_pre, hscratch1_limbs_pre⟩
-  set acc1 := hacc1_res.2.2 with hacc1
-  have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := hinp1_mont1
-  have hacc1_lt : Scalar52_as_Nat acc1 < L := hinp1_mont2
+    as ⟨inputs1, scratch1, acc1, hacc1_inv, hscratch1_inv, hinp1_mont,
+      hacc1_limbs, hacc1_lt, hinputs1_len_post, hscratch1_len_post,
+      hinp1_mont_lt_pre, hscratch1_limbs_pre⟩
   step
   step
   step
@@ -1213,14 +1220,12 @@ theorem batch_invert_spec
             Nat.mul_lt_mul_of_pos_left hacc1_lt hLpos
         _ ≤ R * L :=
             Nat.mul_le_mul hLR (le_refl L)
-  have hs2_limbs62 : ∀ j < 5, s2[j]!.val < 2 ^ 62 := by
-    grind
+  have hs2_limbs62 : ∀ j < 5, s2[j]!.val < 2 ^ 62 :=
+    fun j hj => Nat.lt_trans (s2_post2 j hj) (by norm_num)
   step
-  have hacc2_R : Scalar52_as_Nat acc2 * R ≡ Scalar52_as_Nat s2 [MOD L] := by
-    unfold Nat.ModEq
-    grind
-  have hacc2_limbs : ∀ j < 5, acc2[j]!.val < 2 ^ 52 := by grind
-  have hacc2_lt : Scalar52_as_Nat acc2 < L := by grind
+  have hacc2_R : Scalar52_as_Nat acc2 * R ≡ Scalar52_as_Nat s2 [MOD L] := acc2_post1
+  have hacc2_limbs : ∀ j < 5, acc2[j]!.val < 2 ^ 52 := acc2_post3
+  have hacc2_lt : Scalar52_as_Nat acc2 < L := acc2_post2
   -- Key: acc2 is the inverse of PrefixProd vals n modulo L
   have hacc2_inv : Scalar52_as_Nat acc2 * PrefixProd vals (Slice.len inputs).val ≡ 1 [MOD L] := by
     have hmontinv : Scalar52_as_Nat acc1 * Scalar52_as_Nat s2 ≡ R * R [MOD L] := by
@@ -1232,8 +1237,6 @@ theorem batch_invert_spec
   have hret_inv : U8x32_as_Nat ret.bytes * PrefixProd vals inputs.val.length ≡ 1 [MOD L] := by
     rw [hn_val] at hacc2_inv
     exact (ret_post1.mul_right (PrefixProd vals inputs.val.length)).trans hacc2_inv
-  set inputs1:=hacc1_res.1 with hinputs1
-  set scratch1:= hacc1_res.2.1  with hscratch1
   have hinp1_mont_lt : ∀ j < (Slice.len inputs).val,
       SliceScalarAt inputs1 j (fun b => U8x32_as_Nat b < L) := hinp1_mont_lt_pre
   have hscratch1_limbs : ∀ j < (Slice.len inputs).val,

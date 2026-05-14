@@ -80,7 +80,7 @@ theorem step_1_spec (c : CompressedRistretto) :
     exact h_tight
   · -- s.IsValid from from_bytes_spec
     unfold backend.serial.u64.field.FieldElement51.IsValid
-    grind
+    intro i hi; have := h_tight i hi; omega
   · exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr hs
   · -- goal: ct_flag.val = 1#u8 ↔ U8x32_as_Nat a < p
     have val_iff : ct_flag.val = 1#u8 ↔ ct_flag = Choice.one := by

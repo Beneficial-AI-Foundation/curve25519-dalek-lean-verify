@@ -41,14 +41,14 @@ private lemma U32_ofDigits_toLEBytes (x : U32) :
     simp only [UScalarTy.U8_numBits_eq, List.map_map, List.map_inj_left, Function.comp_apply]
     intro a ha
     rfl
-  simp only [Nat.reducePow, UScalarTy.U8_numBits_eq, hmap]
+  simp only [Nat.reducePow, UScalarTy.U8_numBits_eq]
   have hdigits :
       Nat.ofDigits (2^8) (x.bv.toLEBytes.map (fun b => b.toNat))
         = (BitVec.fromLEBytes x.bv.toLEBytes).toNat := by
     rw [hdigits]
-  simp only [Nat.reducePow, Nat.reduceMod, BitVec.fromLEBytes_toLEBytes, BitVec.toNat_cast,
-    UScalar.bv_toNat] at hdigits
-  rw [hdigits]
+  simp only [Nat.reducePow, Nat.reduceMod, BitVec.fromLEBytes_toLEBytes,
+    BitVec.toNat_cast, U32.bv_toNat] at hdigits
+  exact hmap.symm ▸ hdigits
 
 private lemma U8x32_as_Nat_setSlice_zeroI (bs : List U8) (h_len : bs.length = 4) :
     U8x32_as_Nat ⟨(List.replicate 32 (0#u8)).setSlice! 0 bs, by simp⟩ =
@@ -94,6 +94,7 @@ theorem from_spec (x : U32) :
     List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil, zero_add,
     Nat.reduceAdd, Slice.setSlice!_val, List.length_setSlice!, ↓reduceDIte]
   have eq1 := U32_ofDigits_toLEBytes x
+  simp only [UScalarTy.U8_numBits_eq] at eq1
   rw [← x_bytes_post] at eq1
   have : (x_bytes).length = 4 := by
     simp

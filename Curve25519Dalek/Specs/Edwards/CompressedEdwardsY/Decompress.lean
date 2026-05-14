@@ -68,10 +68,9 @@ theorem decompress_spec (self : CompressedEdwardsY) :
           (x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1))) ⦄ := by
   unfold decompress
   -- Compose step_1_spec (explicit `let*` to avoid Pattern-8 self-recursion of `@[step]`)
-  let* ⟨res1, post1⟩ ← step_1_spec
-  obtain ⟨is_valid, X, Y, Z⟩ := res1
+  -- aeneas#963: tuple postcondition is uncurried, so `let*` now binds the 4 components flat
+  let* ⟨is_valid, X, Y, Z, post1⟩ ← step_1_spec
   obtain ⟨Y_mod, Y_bounds, Z_val, Z_bounds, X_bounds, X_parity, flag_iff, flag_curve⟩ := post1
-  simp only [step_simps]
   -- Nat → CurveField bridges for Y and Z
   have hY_toField : Y.toField = ((U8x32_as_Nat self % 2 ^ 255 : Nat) : CurveField) := by
     simp only [FieldElement51.toField]

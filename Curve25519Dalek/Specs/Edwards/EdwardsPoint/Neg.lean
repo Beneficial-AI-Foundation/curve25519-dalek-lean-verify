@@ -35,10 +35,12 @@ theorem neg_spec
       result.IsValid ∧
       result.toPoint = -self.toPoint ⦄ := by
   unfold neg
-  have := h_self_valid.X_bounds
-  have := h_self_valid.Y_bounds
-  have := h_self_valid.Z_bounds
-  have := h_self_valid.T_bounds
+  -- aeneas#963: anonymous `have :=` leaves `this✝` binders that `grind` can no
+  -- longer pick up after `step*` introduces further hypotheses; name them.
+  have hX_bounds := h_self_valid.X_bounds
+  have hY_bounds := h_self_valid.Y_bounds
+  have hZ_bounds := h_self_valid.Z_bounds
+  have hT_bounds := h_self_valid.T_bounds
   step*
   simp only [Montgomery.lift_mod_eq_iff, Nat.cast_add, Nat.cast_zero] at fe_post1
   rw [← FieldElement51.toField, ← FieldElement51.toField] at fe_post1
@@ -61,10 +63,11 @@ theorem neg_spec
       have := h_self_valid.on_curve
       simp only at this
       grind
-    · grind
-    · grind
-    · grind
-    · grind
+    -- aeneas#963: `grind` no longer auto-applies `Array.getElem!_Nat_eq`
+    · grind [Array.getElem!_Nat_eq]
+    · grind [Array.getElem!_Nat_eq]
+    · grind [Array.getElem!_Nat_eq]
+    · grind [Array.getElem!_Nat_eq]
   unfold toPoint
   simp only [this, ↓reduceDIte, toPoint', h_self_valid, true_and, fe_neg]
   ext
