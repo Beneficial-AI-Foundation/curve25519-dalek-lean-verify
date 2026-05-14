@@ -77,7 +77,7 @@ charon:
     - "curve25519_dalek::ristretto::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
     - "curve25519_dalek::backend::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
     # EXCLUDED BY CHOICE
-    # The following exludes aren't required for Charon to function, the have been added here since they are not part of the verification scope
+    # The following excludes aren't required for Charon to function, the have been added here since they are not part of the verification scope
     # TODO: https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/issues/829   
     # Zeroize impls (remaining modules)
     - "curve25519_dalek::backend::serial::curve_models::{impl zeroize::Zeroize for _}"
