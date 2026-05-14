@@ -76,6 +76,9 @@ charon:
     - "curve25519_dalek::ristretto::VartimeRistrettoPrecomputation"
     - "curve25519_dalek::ristretto::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
     - "curve25519_dalek::backend::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
+    # EXCLUDED BY CHOICE
+    # The following exludes aren't required for Charon to function, the have been added here since they are not part of the verification scope
+    # TODO: https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/issues/829   
     # Zeroize impls (remaining modules)
     - "curve25519_dalek::backend::serial::curve_models::{impl zeroize::Zeroize for _}"
     - "curve25519_dalek::backend::serial::u64::field::{impl zeroize::Zeroize for _}"
@@ -109,6 +112,7 @@ charon:
     - "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::to_bytes"
     - "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::coset4"
     - "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::non_adjacent_form"
+    # END EXCLUDED BY CHOICE
   opaque: []
 
 aeneas_args:
