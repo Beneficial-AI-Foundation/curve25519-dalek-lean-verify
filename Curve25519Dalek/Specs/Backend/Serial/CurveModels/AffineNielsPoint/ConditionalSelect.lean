@@ -25,12 +25,11 @@ namespace SubtleConditionallySelectable
 
 /-- **Spec theorem for
 `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_select`**
-• The function always succeeds (no panic)for an AffineNielsPoint `a`
-  an AffineNielsPoint `b`, and a Choice `choice`
-• The result is a valid AffineNielsPoint has coordinates selected component-wise:
+• The function always succeeds (no panic) for AffineNielsPoints `a` and `b` and a Choice `choice`
+• The result is an AffineNielsPoint whose coordinates are selected component-wise:
   - If choice = 1, each coordinate equals the corresponding one of `b`
   - If choice = 0, each coordinate equals the corresponding one of `a`
-  - The operation is constant-time (does not branch on choice) -/
+• The operation is constant-time (does not branch on choice) -/
 @[step]
 theorem conditional_select_spec
     (a b : backend.serial.curve_models.AffineNielsPoint)

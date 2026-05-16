@@ -34,12 +34,12 @@ namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Inst
 namespace SubtleConditionallySelectable
 
 /-- **Spec theorem for
-`backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign`**
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_assign`**
 • No panic (always returns successfully)
 • Given inputs:
-  - a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),
-  - a ProjectiveNielsPoint `other` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),
-  - a Choice `choice`,
+  • a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),
+  • a ProjectiveNielsPoint `other` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),
+  • a Choice `choice`,
 the output ProjectiveNielsPoint computed by `conditional_assign self other choice` satisfies:
 • Each coordinate is conditionally selected:
   if choice is 1, output = other; if choice is 0, output = self

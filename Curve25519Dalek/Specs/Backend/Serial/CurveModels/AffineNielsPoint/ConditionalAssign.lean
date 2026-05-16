@@ -33,9 +33,9 @@ namespace SubtleConditionallySelectable
 /-- **Spec theorem for `backend::serial::curve_models::AffineNielsPoint::conditional_assign`**
 • No panic (always returns successfully)
 • Given inputs:
-  - an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),
-  - an AffineNielsPoint `other` with coordinates (y_plus_x', y_minus_x', xy2d'),
-  - a Choice `choice`,
+  • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),
+  • an AffineNielsPoint `other` with coordinates (y_plus_x', y_minus_x', xy2d'),
+  • a Choice `choice`,
 the output AffineNielsPoint computed by `conditional_assign self other choice` satisfies:
 • Each coordinate is conditionally selected: if choice is 1, output = other;
   if choice is 0, output = self

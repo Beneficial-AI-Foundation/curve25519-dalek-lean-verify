@@ -7,7 +7,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
 
-/-! # Spec theorem for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::sub`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::sub`
 
 This function implements the mixed subtraction of an AffineNielsPoint from an
 Edwards point in extended coordinates, returning the result in completed
@@ -36,7 +36,7 @@ open curve25519_dalek.backend.serial.curve_models
 namespace curve25519_dalek.Shared0EdwardsPoint.Insts
 namespace CoreOpsArithSubSharedAAffineNielsPointCompletedPoint
 
-/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::sub`**
+/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::sub`**
 • The function always succeeds (no panic)
 • Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')
   satisfies modulo p:

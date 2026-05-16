@@ -7,7 +7,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
 
-/-! # Spec theorem for `curve25519-dalek::backend::serial::curve_models::CompletedPoint::add`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::add`
 
 This function implements the mixed addition of an AffineNielsPoint to an
 Edwards point in extended coordinates, returning the result in completed

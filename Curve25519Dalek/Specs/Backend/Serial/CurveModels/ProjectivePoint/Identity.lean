@@ -7,8 +7,8 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ZERO
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
-/-!
-# Spec theorem for `ProjectivePoint::identity`
+
+/-! Spec theorem for `curve25519-dalek::backend::serial::curve_models::ProjectivePoint::identity`
 
 This function returns the identity element of the Edwards curve in projective coordinates
 (X=0, Y=1, Z=1), representing the affine point (0, 1).
@@ -20,12 +20,9 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.IdentityCurveModelsProjectivePoint
 
-/-- **Spec theorem for
-`curve25519_dalek.IdentityCurveModelsProjectivePoint.identity`**
-
-Returns the identity element of the Edwards curve in projective coordinates:
-- No panic (always returns successfully)
-- The resulting ProjectivePoint is the identity element with coordinates (X=0, Y=1, Z=1) -/
+/-- Spec theorem for `curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity`
+• No panic (always returns successfully)
+• The resulting ProjectivePoint is the identity element with coordinates (X=0, Y=1, Z=1) -/
 @[step]
 theorem identity_spec :
     identity ⦃ (result : backend.serial.curve_models.ProjectivePoint) =>

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong, Oliver Butterley
 -/
@@ -7,19 +7,19 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
-/-! # Spec Theorem for `FieldElement51::mul`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::mul`
 
-This function computes the product of two field elements.
-
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
+This function computes the product of two `FieldElement51` values modulo `p = 2^255 - 19`.
 
 ## Proof strategy: Fold theorem decomposition
 
 The function is decomposed into 3 helper functions, each with a fold theorem and `@[step]` spec.
 
-- Stage 1 — Product computation (`mul_product_stage`)
-- Stage 2 — Carry propagation (`mul_carry_prop_stage`)
-- Stage 3 — Final reduction (`mul_final_reduce_stage`)
+• Stage 1 — Product computation (`mul_product_stage`)
+• Stage 2 — Carry propagation (`mul_carry_prop_stage`)
+• Stage 3 — Final reduction (`mul_final_reduce_stage`)
+
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 set_option linter.hashCommand false
@@ -28,7 +28,6 @@ set_option linter.hashCommand false
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field
 open MulShared0FieldElement51SharedAFieldElement51FieldElement51 (mul.m mul.LOW_51_BIT_MASK)
-
 namespace curve25519_dalek.Shared0FieldElement51.Insts
 namespace CoreOpsArithMulSharedAFieldElement51FieldElement51
 
@@ -829,7 +828,7 @@ theorem mul_final_reduce_stage_spec (a' : Array U64 5#usize) (carry i54 : U64)
 
 set_option maxHeartbeats 14000000 in
 -- Required for step*
-/-- Spec theorem for `FieldElement51::mul`.
+/-- Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::mul`
 
 Field multiplication is correct mod p and produces reduced limbs. -/
 @[step]

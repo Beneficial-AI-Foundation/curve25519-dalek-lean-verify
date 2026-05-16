@@ -6,8 +6,8 @@ Authors: Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-!
-# Spec theorem for `backend::serial::curve_models::AffineNielsPoint::assert_receiver_is_total_eq`
+/-! Spec theorem for
+`curve25519_daleK::backend::serial::curve_models::AffineNielsPoint::assert_receiver_is_total_eq`
 
 This function is the totality assertion required by Rust's `Eq` trait. For
 `AffineNielsPoint`, it is a no-op and always succeeds.
@@ -18,8 +18,8 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs", lines 182:22-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpEq
 
-/-- **Spec theorem for
-`backend::serial::curve_models::AffineNielsPoint::assert_receiver_is_total_eq`**
+/-- Spec theorem for
+`curve25519_daleK::backend::serial::curve_models::AffineNielsPoint::assert_receiver_is_total_eq`
 • No panic (always returns successfully)
 • The result is `()`
 • This is the `Eq`-trait totality assertion for `AffineNielsPoint` -/

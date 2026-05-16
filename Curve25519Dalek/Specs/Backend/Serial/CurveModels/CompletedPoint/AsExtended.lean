@@ -29,10 +29,10 @@ namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 • No panic (always returns successfully)
 • Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')
   satisfies the conversion formulas modulo p = 2^255 - 19:
-  - X' ≡ X·T (mod p)
-  - Y' ≡ Y·Z (mod p)
-  - Z' ≡ Z·T (mod p)
-  - T' ≡ X·Y (mod p)
+  • X' ≡ X·T (mod p)
+  • Y' ≡ Y·Z (mod p)
+  • Z' ≡ Z·T (mod p)
+  • T' ≡ X·Y (mod p)
 • Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)
 • The output is a valid EdwardsPoint whose `toPoint` equals `q.toPoint` -/
 @[step]

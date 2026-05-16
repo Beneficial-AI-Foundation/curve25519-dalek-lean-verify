@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Hoang Le Truong
 -/
@@ -8,11 +8,11 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Aux
 import Curve25519Dalek.ExternallyVerified
 
-/-! # FromBytes
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes`
 
-Specification and proof for `FieldElement51::from_bytes`.
 This function constructs a field element from a 32-byte array.
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
+
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 
 ## Rust source
 
@@ -47,9 +47,9 @@ We think of the 32 bytes as a single list of 256 booleans (bits), LSB-first:
 Byte `bytes[i]` contributes `bits[8i .. 8i+7]`.
 
 Every operation in `from_bytes` is a simple list operation:
-  - `load8_at(bytes, i)` → extract sublist `bits[8i .. 8i+63]` (64 bits)
-  - `>> k` (right shift)  → drop the first `k` elements from the list
-  - `& low_51_bit_mask`   → take only the first 51 elements (truncate the tail)
+  • `load8_at(bytes, i)` → extract sublist `bits[8i .. 8i+63]` (64 bits)
+  • `>> k` (right shift)  → drop the first `k` elements from the list
+  • `& low_51_bit_mask`   → take only the first 51 elements (truncate the tail)
 
 Tracing each limb:
 
@@ -75,6 +75,8 @@ covering `bits[0..255)`. Bit 255 (the 256th bit) is discarded — this is the `%
 
 3. `from_bytes_bitList_spec` → `from_bytes_spec` via:
    `field51_eq_of_bitList` + `limb_bound_of_equiv`
+
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
@@ -253,6 +255,12 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
 
 /-! ## Final spec -/
 
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes`**
+• The function always succeeds (no panic) on any 32-byte input
+• `Field51_as_Nat result ≡ U8x32_as_Nat bytes % 2^255 (mod p)`, i.e. the limb encoding matches
+  the little-endian byte encoding with the top bit discarded
+• Every output limb is `< 2 ^ 51`
+-/
 @[step]
 theorem from_bytes_spec (bytes : Array U8 32#usize) :
     from_bytes bytes ⦃ (result : FieldElement51) =>

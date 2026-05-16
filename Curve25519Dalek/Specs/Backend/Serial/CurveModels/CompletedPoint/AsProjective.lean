@@ -27,9 +27,9 @@ namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 • The function always succeeds (no panic) for an input completed point (X, Y, Z, T) with all
 coordinates < 2^54
 • The output ProjectivePoint (X', Y', Z') satisfies:
-  - X' ≡ X·T (mod p) where p = 2^255 - 19
-  - Y' ≡ Y·Z (mod p)
-  - Z' ≡ Z·T (mod p)
+  • X' ≡ X·T (mod p) where p = 2^255 - 19
+  • Y' ≡ Y·Z (mod p)
+  • Z' ≡ Z·T (mod p)
 
 The point-level `as_projective_spec` (WP form, takes `IsValid` and
 returns `IsValid ∧ toPoint = toPoint`) is the canonical chain target. -/
@@ -171,14 +171,11 @@ private lemma as_projective_isValid_and_toPoint
       rw [h_py, hY_F, hZ_F, h_qy]
       field_simp [hq_valid.Z_ne_zero, hq_valid.T_ne_zero]
 
-/--
-Verification of the `as_projective` function (WP form, canonical chain target).
-
-The theorem states that converting a valid CompletedPoint to ProjectivePoint:
-1. Always succeeds
-2. Produces a valid ProjectivePoint
-3. Preserves the represented affine point
--/
+/-- Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective`
+• Always succeeds for a valid CompletedPoint
+• Produces a valid ProjectivePoint
+• Preserves the represented affine point (`proj.toPoint = q.toPoint`) -/
 @[step]
 theorem as_projective_spec
     (q : CompletedPoint) (hq_valid : q.IsValid) :

@@ -25,9 +25,9 @@ namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Inst
 namespace SubtleConditionallySelectable
 
 /-- **Spec theorem for
-`curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.conditional_select`**
-- No panic (always returns successfully)
-- Given inputs:
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_select`**
+• No panic (always returns successfully)
+• Given inputs:
   • ProjectiveNielsPoint `a` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),
   • ProjectiveNielsPoint `b` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),
   • a Choice `choice`,

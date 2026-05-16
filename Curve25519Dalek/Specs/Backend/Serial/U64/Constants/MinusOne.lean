@@ -6,12 +6,10 @@ Authors: Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec theorem for `constants::MINUS_ONE`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MINUS_ONE`
 
-Specification and proof for the constant `MINUS_ONE`.
-
-This constant represents −1 modulo p as a field element in the 51-bit limb
-representation (five u64 limbs).
+This constant represents `-1 (mod p)` as a `FieldElement51`, encoded as five 51-bit u64
+limbs.
 
 Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 -/
@@ -20,8 +18,10 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MINUS_ONE`**
-- The value of constants.MINUS_ONE, when converted to a natural number, equals p − 1
-(the canonical representative of −1 modulo p in [0, p-1]). -/
+• The function always succeeds (no panic)
+• `Field51_as_Nat MINUS_ONE = p - 1`, the canonical representative of `-1 (mod p)`
+• Every limb is bounded by `2 ^ 51`
+-/
 @[step]
 theorem MINUS_ONE_spec :
     MINUS_ONE ⦃ result =>

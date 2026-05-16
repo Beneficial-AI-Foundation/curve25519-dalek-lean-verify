@@ -15,7 +15,6 @@ Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
 namespace curve25519_dalek.backend.serial.u64.constants
 
 set_option exponentiation.threshold 260

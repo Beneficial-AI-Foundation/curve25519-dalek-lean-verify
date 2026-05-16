@@ -31,9 +31,9 @@ namespace curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNi
 • The function always succeeds (no panic) for an AffineNielsPoint `self` with coordinates
 (y_plus_x, y_minus_x, xy2d)
 • The output AffineNielsPoint computed by `neg self` has coordinates (y_plus_x', y_minus_x', xy2d')
-  - y_plus_x' = y_minus_x (the coordinates are swapped)
-  - y_minus_x' = y_plus_x (the coordinates are swapped)
-  - `xy2d' ≡ -xy2d (mod p)` (the xy2d coordinate is negated modulo p = 2^255 - 19) -/
+  • y_plus_x' = y_minus_x (the coordinates are swapped)
+  • y_minus_x' = y_plus_x (the coordinates are swapped)
+  • `xy2d' ≡ -xy2d (mod p)` (the xy2d coordinate is negated modulo p = 2^255 - 19) -/
 @[step]
 theorem neg_spec
     (self : backend.serial.curve_models.AffineNielsPoint)

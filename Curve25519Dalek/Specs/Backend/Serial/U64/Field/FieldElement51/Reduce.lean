@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo
 -/
@@ -7,14 +7,20 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Funs
 import Mathlib.Tactic.IntervalCases
 
-/-! # Reduce -/
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::reduce`
+
+This function performs a single weak reduction step on a `FieldElement51` whose limbs may
+have grown beyond `2 ^ 51`. It propagates carries through the limbs and finally folds the
+top-limb overflow back into the bottom limb using the prime relation `2^255 ≡ 19 (mod p)`,
+returning a representation with limbs `< 2 ^ 52` and value `< 2 * p`.
+
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek
 
 attribute [-simp] Int.reducePow Nat.reducePow
-
-/-! ## Spec for `reduce` -/
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce
 
@@ -29,10 +35,12 @@ end curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 set_option maxHeartbeats 500000 in -- heavy step, scalar_tac and simp_all's
-/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:
-- All the limbs of the result are small, ≤ 2^(51 + ε)
-- The result is equal to the input mod p.
-- The result value is < 2p. -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::reduce`**
+• The function always succeeds (no panic) on any 5-limb input
+• Every output limb is `< 2 ^ 52`
+• `Field51_as_Nat limbs ≡ Field51_as_Nat result (mod p)`, i.e. value is preserved modulo `p`
+• `Field51_as_Nat result < 2 * p`, i.e. weakly reduced
+-/
 @[step]
 theorem reduce_spec (limbs : Array U64 5#usize) :
     reduce limbs ⦃ (result : FieldElement51) =>
