@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
@@ -336,7 +336,7 @@ private lemma canonical_reduction_mod_p
 
 /-! ## Spec for `to_bytes` -/
 
-set_option maxHeartbeats 1550000 in -- heavy step*
+set_option maxHeartbeats 1600000 in -- heavy step* over 32 byte assignments
 /-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:
 
 This function converts a field element to its canonical 32-byte little-endian representation.

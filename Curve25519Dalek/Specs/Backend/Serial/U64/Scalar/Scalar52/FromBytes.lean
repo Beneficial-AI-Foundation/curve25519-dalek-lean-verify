@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -32,8 +32,6 @@ This function constructs an unpacked scalar from a byte array by:
    `slice_state4_value`.
 -/
 
-set_option linter.style.whitespace false
-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -43,7 +41,7 @@ abbrev word_of_bytes (bytes : Array U8 32#usize) (j : Nat) : Nat :=
 
 /-! ## Part 1: Loop spec — byte packing -/
 
-set_option maxHeartbeats 300000 in -- heavy step
+set_option maxHeartbeats 400000 in -- heavy step
 /-- **Loop spec**: Each iteration packs 8 bytes into one U64 word (little-endian).
 After the loop completes, `words[j] = word_of_bytes bytes j` for all `j < 4`. -/
 theorem from_bytes_loop_helper (bytes : Array U8 32#usize)
@@ -254,6 +252,7 @@ private theorem slice_state4_value (words1 : Array U64 4#usize) (s : Scalar52)
 
 /-! ## Part 2: Main spec -/
 
+set_option linter.hashCommand false in
 /- Decompose `from_bytes` into 5 per-limb helpers + a setup prefix. Each helper
    is small (~7 bindings) so its spec can be proved quickly without burning
    heartbeats, and `from_bytes_spec` composes them via `from_bytes_eq`. -/
