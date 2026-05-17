@@ -7,11 +7,11 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.BitList
 
 
-/-! # Spec Theorem for `Scalar52::to_bytes`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::to_bytes`
 
 This function converts a `Scalar52` to its byte representation.
 
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 
 ## Rust Source
 
@@ -419,9 +419,9 @@ attribute [step] U64.ShiftRight_IScalar_bitList_spec
 attribute [step] U64.ShiftLeft_IScalar_bitList_spec
 
 set_option maxHeartbeats 1600000 in -- heavy step and simps
-/-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:
-- The result byte array represents the same number as the input unpacked scalar modulo L
-- The result is in canonical form (less than L) -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::to_bytes`**
+• The result byte array represents the same number as the input unpacked scalar modulo L
+• The result is in canonical form (less than L) -/
 @[step]
 theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     (h' : Scalar52_as_Nat self < L) :

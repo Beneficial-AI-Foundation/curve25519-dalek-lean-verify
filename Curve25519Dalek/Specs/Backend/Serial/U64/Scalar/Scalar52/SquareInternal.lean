@@ -9,19 +9,17 @@ import Curve25519Dalek.Aux
 import Curve25519Dalek.Tactics
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 
-
-set_option exponentiation.threshold 416
-
-
-/-! # SquareInternal
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal`
 
 The main statement concerning `square_internal` is `square_internal_spec` (below).
+
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
+set_option exponentiation.threshold 416
 attribute [-simp] Int.reducePow Nat.reducePow
 
 /-- Helper: x * y < 2^124 -/
@@ -52,10 +50,10 @@ Corresponds to the Rust function `Scalar52::square_internal` defined
 in `curve25519-dalek/src/backend/serial/u64/scalar.rs`.
 -/
 
-/-- **Spec for `square_internal`**:
-- Does not error and hence returns a result
-- The result represents the square of the input field element
-- Requires each limb to be less than 62 bits to prevent overflow
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal`**
+• Does not error and hence returns a result
+• The result represents the square of the input field element
+• Requires each limb to be less than 62 bits to prevent overflow
 (The optimal bound on the limbs is 2^64 / √5  ≈ 2^62.839) -/
 @[step]
 theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62) :

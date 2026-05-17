@@ -10,17 +10,13 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ConditionalAddL
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 
-set_option exponentiation.threshold 260
-
-/-! # Sub
-
-Specification and proof for `Scalar52::sub`.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub`
 
 This function computes the difference of two Scalar52 values modulo L (the group order).
 The function performs subtraction with borrow handling and conditional addition of L
 to ensure the result is non-negative.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs:L175-L198
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 
 ## Algorithm Summary
 
@@ -46,11 +42,10 @@ When `A < B`, the difference array stores `2^260 + (A - B)` (the representation 
 Adding L causes wrap-around: `(2^260 + (A - B) + L) mod 2^260 = A - B + L ∈ (0, L)`.
 -/
 
-open Aeneas Aeneas.Std Result
-open Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
-
+set_option exponentiation.threshold 260
 attribute [-simp] Int.reducePow Nat.reducePow
 
 /-! ## Spec for `sub` -/
@@ -60,7 +55,7 @@ def Scalar52_partial_as_Nat (limbs : Array U64 5#usize) (n : Nat) : Nat :=
   ∑ j ∈ Finset.range n, 2 ^ (52 * j) * (limbs[j]!).val
 
 set_option maxHeartbeats 300000 in -- proof could be better
-/-- **Spec for `backend.serial.u64.scalar.Scalar52.sub_loop`**:
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub_loop`**
 
 The loop computes the subtraction a - b with borrow propagation.
 After processing indices 0..i, the loop invariant holds:
@@ -249,11 +244,11 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
-/-- **Spec for `backend.serial.u64.scalar.Scalar52.sub`**:
-- Requires bounded limbs for both inputs
-- Requires both inputs to be bounded from above
-- The result represents (a - b) mod L
-- The result has bounded limbs and is canonical -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub`**
+• Requires bounded limbs for both inputs
+• Requires both inputs to be bounded from above
+• The result represents (a - b) mod L
+• The result has bounded limbs and is canonical -/
 @[step]
 theorem sub_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)

@@ -15,62 +15,17 @@ import Mathlib.Data.Nat.ModEq
 import Mathlib.Data.Int.ModEq
 import Mathlib.Data.ZMod.Basic
 
-/-! # Spec Theorem for `Scalar52::montgomery_reduce`
-
-Specification and proof for `Scalar52::montgomery_reduce`.
+/-! Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_reduce`
 
 This function performs Montgomery reduction.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
-
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 set_option exponentiation.threshold 416
-
-/-
-natural language description:
-
-    • **Motivation**: The Montgomery form `M(x) := x * R`, where `R = 2^{260} = 2^{5*52}`,
-      is used to optimize chains of modular arithmetic operations (like elliptic curve scalar
-      multiplication). The isomorphism induced by `* R` changes the multiplication to:
-      `MontMul(x,y) := M(x) * M(y) * R⁻¹`. Therefore, instead of computing standard reduction
-      (`x % L`) which requires complex division logic, one needs to compute `x * R⁻¹ (mod L)`.
-      Montgomery reduction refers to the algorithm that computes this `x * R⁻¹` using efficient
-      bitwise shifts.
-
-    • **Mechanism**: The algorithm avoids division by adding multiples of `L` to the input `x`
-      until the result is exactly divisible by `R = 2^{260}` (i.e., the lower 260 bits are all zero).
-      Since `R = 2^{260}` and limbs are 52 bits, we perform 5 "zeroing" steps (`part1`)
-      followed by 4 "result assembly" steps (`part2`).
-
-    • **Part 1: The Zeroing Strategy**
-      We iteratively ensure the lowest remaining limb is 0 by adding a carefully chosen multiple of `L`.
-      The helper `part1` calculates a "zeroing factor" `p` using the precomputed `LFACTOR`
-      (where `LFACTOR * L ≡ -1 (mod 2⁵²)`).
-
-      - **Limb 0 (First part1)**:
-        * **Problem**: `limbs[0]` is non-zero. We cannot shift yet.
-        * **Action**: Calculate `p` such that `limbs[0] + p * L ≡ 0 (mod 2⁵²)`.
-        * **Result**: The sum's lowest 52 bits become 0.
-        * **Shift**: We discard these zero bits (effectively dividing by 2⁵²). The carry flows to the next limb.
-
-      *This repeats 5 times (using updated carries) until the entire lower 260 bits are zero.*
-
-    • **Part 2: Result Reconstruction**
-      After 5 reductions, the number is divisible by `R`. The helper `part2` extracts the quotient.
-      It takes the high-order accumulated bits, slices off the lower 52 bits as a result limb (`w`),
-      and passes the remaining upper bits (`carry`) to the next position. This reassembles
-      the final 256-bit result (`r0` through `r4`).
-
-natural language specs:
-
-    • For any 9-limb array `a` of u128 values (representing a 512-bit integer):
-      - The function returns a `Scalar52` `m` such that:
-        `Scalar52_as_Nat(m) * R ≡ U128x9_as_Nat(a) (mod L)`
--/
 
 -- Bridge lemma: converts the existing LFACTOR_spec (on Nat) to the form needed for Int arithmetic
 private lemma LFACTOR_prop :
@@ -329,9 +284,9 @@ private theorem mont_reduce_consts :
       _ < 2 ^ 104 := by omega
 
 set_option maxHeartbeats 2600000 in -- New Aeneas version needs more
-/-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
-- No panic (always returns successfully)
-- The result m satisfies the Montgomery reduction property:
+/-- Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_reduce`
+• No panic (always returns successfully)
+• The result m satisfies the Montgomery reduction property:
   m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant
 
 **Why `h_canonical` (`Scalar52_wide_as_Nat a < R * L`)**:
