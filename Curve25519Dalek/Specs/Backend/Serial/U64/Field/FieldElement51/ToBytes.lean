@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
@@ -10,20 +10,16 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
 import Curve25519Dalek.Tactics
 import Curve25519Dalek.ExternallyVerified
 
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes`
 
-/-! # to_bytes
-
-Specification and proof for `FieldElement51::to_bytes`.
-
-This function converts a field element to its canonical 32-byte little-endian representation.
+This function converts a `FieldElement51` to its canonical 32-byte little-endian
+representation.
 It performs reduction modulo 2^255-19 and encodes the result as bytes.
 
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
-
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-
@@ -312,7 +308,8 @@ private lemma canonical_reduction_mod_p
     rw [hl4, Nat.mul_comm c4]; exact Nat.mod_add_div _ _
   -- Main telescoping: L + c4 * 2^255 = F + 19*q
   have htel : l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 +
-      c4 * 2 ^ 255 = F + 19 * q := by linear_combination ht0 + 2^51 * ht1 + 2^102 * ht2 + 2^153 * ht3 + 2^204 * ht4
+      c4 * 2 ^ 255 = F + 19 * q := by
+    linear_combination ht0 + 2^51 * ht1 + 2^102 * ht2 + 2^153 * ht3 + 2^204 * ht4
   -- L < 2^255 (each limb < 2^51 from masking)
   have hl0b : l0 < 2 ^ 51 := by rw [hl0]; exact Nat.mod_lt _ (by norm_num)
   have hl1b : l1 < 2 ^ 51 := by rw [hl1]; exact Nat.mod_lt _ (by norm_num)
@@ -335,21 +332,12 @@ private lemma canonical_reduction_mod_p
 /-! ## Spec for `to_bytes` -/
 
 set_option maxHeartbeats 1550000 in -- heavy step*
-/-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:
-
-This function converts a field element to its canonical 32-byte little-endian representation.
-The implementation performs reduction modulo p = 2^255-19 to ensure the result is in
-canonical form.
-
-The algorithm:
-1. Reduces the field element using `reduce` to ensure all limbs are within bounds
-2. Performs a final conditional reduction to ensure the result is < p
-3. Packs the 5 limbs (each 51 bits) into 32 bytes in little-endian format
-
-Specification:
-- The function succeeds (no panic)
-- The natural number interpretation of the byte array is congruent to the field element value modulo p
-- The byte array represents the unique canonical form (0 ≤ value < p)
+/-- Spec theorem for
+`curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes`
+• The function always succeeds (no panic)
+• `U8x32_as_Nat result ≡ Field51_as_Nat self (mod p)`, i.e. the byte encoding represents the
+  same residue as the input limb encoding
+• `U8x32_as_Nat result < p`, i.e. the byte array is in canonical form `0 ≤ value < p`
 -/
 @[step]
 theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :

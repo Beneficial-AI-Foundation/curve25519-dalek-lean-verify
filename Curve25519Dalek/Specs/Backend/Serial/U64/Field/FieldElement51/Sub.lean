@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
@@ -8,57 +8,32 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
 import Mathlib.Data.Nat.ModEq
 
-/-! # Spec Theorem for `FieldElement51::sub`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::sub`
 
-Specification and proof for `FieldElement51::sub`.
+This function computes the difference `a - b` of two `FieldElement51` values modulo
+`p = 2^255 - 19`. To avoid underflow, a multiple of p is added.
 
-This function performs field element subtraction. To avoid underflow, a multiple
-of p is added.
-
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
-
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-namespace curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
+namespace curve25519_dalek.Shared0FieldElement51.Insts
+namespace CoreOpsArithSubSharedAFieldElement51FieldElement51
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
 open backend.serial.u64.field
 
-/-
-natural language description:
-
-    • Takes two input FieldElement51s a and b and returns another FieldElement51 d
-      that is a representant of the difference a - b in the field (modulo p = 2^255 - 19).
-
-    • The implementation adds a multiple of p (namely 16p) as a bias value to a before
-      subtraction is performed to avoid underflow: computes (a + 16*p) - b, then reduces
-
-natural language specs:
-
-    • For appropriately bounded FieldElement51s a and b:
-      Field51_as_Nat(sub(a, b)) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p), or equivalently
-      Field51_as_Nat(sub(a, b)) + Field51_as_Nat(b) ≡ Field51_as_Nat(a) (mod p)
--/
-
 set_option maxRecDepth 4096 in
-/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.sub`**:
-- No panic (always returns successfully when bounds are satisfied)
-- The result d satisfies the field subtraction property:
-
-  Field51_as_Nat(d) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p), or equivalently
-  Field51_as_Nat(d) + Field51_as_Nat(b) ≡ Field51_as_Nat(a) (mod p)
-
-- Requires that input limbs are bounded:
-  - For a: limbs must allow addition with 16*p without U64 overflow
-    - a[0] must be ≤ 18410715276690587951 (= 2^64 - 1 - 36028797018963664)
-    - a[1..4] must be ≤ 18410715276690587663 (= 2^64 - 1 - 36028797018963952)
-  - For b: limbs must be ≤ the constants (representing 16*p) to avoid underflow
-    - b[0] must be ≤ 36028797018963664
-    - b[1..4] must be ≤ 36028797018963952
-  To make the theorem more easily readable and provable, we
-  replace these precise bounds with the slightly looser bounds
-  a[i] < 2^63  and b[i] < 2^54
+/-- Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::sub`
+• The function always succeeds (no panic) provided `a[i].val < 2^63` and `b[i].val < 2^54`
+• Every output limb is `< 2 ^ 52`
+• `Field51_as_Nat result + Field51_as_Nat b ≡ Field51_as_Nat a (mod p)`,
+  the field subtraction property — equivalently `result ≡ a - b (mod p)`
+• To make the theorem more easily readable and provable, we make the bounds `a[i] < 2^63`
+  and `b[i] < 2^54` are slightly looser than what is strictly
+  required:
+  - `a[0] ≤ 2^64 - 1 - 36028797018963664`, `a[i] ≤ 2^64 - 1 - 36028797018963952` for `i ≥ 1`
+  - `b[0] ≤ 36028797018963664`, `b[i] ≤ 36028797018963952` for `i ≥ 1`
 -/
 @[step]
 theorem sub_spec (a b : Array U64 5#usize)
@@ -137,4 +112,5 @@ theorem sub_spec (a b : Array U64 5#usize)
   simp only [add_zero] at h
   exact h
 
-end curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
+end CoreOpsArithSubSharedAFieldElement51FieldElement51
+end curve25519_dalek.Shared0FieldElement51.Insts

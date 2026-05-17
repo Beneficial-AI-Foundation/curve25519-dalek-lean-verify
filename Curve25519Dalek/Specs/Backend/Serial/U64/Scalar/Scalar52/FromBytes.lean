@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -7,15 +7,11 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
-/-! # Spec Theorem for `Scalar52::from_bytes`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes`
 
-Specification and proof for `Scalar52::from_bytes`.
-
-This function constructs an unpacked scalar from a byte array by:
-1. Packing 32 bytes into 4 little-endian U64 words (loop)
-2. Extracting 5 limbs via shift/OR/mask (bit-slicing)
-
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs (lines 66-93)
+This function constructs an unpacked `Scalar52` from a 32-byte little-endian array by:
+1. Packing 32 bytes into 4 little-endian `U64` words (loop)
+2. Extracting 5 limbs via shift / OR / mask (bit-slicing)
 
 ## Proof structure
 
@@ -30,6 +26,8 @@ This function constructs an unpacked scalar from a byte array by:
    via `simp` to avoid CPU explosion from function-typed
    callbacks, then steps through arithmetic and closes via
    `slice_state4_value`.
+
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs#L66-L93"
 -/
 
 set_option linter.style.whitespace false
@@ -250,10 +248,11 @@ private theorem slice_state4_value (words1 : Array U64 4#usize) (s : Scalar52)
 /-! ## Part 2: Main spec -/
 
 set_option maxHeartbeats 400000 in -- heavy step
-/-- **Spec and proof concerning `scalar.Scalar52.from_bytes`**:
-- No panic (always returns successfully)
-- The result represents the same number as the input byte array
-- All limbs are < 2^52 (from masking with `(1 << 52) - 1` and `(1 << 48) - 1`)
+/-- Spec theorem for
+`curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes`
+• The function always succeeds (no panic) on any 32-byte input
+• `Scalar52_as_Nat result = U8x32_as_Nat b`, i.e. the limb and byte encodings agree
+• Every output limb is `< 2 ^ 52`, ensured by masking with `(1 << 52) - 1` / `(1 << 48) - 1`
 -/
 @[step]
 theorem from_bytes_spec (b : Array U8 32#usize) :

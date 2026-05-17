@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -9,15 +9,12 @@ import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Rr
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
-/-! # Spec Theorem for `Scalar52::from_bytes_wide`
+/-! Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes_wide`
 
-Converts a 64-byte (512-bit) little-endian integer to a
-canonical `Scalar52` reduced modulo L.
-
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
-(lines 97-132)
+This function converts a 64-byte (512-bit) little-endian integer into a canonical `Scalar52`
+reduced modulo the group order `L` of Curve25519.
 
 ## Proof structure
 
@@ -28,6 +25,8 @@ canonical `Scalar52` reduced modulo L.
 3. Montgomery algebra: `montgomery_mul(lo, R) + montgomery_mul(hi, RR)`
    = N mod L via the identity R = 2^260 mod L.
 4. `from_bytes_wide_spec` (`@[step]`): Combines all pieces.
+
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs#L97-L132"
 -/
 
 set_option exponentiation.threshold 260
@@ -394,10 +393,12 @@ theorem bit_slicing_wide (w0 w1 w2 w3 w4 w5 w6 w7 : U64) :
 /-! ## Part 3: Main spec -/
 
 set_option maxHeartbeats 800000 in -- heavy steps
-/-- **Spec for `Scalar52::from_bytes_wide`**:
-- No panic
-- Result = input mod L (canonical form)
-- All limbs < 2^52 -/
+/-- Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes_wide`
+• The function always succeeds (no panic) on any 64-byte input `b`
+• `Scalar52_as_Nat result = U8x64_as_Nat b % L`, the canonical residue modulo `L`
+• `Scalar52_as_Nat result < L`, the canonical reduced representative
+• Every output limb is `< 2 ^ 52`
+-/
 @[step]
 theorem from_bytes_wide_spec
     (b : Array U8 64#usize) :

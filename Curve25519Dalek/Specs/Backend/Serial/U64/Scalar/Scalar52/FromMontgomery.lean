@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Oliver Butterley
 -/
@@ -8,29 +8,17 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 
-/-! # Spec Theorem for `Scalar52::from_montgomery`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_montgomery`
 
-This function converts from Montgomery form.
+This function converts a `Scalar52` `m` out of Montgomery form, computing `(m * R⁻¹) mod L`,
+where `R = 2^260` is the Montgomery constant for Scalar52 and `L` is the group order of
+Curve25519. It is the inverse operation of `as_montgomery`.
 
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
-open Aeneas Aeneas.Std Aeneas.Std.WP Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
-
-/-
-natural language description:
-
-    • Takes an input unpacked scalar m in Montgomery form and returns an unpacked scalar u
-      representing the value (m * R⁻¹) mod L, where R = 2^260 is the Montgomery constant and L is
-      the group order.
-    • This is the inverse operation of as_montgomery.
-
-natural language specs:
-
-    • The function always succeeds (no panic)
-    • scalar_to_nat(u) * R = scalar_to_nat(m) mod L
--/
 
 /-- TODO: can the argument be made smoother where this is used and remove this? -/
 theorem set_getElem!_eq (l : List U128) (a : U128) (i : ℕ) (h : i < l.length) :
@@ -42,12 +30,12 @@ theorem zero_array (i : ℕ) (hi : i < 9) :
     ((Array.repeat 9#usize 0#u128) : List U128)[i]!.val = 0 := by
   interval_cases i <;> exact rfl
 
-/-- **Spec theorem for `from_montgomery_loop`**:
-- Specification for the loop that copies limbs from a Scalar52 (5 × U64) into a 9-element U128 array
-- Ensures that:
-  - Limbs at indices [i, 5) are copied from the input Scalar52 to the result array
-  - Limbs at indices [5, 9) remain unchanged from the input limbs array
-  - Limbs at indices [0, i) remain unchanged from the input limbs array -/
+/-- **Spec theorem for the inner loop `from_montgomery_loop` of `from_montgomery`**
+• Copies limbs from a `Scalar52` (5 × U64) into a 9-element `U128` array
+• Limbs at indices `[i, 5)` are cast and copied from the input scalar to the result array
+• Limbs at indices `[5, 9)` remain unchanged from the input limbs array
+• Limbs at indices `[0, i)` remain unchanged from the input limbs array
+-/
 @[step]
 theorem from_montgomery_loop_spec (self : Scalar52) (limbs : Array U128 9#usize) (i : Usize)
     (hi : i.val ≤ 5) :
@@ -76,8 +64,12 @@ theorem from_montgomery_loop_spec (self : Scalar52) (limbs : Array U128 9#usize)
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
-/-- **Spec theroem for `scalar.Scalar52.from_montgomery`**:
-- The result represents the input scalar divided by the Montgomery constant R = 2^260, modulo L -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_montgomery`**
+• The function always succeeds (no panic) when every input limb is `< 2 ^ 62`
+• `(Scalar52_as_Nat result) * R ≡ Scalar52_as_Nat self (mod L)`, i.e. division by `R`
+• `Scalar52_as_Nat result < L`, the canonical reduced representative
+• Every output limb is `< 2 ^ 52`
+-/
 @[step]
 theorem from_montgomery_spec (self : Scalar52) (h_bounds : ∀ i < 5, self[i]!.val < 2 ^ 62) :
     from_montgomery self ⦃ (result : Scalar52) =>
@@ -87,9 +79,10 @@ theorem from_montgomery_spec (self : Scalar52) (h_bounds : ∀ i < 5, self[i]!.v
   step*
   · intro i hi
     by_cases h_lt : i < 5
-    · rw [limbs1_post1 i h_lt (Nat.zero_le i)]; specialize h_bounds i h_lt; simp only [Array.getElem!_Nat_eq,
-      UScalarTy.U64_numBits_eq, UScalarTy.U128_numBits_eq, Nat.reduceLeDiff,
-      UScalar.cast_val_mod_pow_greater_numBits_eq, Nat.reducePow];
+    · rw [limbs1_post1 i h_lt (Nat.zero_le i)]
+      specialize h_bounds i h_lt
+      simp only [Array.getElem!_Nat_eq, UScalarTy.U64_numBits_eq, UScalarTy.U128_numBits_eq,
+        Nat.reduceLeDiff, UScalar.cast_val_mod_pow_greater_numBits_eq, Nat.reducePow]
       agrind
     · rw [limbs1_post2 i hi (by omega)]
       simp only [Array.repeat, getElem!, List.getElem?_replicate, *,

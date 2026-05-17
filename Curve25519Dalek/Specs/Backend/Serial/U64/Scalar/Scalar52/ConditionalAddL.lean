@@ -1,5 +1,5 @@
 /-
-Copyright 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Oliver Butterley
 -/
@@ -8,22 +8,13 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 
-/-! # Spec Theorem for `Scalar52::conditional_add_l`
-
-Specification and proof for `Scalar52::conditional_add_l`.
-
-This function conditionally adds the group order L to a scalar based on a choice parameter.
-
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs -/
-
 attribute [-simp] Int.reducePow Nat.reducePow
 set_option exponentiation.threshold 260
 
-/-! # Spec Theorem for `Scalar52::conditional_add_l`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l`
 
-This function conditionally adds the group order `L` to a scalar based on a `choice` parameter.
-
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
+This function conditionally adds the group order `L` to a `Scalar52` based on a `Choice`
+parameter, returning the carry-out and the updated scalar.
 
 ## Rust source
 
@@ -81,20 +72,21 @@ After all 5 limbs, the full sum telescopes to:
 
 **Natural language spec**:
 
-    • Input: limbs bounded by 2^52
-    • If condition is 1 and input ∈ [2^260 - L, 2^260):
-        - Output value: u' + 2^260 = u + L
-        - Output canonical: u' < L
-        - Output limbs: < 2^52
-    • If condition is 0:
-        - Output value: u' = u
-        - Output limbs: < 2^52
-    • Carry value: not used by caller
+  • Input: limbs bounded by `2^52`
+  • If `condition = 1` and the input lies in `[2^260 - L, 2^260)`:
+    - Output value: `u' + 2^260 = u + L`
+    - Output canonical: `u' < L`
+    - Output limbs: `< 2^52`
+  • If `condition = 0`:
+    - Output value: `u' = u`
+    - Output limbs: `< 2^52`
+  • Carry value: not used by caller
 
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 namespace curve25519_dalek
-open Aeneas Aeneas.Std Aeneas.Std.WP Result 
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 /- Replace the spec currently in FunsExternal.lean with an alternative phrased in terms of
 `Choice.one`/`Choice.zero`.
@@ -245,12 +237,14 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
 termination_by 5 - i.val
 decreasing_by agrind
 
-/-- **Spec for `scalar.Scalar52.conditional_add_l`** (tailored for use in `sub`):
-- Requires input limbs bounded by 2^52
-- When condition is 1, requires input value in [2^260 - L, 2^260)
-- When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52
-- When condition is 0: result unchanged with limbs < 2^52
--/
+/-- Spec theorem for
+`curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l`
+• The function always succeeds (no panic) when input limbs are `< 2 ^ 52` and the value
+  precondition matches `condition` (see hypotheses)
+• Every output limb is `< 2 ^ 52`
+• When condition is 1, requires input value in [2^260 - L, 2^260)
+• When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52
+• When condition is 0: result unchanged with limbs < 2^52 -/
 @[step]
 theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
     (hself : ∀ i < 5, self[i]!.val < 2 ^ 52)
