@@ -14,7 +14,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
 set_option exponentiation.threshold 260
 
-/-! # Spec theorem for `curve25519_dalek::backend::scalar::u64::Scalar52::invert`
+/-! # Spec theorem for `curve25519_dalek::scalar::Scalar52::invert`
 
 This function computes the multiplicative inverse of a `Scalar52` `self` in the finite field
 `ℤ / L ℤ`, where `L` is the group order of Curve25519. The computation proceeds by converting
@@ -30,7 +30,7 @@ open curve25519_dalek.backend.serial.u64.scalar
 
 namespace curve25519_dalek.scalar.Scalar52
 
-/-- Spec theorem for curve25519_dalek::backend::scalar::u64::Scalar52::invert
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar52::invert`**
 • The function always succeeds (no panic) when `self` is non-zero modulo `L` and every input
   limb is `< 2 ^ 52`
 • The result satisfies the multiplicative inverse property:

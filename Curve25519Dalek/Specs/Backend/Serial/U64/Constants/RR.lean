@@ -20,7 +20,7 @@ namespace curve25519_dalek.backend.serial.u64.constants
 set_option exponentiation.threshold 260
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::RR`**
-`Scalar52_as_Nat RR ≡ R² (mod L)` where `R = 2^260`. -/
+• `Scalar52_as_Nat RR ≡ R² (mod L)` where `R = 2^260` is the Montgomery constant -/
 @[simp]
 theorem RR_spec : Scalar52_as_Nat RR % _root_.L = _root_.R ^ 2 % _root_.L := by
   unfold RR

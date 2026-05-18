@@ -333,8 +333,7 @@ private lemma canonical_reduction_mod_p
 /-! ## Spec for `to_bytes` -/
 
 set_option maxHeartbeats 1550000 in -- heavy step*
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes`
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes`**
 • The function always succeeds (no panic)
 • `U8x32_as_Nat result ≡ Field51_as_Nat self (mod p)`, i.e. the byte encoding represents the
   same residue as the input limb encoding

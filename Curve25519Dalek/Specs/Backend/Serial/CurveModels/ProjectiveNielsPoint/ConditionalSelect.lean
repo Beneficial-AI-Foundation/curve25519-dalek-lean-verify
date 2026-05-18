@@ -32,9 +32,9 @@ namespace SubtleConditionallySelectable
   • ProjectiveNielsPoint `b` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),
   • a Choice `choice`,
   the output ProjectiveNielsPoint has coordinates selected component-wise:
-  - If choice = 1, each coordinate equals the corresponding one of `b`
-  - If choice = 0, each coordinate equals the corresponding one of `a`
-  - The operation is constant-time (does not branch on choice) -/
+  • If choice = 1, each coordinate equals the corresponding one of `b`
+  • If choice = 0, each coordinate equals the corresponding one of `a`
+  • The operation is constant-time (does not branch on choice) -/
 @[step]
 theorem conditional_select_spec
     (a b : backend.serial.curve_models.ProjectiveNielsPoint)

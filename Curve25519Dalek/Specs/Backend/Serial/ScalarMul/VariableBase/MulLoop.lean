@@ -70,9 +70,9 @@ lemma I8x64_partial_radix16_recurrence
   ring
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::scalar_mul::variable_base::mul_loop`**
-- No panic (always returns successfully).
-- The result is a valid `CompletedPoint`.
-- The result's Edwards point equals the full radix-16 reconstruction of `scalar_digits`,
+• No panic (always returns successfully).
+• The result is a valid `CompletedPoint`.
+• The result's Edwards point equals the full radix-16 reconstruction of `scalar_digits`,
   scaled by `P.toPoint`.
 -/
 @[step]

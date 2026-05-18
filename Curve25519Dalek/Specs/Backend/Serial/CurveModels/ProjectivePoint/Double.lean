@@ -324,9 +324,9 @@ theorem double_spec_core
             (q.toPoint' hq_on).y) := by
             rw [h_qx, h_qy]; simp only [Ed25519]; ring
 
-/-- Spec theorem for `curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double`
-Thin wrapper over `double_spec_core`: widens bounds from `< 2^52`
-to `< 2^53` and bridges `toPoint' → toPoint`. -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double`**
+• The function always succeeds (no panic) on any valid input ProjectivePoint
+• The resulting CompletedPoint is valid and represents `2 · q.toPoint` on the Edwards curve -/
 @[step]
 theorem double_spec
     (q : ProjectivePoint) (hq_valid : q.IsValid) :

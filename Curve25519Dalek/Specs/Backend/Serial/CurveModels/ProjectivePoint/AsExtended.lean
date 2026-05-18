@@ -26,7 +26,8 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
-/-- **Spec theorem for `backend::serial::curve_models::ProjectivePoint::as_extended`**
+/-- **Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended`**
 • The function always succeeds (no panic)
 • Given input ProjectivePoint with coordinates (X, Y, Z), the output EdwardsPoint
   (X', Y', Z', T') satisfies the conversion formulas modulo p = 2^255 - 19:

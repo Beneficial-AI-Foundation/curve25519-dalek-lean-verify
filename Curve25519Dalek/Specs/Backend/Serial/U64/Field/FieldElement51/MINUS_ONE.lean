@@ -17,14 +17,14 @@ Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
-/-- Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::MINUS_ONE`
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::MINUS_ONE`**
 • The function always succeeds (no panic)
 • `Field51_as_Nat MINUS_ONE = 2^255 - 20 = p - 1`, the canonical representative of `-1 (mod p)`
 -/
 @[step]
 theorem MINUS_ONE_spec : MINUS_ONE ⦃ result => Field51_as_Nat result = p - 1 ⦄ := by
-    unfold MINUS_ONE from_limbs
-    simp only [spec_ok];
-    decide
+  unfold MINUS_ONE from_limbs
+  simp only [spec_ok];
+  decide
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

@@ -24,7 +24,7 @@ open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldEle
 open backend.serial.u64.field
 
 set_option maxRecDepth 4096 in
-/-- Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::sub`
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::sub`**
 • The function always succeeds (no panic) provided `a[i].val < 2^63` and `b[i].val < 2^54`
 • Every output limb is `< 2 ^ 52`
 • `Field51_as_Nat result + Field51_as_Nat b ≡ Field51_as_Nat a (mod p)`,

@@ -20,7 +20,8 @@ namespace curve25519_dalek.backend.serial.u64.constants
 set_option exponentiation.threshold 260
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::R`**
-The value of constants.R when converted to a natural number is congruent to R modulo L -/
+• `Scalar52_as_Nat R ≡ R (mod L)`, i.e. the 5-limb encoding represents the Montgomery
+  constant `R = 2^260` modulo the group order `L` -/
 @[simp]
 theorem R_spec : Scalar52_as_Nat R % _root_.L = _root_.R % _root_.L := by
   unfold R

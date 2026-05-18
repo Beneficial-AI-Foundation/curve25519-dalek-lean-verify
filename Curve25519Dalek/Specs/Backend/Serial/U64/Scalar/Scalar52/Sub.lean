@@ -55,8 +55,7 @@ def Scalar52_partial_as_Nat (limbs : Array U64 5#usize) (n : Nat) : Nat :=
   ∑ j ∈ Finset.range n, 2 ^ (52 * j) * (limbs[j]!).val
 
 set_option maxHeartbeats 300000 in -- proof could be better
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub_loop`
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub_loop`**
 • No panic (always returns successfully) under the stated preconditions
 • Every output difference limb is `< 2 ^ 52`
 • Loop invariant on completion: `A + (borrow / 2^63) * 2^260 = B + D`, where (borrow / 2^63) = 1

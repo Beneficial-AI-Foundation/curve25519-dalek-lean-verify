@@ -19,10 +19,9 @@ Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce
 
 attribute [-simp] Int.reducePow Nat.reducePow
-
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce
 
 @[step]
 theorem LOW_51_BIT_MASK_spec :

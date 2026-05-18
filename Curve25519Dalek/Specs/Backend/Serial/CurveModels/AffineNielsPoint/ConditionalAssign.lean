@@ -30,8 +30,8 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
 namespace SubtleConditionallySelectable
 
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_assign`
+/-- **Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_assign`**
 • No panic (always returns successfully)
 • Given inputs:
   • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),

@@ -11,7 +11,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
-/-! Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes_wide`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes_wide`
 
 This function converts a 64-byte (512-bit) little-endian integer into a canonical `Scalar52`
 reduced modulo the group order `L` of Curve25519.
