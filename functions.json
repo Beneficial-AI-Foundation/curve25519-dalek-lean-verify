@@ -26,7 +26,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Identity.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`curve25519_dalek.IdentityCurveModelsProjectivePoint.identity`**\n\nReturns the identity element of the Edwards curve in projective coordinates:\n- No panic (always returns successfully)\n- The resulting ProjectivePoint is the identity element with coordinates (X=0, Y=1, Z=1) -/",
+   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity`**\n• No panic (always returns successfully)\n• The resulting ProjectivePoint is the identity element with coordinates (X=0, Y=1, Z=1) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::identity",
@@ -111,7 +111,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Neg.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::neg`**\n- No panic (always returns successfully)\n- Given input:\n  • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),\nthe output AffineNielsPoint computed by `neg self` has coordinates\n(y_plus_x', y_minus_x', xy2d') where:\n    - y_plus_x' = y_minus_x (the coordinates are swapped)\n    - y_minus_x' = y_plus_x (the coordinates are swapped)\n    - xy2d' ≡ -xy2d (mod p) (the xy2d coordinate is negated modulo p)\n\nwhere p = 2^255 - 19.\n\nThis implements the negation of a point in affine Niels coordinates. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::neg`**\n• The function always succeeds (no panic) for an AffineNielsPoint `self` with coordinates\n(y_plus_x, y_minus_x, xy2d)\n• The output AffineNielsPoint computed by `neg self` has coordinates (y_plus_x', y_minus_x', xy2d')\n  • y_plus_x' = y_minus_x (the coordinates are swapped)\n  • y_minus_x' = y_plus_x (the coordinates are swapped)\n  • `xy2d' ≡ -xy2d (mod p)` (the xy2d coordinate is negated modulo p = 2^255 - 19) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint)}::neg",
@@ -154,7 +154,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Add.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `CompletedPoint::add`**:\n• The function always succeeds (no panic)\n• Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')\n  satisfies modulo p:\n  - X' ≡ ( (Y+X)·N.y_plus_x − (Y−X)·N.y_minus_x ) (mod p)\n  - Y' ≡ ( (Y+X)·N.y_plus_x + (Y−X)·N.y_minus_x ) (mod p)\n  - Z' ≡ ( 2·Z + T·N.xy2d ) (mod p)\n  - T' ≡ ( 2·Z − T·N.xy2d ) (mod p) -/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::add`\n• The function always succeeds (no panic)\n• Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')\n  satisfies modulo p:\n  - X' ≡ ( (Y+X)·N.y_plus_x − (Y−X)·N.y_minus_x ) (mod p)\n  - Y' ≡ ( (Y+X)·N.y_plus_x + (Y−X)·N.y_minus_x ) (mod p)\n  - Z' ≡ ( 2·Z + T·N.xy2d ) (mod p)\n  - T' ≡ ( 2·Z − T·N.xy2d ) (mod p) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -243,7 +243,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/Add.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek.backend.serial.curve_models.CompletedPoint.add`**\nThe theorem states that adding a valid EdwardsPoint with a valid ProjectiveNielsPoint:\n1. Always succeeds\n2. The output CompletedPoint is valid (bounds and algebraic properties)\n3. The output represents the sum of the input points\nThe mixed addition formulas implement elliptic curve point addition on twisted Edwards curves. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::add`**\n• Always succeeds (no panic) when both inputs are valid\n• The output CompletedPoint is valid (bounds and algebraic properties)\n• The output represents the sum of the input points: `c.toPoint = self.toPoint + other.toPoint`\n\nThe mixed addition formulas implement elliptic curve point addition on twisted Edwards curves. -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -371,7 +371,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Sub.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `CompletedPoint::sub`**:\n• The function always succeeds (no panic)\n• Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')\n  satisfies modulo p:\n  - X' ≡ ( (Y+X)·N.y_minus_x − (Y−X)·N.y_plus_x ) (mod p)\n  - Y' ≡ ( (Y+X)·N.y_minus_x + (Y−X)·N.y_plus_x ) (mod p)\n  - Z' ≡ ( 2·Z − T·N.xy2d ) (mod p)\n  - T' ≡ ( 2·Z + T·N.xy2d ) (mod p) -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::sub`**\n• The function always succeeds (no panic)\n• Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')\n  satisfies modulo p:\n  - X' ≡ ( (Y+X)·N.y_minus_x − (Y−X)·N.y_plus_x ) (mod p)\n  - Y' ≡ ( (Y+X)·N.y_minus_x + (Y−X)·N.y_plus_x ) (mod p)\n  - Z' ≡ ( 2·Z − T·N.xy2d ) (mod p)\n  - T' ≡ ( 2·Z + T·N.xy2d ) (mod p) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
@@ -460,7 +460,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Sub.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `sub`**\n(`CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint`)\n\nComputes `self - other` as a CompletedPoint: the result is valid\nand represents the difference of the two input points. -/",
+   "/-- Spec theorem for `curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::sub`\n• No panic for valid EdwardsPoints `self` and `other`\n• The output is a valid CompletedPoint `c`\n• `c.toPoint = self.toPoint - other.toPoint` -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
@@ -505,7 +505,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean",
    "spec_docstring":
-   "/-- **Spec for `Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add`**:\n- Does not overflow when limb sums don't exceed U64.max\n- Returns a field element where each limb is the sum of corresponding input limbs\n- This is element-wise addition, not modular field addition (use reduce for that)\n- Input bounds: both inputs have limbs < 2^53\n- Output bounds: output has limbs < 2^54\n- Simply wraps add_assign -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::add`**\n• The function always succeeds (no panic) provided each pair of limb sums fits in `U64`\n• Each output limb equals the sum of the corresponding input limbs (element-wise, no reduction)\n• Output bounds: every output limb is `< 2 ^ 54` when both inputs have limbs `< 2 ^ 53`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::add",
@@ -548,7 +548,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "spec_docstring":
-   "/-- Spec theorem for `FieldElement51::mul`.\n\nField multiplication is correct mod p and produces reduced limbs. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::mul`**\n• No panic (always returns successfully) when every input limb is `< 2 ^ 54`\n• `Field51_as_Nat r ≡ Field51_as_Nat self * Field51_as_Nat _rhs (mod p)`\n• Every output limb is `< 2 ^ 52` -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul",
@@ -592,7 +592,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Neg.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.field.FieldElement51.neg`**:\n- No panic (always returns successfully under standard bounds)\n- Delegates to `negate`, hence returns the additive inverse modulo p\n- Input bound assumption: all limbs of the input are < 2^54 (as in `negate_spec`)\n- Output bound matches `negate_spec` -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::neg`**\n• The function always succeeds (no panic) provided every input limb is `< 2 ^ 54`\n• `Field51_as_Nat self + Field51_as_Nat neg ≡ 0 (mod p)`, i.e. `neg` is the additive inverse\n• Every output limb is `< 2 ^ 52`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Neg<curve25519_dalek::backend::serial::u64::field::FieldElement51> for &0 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::neg",
@@ -635,7 +635,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.sub`**:\n- No panic (always returns successfully when bounds are satisfied)\n- The result d satisfies the field subtraction property:\n\n  Field51_as_Nat(d) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p), or equivalently\n  Field51_as_Nat(d) + Field51_as_Nat(b) ≡ Field51_as_Nat(a) (mod p)\n\n- Requires that input limbs are bounded:\n  - For a: limbs must allow addition with 16*p without U64 overflow\n    - a[0] must be ≤ 18410715276690587951 (= 2^64 - 1 - 36028797018963664)\n    - a[1..4] must be ≤ 18410715276690587663 (= 2^64 - 1 - 36028797018963952)\n  - For b: limbs must be ≤ the constants (representing 16*p) to avoid underflow\n    - b[0] must be ≤ 36028797018963664\n    - b[1..4] must be ≤ 36028797018963952\n  To make the theorem more easily readable and provable, we\n  replace these precise bounds with the slightly looser bounds\n  a[i] < 2^63  and b[i] < 2^54\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::sub`**\n• The function always succeeds (no panic) provided `a[i].val < 2^63` and `b[i].val < 2^54`\n• Every output limb is `< 2 ^ 52`\n• `Field51_as_Nat result + Field51_as_Nat b ≡ Field51_as_Nat a (mod p)`,\n  the field subtraction property — equivalently `result ≡ a - b (mod p)`\n• To make the theorem more easily readable and provable, we make the bounds `a[i] < 2^63`\n  and `b[i] < 2^54` are slightly looser than what is strictly\n  required:\n  - `a[0] ≤ 2^64 - 1 - 36028797018963664`, `a[i] ≤ 2^64 - 1 - 36028797018963952` for `i ≥ 1`\n  - `b[0] ≤ 36028797018963664`, `b[i] ≤ 36028797018963952` for `i ≥ 1`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::sub",
@@ -678,7 +678,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Neg.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg`**:\n\n- No panic (always returns successfully) given `self.IsValid`.\n- The output is a valid `ProjectiveNielsPoint`.\n- It represents `-self.toPoint` on Ed25519.\n\nDerived by lifting the Field51-level `FieldElement51.neg_spec` postconditions\n(`r.Y_plus_X = self.Y_minus_X`, `r.Y_minus_X = self.Y_plus_X`, `r.Z = self.Z`,\n`r.T2d ≡ -self.T2d [mod p]` with `r.T2d[i]!.val < 2^52`) through\n`ProjectiveNielsPoint.toPoint'`. `IsValid` is symmetric in `Y_plus_X`/`Y_minus_X`\nat `< 2^54`, so the swap preserves `IsValid` trivially on those fields;\n`Z` is unchanged; `T2d`'s strict `< 2^52` bound is supplied by the tightened\n`FieldElement51.neg_spec`. -/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg` (shared-reference)\n• No panic (always returns successfully) given `self.IsValid`\n• The output is a valid `ProjectiveNielsPoint`\n• It represents `-self.toPoint` on Ed25519\n\nDerived by lifting the Field51-level `FieldElement51.neg_spec` postconditions\n(`r.Y_plus_X = self.Y_minus_X`, `r.Y_minus_X = self.Y_plus_X`, `r.Z = self.Z`,\n`r.T2d ≡ -self.T2d [mod p]` with `r.T2d[i]!.val < 2^52`) through\n`ProjectiveNielsPoint.toPoint'`. -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint)}::neg",
@@ -1861,7 +1861,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/AssertReceiverIsTotalEq.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `AffineNielsPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq`**:\n- No panic (always returns successfully)\n- The result is `()`\n- This is the `Eq`-trait totality assertion for `AffineNielsPoint` -/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::assert_receiver_is_total_eq`\n• No panic (always returns successfully)\n• The result is `()`\n• This is the `Eq`-trait totality assertion for `AffineNielsPoint` -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::cmp::Eq for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::assert_receiver_is_total_eq",
@@ -1903,7 +1903,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Eq.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::eq`**\n- No panic (always returns successfully)\n- Returns true iff all three coordinate comparisons return true\n- Short-circuits to false as soon as a comparison fails -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::eq`**\n• No panic (always returns successfully)\n• Returns true iff all three coordinate comparisons return true\n• Short-circuits to false as soon as a comparison fails -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::eq",
@@ -2065,7 +2065,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Identity.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::identity`**\n- No panic (always returns successfully)\n- The resulting AffineNielsPoint is the identity element with coordinates:\n  y_plus_x = 1, y_minus_x = 1, xy2d = 0 -/",
+   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::identity`**\n• No panic (always returns successfully)\n• The resulting AffineNielsPoint is the identity element with coordinates:\n  y_plus_x = 1, y_minus_x = 1, xy2d = 0 -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::identity",
@@ -2111,7 +2111,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/ConditionalAssign.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `backend::serial::curve_models::AffineNielsPoint::conditional_assign`**\n- No panic (always returns successfully)\n- Given inputs:\n  • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),\n  • an AffineNielsPoint `other` with coordinates (y_plus_x', y_minus_x', xy2d'),\n  • a Choice `choice`,\nthe output AffineNielsPoint computed by `conditional_assign self other choice` satisfies:\n- Each coordinate is conditionally selected: if choice is 1, output = other;\n  if choice is 0, output = self\n- The operation is performed in constant time for all field elements -/",
+   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_assign`**\n• No panic (always returns successfully)\n• Given inputs:\n  • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),\n  • an AffineNielsPoint `other` with coordinates (y_plus_x', y_minus_x', xy2d'),\n  • a Choice `choice`,\nthe output AffineNielsPoint computed by `conditional_assign self other choice` satisfies:\n• Each coordinate is conditionally selected: if choice is 1, output = other;\n  if choice is 0, output = self\n• The operation is performed in constant time for all field elements -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_assign",
@@ -2134,7 +2134,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/ConditionalSelect.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_select`**\n- No panic (always returns successfully)\n- Given inputs:\n  • AffineNielsPoint `a` with coordinates (y_plus_x, y_minus_x, xy2d),\n  • AffineNielsPoint `b` with coordinates (y_plus_x', y_minus_x', xy2d'),\n  • a Choice `choice`,\n  the output AffineNielsPoint has coordinates selected component-wise:\n  - If choice = 1, each coordinate equals the corresponding one of `b`\n  - If choice = 0, each coordinate equals the corresponding one of `a`\n  - The operation is constant-time (does not branch on choice) -/",
+   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_select`**\n• The function always succeeds (no panic) for AffineNielsPoints `a` and `b` and a Choice `choice`\n• The result is an AffineNielsPoint whose coordinates are selected component-wise:\n  - If choice = 1, each coordinate equals the corresponding one of `b`\n  - If choice = 0, each coordinate equals the corresponding one of `a`\n• The operation is constant-time (does not branch on choice) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_select",
@@ -2256,7 +2256,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsExtended.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `backend.serial.curve_models.CompletedPoint.as_extended`**\n- No panic (always returns successfully)\n- Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·T (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z·T (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\n- Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)\nThese formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended\ntwisted Edwards ℙ³ coordinates. -/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended`\n• No panic (always returns successfully)\n• Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')\n  satisfies the conversion formulas modulo p = 2^255 - 19:\n  • X' ≡ X·T (mod p)\n  • Y' ≡ Y·Z (mod p)\n  • Z' ≡ Z·T (mod p)\n  • T' ≡ X·Y (mod p)\n• Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)\n• The output is a valid EdwardsPoint whose `toPoint` equals `q.toPoint` -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_extended",
@@ -2279,7 +2279,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsProjective.lean",
    "spec_docstring":
-   "/--\nVerification of the `as_projective` function (WP form, canonical chain target).\n\nThe theorem states that converting a valid CompletedPoint to ProjectivePoint:\n1. Always succeeds\n2. Produces a valid ProjectivePoint\n3. Preserves the represented affine point\n-/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective`\n• Always succeeds for a valid CompletedPoint\n• Produces a valid ProjectivePoint\n• Preserves the represented affine point (`proj.toPoint = q.toPoint`) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_projective",
@@ -2421,7 +2421,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Neg.lean",
    "spec_docstring":
-   "/-- **Spec theorem for the owned-value\n`ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg`**.\n\nMirrors the shared-reference `Shared0…neg_spec`; the owned `neg` is just a\none-step delegation to it (Rust source: `-&self`). Needed so that `let*`\nin downstream proofs (e.g., `LookupTable.select_spec`) matches the binding\nthat type-class resolution produces. -/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg`\n• No panic (always returns successfully) given `self.IsValid`\n• The output is a valid `ProjectiveNielsPoint`\n• It represents `-self.toPoint` on Ed25519\n\nMirrors the shared-reference `Shared0…neg_spec`; the owned `neg` is just a\none-step delegation to it (Rust source: `-&self`). Needed so that `let*`\nin downstream proofs (e.g., `LookupTable.select_spec`) matches the binding\nthat type-class resolution produces. -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::neg",
@@ -2464,7 +2464,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Identity.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**\n\nReturns the identity element of the Edwards curve in ProjectiveNiels coordinates:\n- No panic (always returns successfully)\n- The resulting ProjectiveNielsPoint is the identity element with coordinates\n  (Y_plus_X=1, Y_minus_X=1, Z=1, T2d=0)\n- The result is a valid `ProjectiveNielsPoint`.\n- It represents the Edwards curve identity `0 = (0, 1)` (the affine neutral element). -/",
+   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::identity`**\n• No panic (always returns successfully)\n• The resulting ProjectiveNielsPoint is the identity element with coordinates\n  (Y_plus_X=1, Y_minus_X=1, Z=1, T2d=0)\n• The result is a valid `ProjectiveNielsPoint`\n• It represents the Edwards curve identity `0 = (0, 1)` (the affine neutral element) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::identity",
@@ -2510,7 +2510,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/ConditionalAssign.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign`**\n- No panic (always returns successfully)\n- Given inputs:\n  • a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\n  • a ProjectiveNielsPoint `other` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),\n  • a Choice `choice`,\nthe output ProjectiveNielsPoint computed by `conditional_assign self other choice` satisfies:\n- Each coordinate is conditionally selected:\n  if choice is 1, output = other; if choice is 0, output = self\n- The operation is performed in constant time for all field elements -/",
+   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_assign`**\n• No panic (always returns successfully)\n• Given inputs:\n  • a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\n  • a ProjectiveNielsPoint `other` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),\n  • a Choice `choice`,\nthe output ProjectiveNielsPoint computed by `conditional_assign self other choice` satisfies:\n• Each coordinate is conditionally selected:\n  if choice is 1, output = other; if choice is 0, output = self\n• The operation is performed in constant time for all field elements -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_assign",
@@ -2533,7 +2533,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/ConditionalSelect.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`backend.serial.curve_models.ProjectiveNielsPoint.conditional_select`**\n- No panic (always returns successfully)\n- Given inputs:\n  • ProjectiveNielsPoint `a` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\n  • ProjectiveNielsPoint `b` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),\n  • a Choice `choice`,\n  the output ProjectiveNielsPoint has coordinates selected component-wise:\n  - If choice = 1, each coordinate equals the corresponding one of `b`\n  - If choice = 0, each coordinate equals the corresponding one of `a`\n  - The operation is constant-time (does not branch on choice) -/",
+   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_select`**\n• No panic (always returns successfully)\n• Given inputs:\n  • ProjectiveNielsPoint `a` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\n  • ProjectiveNielsPoint `b` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),\n  • a Choice `choice`,\n  the output ProjectiveNielsPoint has coordinates selected component-wise:\n  • If choice = 1, each coordinate equals the corresponding one of `b`\n  • If choice = 0, each coordinate equals the corresponding one of `a`\n  • The operation is constant-time (does not branch on choice) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select",
@@ -2641,7 +2641,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/AsExtended.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended`**\n\nGiven input ProjectivePoint with coordinates (X, Y, Z), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·Z (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z² (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19 -/",
+   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended`**\n• The function always succeeds (no panic)\n• Given input ProjectivePoint with coordinates (X, Y, Z), the output EdwardsPoint\n  (X', Y', Z', T') satisfies the conversion formulas modulo p = 2^255 - 19:\n  • X' ≡ X·Z (mod p)\n  • Y' ≡ Y·Z (mod p)\n  • Z' ≡ Z² (mod p)\n  • T' ≡ X·Y (mod p) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::as_extended",
@@ -2665,7 +2665,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Double.lean",
    "spec_docstring":
-   "/-- Verification of the `double` function for `ProjectivePoint` in WP form.\nThin wrapper over `double_spec_core`: widens bounds from `< 2^52`\nto `< 2^53` and bridges `toPoint' → toPoint`. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double`**\n• The function always succeeds (no panic) on any valid input ProjectivePoint\n• The resulting CompletedPoint is valid and represents `2 · q.toPoint` on the Edwards curve -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double",
@@ -2691,7 +2691,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VariableBase/Mul.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `variable_base.mul`**:\n- No panic (always returns successfully) given `point.IsValid` and\n  `(scalar.bytes[31]!).val ≤ 127`.\n- The result is a valid `EdwardsPoint`.\n- It represents `(U8x32_as_Nat scalar.bytes) • point.toPoint` on Ed25519.\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::scalar_mul::variable_base::mul`**\n• No panic (always returns successfully) given `point.IsValid` and\n  `(scalar.bytes[31]!).val ≤ 127`.\n• The result is a valid `EdwardsPoint`.\n• It represents `(U8x32_as_Nat scalar.bytes) • point.toPoint` on Ed25519.\n-/",
    "source": "curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::scalar_mul::variable_base::mul",
@@ -2723,7 +2723,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VariableBase/MulLoop.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `variable_base.mul_loop`**:\n- No panic (always returns successfully)\n- Returns a `CompletedPoint` whose Edwards point equals the full radix-16 reconstruction\n  of `scalar_digits`, scaled by `P.toPoint`.\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::scalar_mul::variable_base::mul_loop`**\n• No panic (always returns successfully).\n• The result is a valid `CompletedPoint`.\n• The result's Edwards point equals the full radix-16 reconstruction of `scalar_digits`,\n  scaled by `P.toPoint`.\n-/",
    "source": "curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::scalar_mul::variable_base::mul",
@@ -2754,7 +2754,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Aplus2OverFour.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::APLUS2_OVER_FOUR`**\n\nThe value of `APLUS2_OVER_FOUR` when converted to a natural number equals 121666, and all limbs\nare bounded by 2^54, which is used in the Montgomery differential addition formula. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::APLUS2_OVER_FOUR`**\n• The function always succeeds (no panic)\n• The value of `APLUS2_OVER_FOUR` when converted to a natural number equals 121666\n• Every limb is bounded by `2 ^ 54`, which is used in the Montgomery differential addition formula.\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::APLUS2_OVER_FOUR",
@@ -2777,7 +2777,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Ed25519BasepointPoint.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`**\n\n`ED25519_BASEPOINT_POINT` is a valid Edwards point (fulfilling the curve equation) of prime order L. -/",
+   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`**\n• The function always succeeds (no panic)\n• The result is a valid Edwards point (it satisfies the Edwards curve equation)\n• It has prime order `L`, i.e. `L • result.toPoint = 0`\n• It is non-zero, and so is `4 • result.toPoint`\n• `result.Z^2 - result.Y^2` equals the square of a specific witness integer\n• `result.toPoint` equals the canonical Ed25519 Edwards basepoint\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT",
@@ -2800,7 +2800,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsD.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D`**\n\nField51_as_Nat(constants.EDWARDS_D) = d where d is the mathematical representation of the Edwards\ncurve parameter as a natural number. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D`**\n• The function always succeeds (no panic)\n• `Field51_as_Nat EDWARDS_D = d`, the mathematical Edwards curve parameter\n• Every limb is bounded by `2 ^ 51`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::EDWARDS_D",
    "lines": "L45-L51",
@@ -2821,7 +2821,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsD2.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2`**\n\nThe value of `EDWARDS_D2` when converted to a natural number equals\nthe canonical (reduced) representation of 2*d (mod p) in [0, p-1]. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2`**\n• The function always succeeds (no panic)\n• `Field51_as_Nat EDWARDS_D2 = (2 * d) % p`, the canonical reduced representation\n• Every limb is bounded by `2 ^ 52`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2",
    "lines": "L54-L60",
@@ -2842,7 +2842,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsDMinusOneSquared.lean",
    "spec_docstring":
-   "/-- Spec theorem for `backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED`\n\nThe value of `EDWARDS_D_MINUS_ONE_SQUARED` when converted to a natural number equals\nthe canonical (reduced) representation of (d - 1)² (mod p) in [0, p-1]. -/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED`\n\n• The function always succeeds (no panic)\n• `Field51_as_Nat EDWARDS_D_MINUS_ONE_SQUARED = (d - 1)^2 % p` (canonical reduced form)\n• Every limb is bounded by `2 ^ 51`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED",
@@ -2865,7 +2865,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EightTorsion.lean",
    "spec_docstring":
-   "/-- Spec theorem for `curve25519_dalek::backend::serial::u64::constants::EIGHT_TORSION`\n\n• P := EIGHT_TORSION[1] is a valid EdwardsPoint\n• P has order eight (this is equivalent to [4]P ≠ 0 and [8]P = 0, because [8]P = 0 implies that\nthe order of P divides 8)\n• For all i ∈ {0,...,7}: EIGHT_TORSION[i] is a valid EdwardsPoint and EIGHT_TORSION[i] = [i]P -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::EIGHT_TORSION`**\n• The function always succeeds (no panic)\n• `P := EIGHT_TORSION[1]` is a valid `EdwardsPoint`\n• `P` has order exactly eight (`4 • P ≠ 0` and `8 • P = 0`)\n• Each `EIGHT_TORSION[i]` (`i ∈ {0,...,7}`) is a valid `EdwardsPoint`\n• Each `EIGHT_TORSION[i]` represents `[i] • P` on the Edwards curve\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::EIGHT_TORSION",
@@ -2907,7 +2907,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/InvsqrtAMinusD.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D`**\n\nField51_as_Nat(constants.INVSQRT_A_MINUS_D)^2 * (a - d) ≡ 1 (mod p), which is equivalent\nto Field51_as_Nat(constants.INVSQRT_A_MINUS_D) ≡ 1/sqrt(a-d) (mod p). Here, a and d are the\nmathematical representations of the Edwards curve parameters as integers. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D`**\n• The function always succeeds (no panic)\n• `(Field51_as_Nat INVSQRT_A_MINUS_D)^2 * (a - d) ≡ 1 (mod p)`, i.e. it inverts `sqrt(a - d)`\n• Every limb is bounded by `2 ^ 51`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D",
@@ -2928,7 +2928,7 @@
    "spec_statement": "theorem L_spec : Scalar52_as_Nat L = _root_.L := by ...",
    "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/L.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::L`**\n\nScalar52_as_Nat(constants.L) = L where L is the group order. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::L`**\n• The natural-number interpretation of the 5-limb encoding `L` equals the mathematical\n  group order `L` -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::L",
    "lines": "L127-L133",
@@ -2944,11 +2944,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem LFACTOR_spec :\n    (_root_.L * LFACTOR + 1) % (2^52) = 0 ∧\n    0 ≤ LFACTOR.val ∧\n    LFACTOR.val < 2^52 := by ...",
+   "theorem LFACTOR_spec :\n      (_root_.L * LFACTOR + 1) % (2^52) = 0 ∧\n      0 ≤ LFACTOR.val ∧\n      LFACTOR.val < 2^52 := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Lfactor.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::LFACTOR`**\n\n(L * LFACTOR + 1) % 2^52 = 0 and LFACTOR is in the range [0, 2^52 - 1]. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::LFACTOR`**\n• (L * LFACTOR + 1) % 2^52 = 0\n• LFACTOR.val lies in the range [0, 2^52) -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::LFACTOR",
    "lines": "L136-L136",
@@ -2968,7 +2968,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MinusOne.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MINUS_ONE`**\n- The value of constants.MINUS_ONE, when converted to a natural number, equals p − 1\n(the canonical representative of −1 modulo p in [0, p-1]). -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MINUS_ONE`**\n• The function always succeeds (no panic)\n• `Field51_as_Nat MINUS_ONE = p - 1`, the canonical representative of `-1 (mod p)`\n• Every limb is bounded by `2 ^ 51`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::MINUS_ONE",
    "lines": "L26-L32",
@@ -2989,7 +2989,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MontgomeryA.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A`**\nThe value of constants.MONTGOMERY_A when converted to a natural number equals 486662. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A`**\n• The function always succeeds (no panic)\n• `Field51_as_Nat MONTGOMERY_A = 486662`\n• Every limb is bounded by `2 ^ 51`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A",
@@ -3011,7 +3011,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MontgomeryANeg.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A_NEG`**\n\nField51_as_Nat(constants.MONTGOMERY_A_NEG) + 486662 = p, i.e. MONTGOMERY_A_NEG represents\n−486662 modulo p, the negation of the Montgomery curve parameter A. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A_NEG`**\n• The function always succeeds (no panic)\n• `Field51_as_Nat MONTGOMERY_A_NEG + 486662 = p`, i.e. it represents `-486662 (mod p)`\n• Every limb is bounded by `2 ^ 51`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A_NEG",
@@ -3034,7 +3034,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/OneMinusEdwardsDSquared.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED`**\n- The value of constants.ONE_MINUS_EDWARDS_D_SQUARED when converted to a natural number equals\n  the canonical (reduced) representation of (1 - d²) (mod p) in [0, p-1].\n  Note: the extra \" + p\" in the spec theorem is to avoided hitting 0 in the truncated subtraction\n  implemented by Lean. -/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED`\n• The function always succeeds (no panic)\n• `Field51_as_Nat ONE_MINUS_EDWARDS_D_SQUARED = (1 + p - (d^2 % p)) % p`, the canonical\n  reduced representation of `1 - d^2 (mod p)` (the extra `+ p` avoids underflow in Lean's\n  truncated `Nat` subtraction)\n• Every limb is bounded by `2 ^ 51`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED",
@@ -3056,7 +3056,7 @@
    "theorem R_spec : Scalar52_as_Nat R % _root_.L = _root_.R % _root_.L := by ...",
    "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/R.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::R`**\n- The value of constants.R when converted to a natural number is congruent to R modulo L -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::R`**\n• `Scalar52_as_Nat R ≡ R (mod L)`, i.e. the 5-limb encoding represents the Montgomery\n  constant `R = 2^260` modulo the group order `L` -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::R",
    "lines": "L139-L145",
@@ -3075,7 +3075,7 @@
    "theorem RR_spec : Scalar52_as_Nat RR % _root_.L = _root_.R ^ 2 % _root_.L := by ...",
    "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/RR.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::RR`**\nScalar52_as_Nat(constants.RR) ≡ R² (mod L) where R = 2^260. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::RR`**\n• `Scalar52_as_Nat RR ≡ R² (mod L)` where `R = 2^260` is the Montgomery constant -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::RR",
    "lines": "L148-L154",
@@ -3095,7 +3095,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SqrtAdMinusOne.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.SQRT_AD_MINUS_ONE`**:\n- Field51_as_Nat(constants.SQRT_AD_MINUS_ONE) is a square root of (a*d - 1) modulo p, i.e.\n  `(Field51_as_Nat constants.SQRT_AD_MINUS_ONE)^2 ≡ (a*d - 1) (mod p)`.\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::SQRT_AD_MINUS_ONE`**\n• The function always succeeds (no panic)\n• `(Field51_as_Nat SQRT_AD_MINUS_ONE)^2 ≡ a*d - 1 (mod p)`, i.e. it is a square root\n• Every limb is bounded by `2 ^ 51`\n• The result equals the concrete witness `SQRT_AD_MINUS_ONE_raw`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::SQRT_AD_MINUS_ONE",
@@ -3118,7 +3118,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SqrtM1.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.SQRT_M1`**:\n- Field51_as_Nat(constants.SQRT_M1) ≡ sqrt(-1) (mod p), which is equivalent to\n  Field51_as_Nat(constants.SQRT_M1)^2 ≡ p - 1 (mod p).\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::SQRT_M1`**\n• The function always succeeds (no panic)\n• The result equals the concrete witness `SQRT_M1_raw`\n• `(Field51_as_Nat SQRT_M1)^2 ≡ -1 (mod p)`, i.e. it is a square root of `-1` modulo `p`\n• Every limb is bounded by `2 ^ 51`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::SQRT_M1",
    "lines": "L99-L105",
@@ -3278,7 +3278,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign`**:\n- Does not overflow when limb sums don't exceed `U64.max`\n- Returns a field element where each limb is the sum of corresponding input limbs\n- Input bounds: both inputs have limbs < 2^53\n- Output bounds: output has limbs < 2^54 -/",
+   "/-- Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::add_assign`\n• The function always succeeds (no panic) when both inputs have limbs `< 2 ^ 53`\n• Each output limb equals the sum of the corresponding input limbs (element-wise)\n• Every output limb is `< 2 ^ 54`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::add_assign",
@@ -3301,7 +3301,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop`**:\n- Iterates through limbs adding `b[i]` to `a[i]`\n- Does not overflow if limb sums don't exceed `U64.max`. -/",
+   "/-- **Spec for the inner loop `add_assign_loop` of `add_assign`**\n• Iterates through the limb arrays adding `_rhs[j]` to `self[j]` from index `i` onwards\n• Does not overflow when every pairwise limb sum is `≤ U64.max`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::add_assign",
@@ -3402,7 +3402,8 @@
    "theorem sub_assign_spec (self _rhs : backend.serial.u64.field.FieldElement51)\n    (ha : ∀ i < 5, self[i]!.val < 2 ^ 63)\n    (hb : ∀ i < 5, _rhs[i]!.val < 2 ^ 54) :\n    sub_assign self _rhs ⦃ (result : backend.serial.u64.field.FieldElement51) =>\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧\n      (Field51_as_Nat result + Field51_as_Nat _rhs) % p = Field51_as_Nat self % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/SubAssign.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign`\n• The function always succeeds (no panic) provided `self[i].val < 2^63` and `_rhs[i].val < 2^54`\n• Every output limb is `< 2 ^ 52`\n• `Field51_as_Nat result + Field51_as_Nat _rhs ≡ Field51_as_Nat self (mod p)`,\n  i.e. the result represents `self - _rhs` modulo `p` -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::SubAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::sub_assign",
@@ -3448,7 +3449,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalAssign.lean",
    "spec_docstring":
-   "/--\n**Spec for `backend.serial.u64.field.FieldElement51.conditional_assign`**:\n- No panic (always returns successfully)\n- For each limb i, the result limb equals `other[i]` when `choice = 1`,\n  and equals `self[i]` when `choice = 0` (constant-time conditional select)\n- Consequently, when `choice = Choice.one`, the whole result equals `other`;\n  when `choice = Choice.zero`, the result equals `self`.\n-/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign`\n• The function always succeeds (no panic)\n• For each limb `i`, the result limb equals `other[i]` when `choice = 1`, and `self[i]`\n  when `choice = 0` (constant-time conditional select)\n• Consequently, when `choice = Choice.one`, the whole result equals `other`;\n  when `choice = Choice.zero`, the result equals `self`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_assign",
@@ -3470,7 +3471,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalSelect.lean",
    "spec_docstring":
-   "/--\n**Spec for `backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select`**:\n- No panic (always returns successfully)\n- For each limb i, the result limb equals `b[i]` when `choice = 1`,\n  and equals `a[i]` when `choice = 0` (constant-time conditional select)\n- Consequently, when `choice = Choice.one`, the whole result equals `b`;\n  when `choice = Choice.zero`, the result equals `a`.\n-/",
+   "/--\nSpec theorem for\n`curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_select`\n• The function always succeeds (no panic)\n• For each limb `i`, the result limb equals `b[i]` when `choice = 1`, and `a[i]` when\n  `choice = 0` (constant-time conditional select)\n• Consequently, when `choice = Choice.one`, the whole result equals `b`;\n  when `choice = Choice.zero`, the result equals `a`.\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select",
@@ -3531,7 +3532,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/CtEq.lean",
    "spec_docstring":
-   "/-- **Spec for `field.ConstantTimeEqFieldElement51.ct_eq`**:\n- No panic (always returns successfully)\n- Returns `Choice.one` iff the canonical encodings (32-byte LE) are equal\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::ct_eq`**\n• The function always succeeds (no panic)\n• The result equals `Choice.one` iff the canonical 32-byte encodings of the inputs agree\n  (i.e. iff `a.to_bytes = b.to_bytes`)\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{subtle::ConstantTimeEq for curve25519_dalek::backend::serial::u64::field::FieldElement51}::ct_eq",
@@ -3593,7 +3594,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/MINUS_ONE.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.MINUS_ONE`**:\n- The constant, when converted to a natural number, equals 2^255 - 20 (i.e., p - 1)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::MINUS_ONE`**\n• The function always succeeds (no panic)\n• `Field51_as_Nat MINUS_ONE = 2^255 - 20 = p - 1`, the canonical representative of `-1 (mod p)`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::MINUS_ONE",
@@ -3616,7 +3617,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ONE.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.ONE`**:\n- The constant, when converted to a natural number, equals 1\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::ONE`**\n• The function always succeeds (no panic)\n• `Field51_as_Nat ONE = 1`, the multiplicative identity of 𝔽_p\n• Every limb is bounded by `2 ^ 51`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ONE",
@@ -3638,7 +3639,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ZERO.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.ZERO`**:\n- The constant is equal to 0\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::ZERO`**\n• The function always succeeds (no panic)\n• `Field51_as_Nat ZERO = 0`, the additive identity of 𝔽_p\n• Every limb is bounded by `2 ^ 51`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ZERO",
@@ -3660,7 +3661,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.field.FieldElement51.as_bytes`**:\n\nFunction was deprecated since 4.1.4 and renamed to `to_bytes`. Simply calls the other function. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::as_bytes`**\n• The function always succeeds (no panic)\n• `U8x32_as_Nat result ≡ Field51_as_Nat self (mod p)`, i.e. byte and limb encodings agree mod `p`\n• The returned 32-byte value, viewed as a natural number, is canonical (`< p`)\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::as_bytes",
@@ -3682,7 +3683,8 @@
    "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    from_bytes bytes ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes`**\n• The function always succeeds (no panic) on any 32-byte input\n• `Field51_as_Nat result ≡ U8x32_as_Nat bytes % 2^255 (mod p)`, i.e. the limb encoding matches\n  the little-endian byte encoding with the top bit discarded\n• Every output limb is `< 2 ^ 51`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_bytes",
@@ -3724,7 +3726,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromLimbs.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.from_limbs`**:\n- No panic (always returns successfully)\n- The result is identical to the input limbs array\n- The natural number representation of the result equals that of the input\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::from_limbs`**\n• The function always succeeds (no panic)\n• The result is identical to the input limbs array\n• `Field51_as_Nat result = Field51_as_Nat a` (trivially, since `result = a`)\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_limbs",
@@ -3746,7 +3748,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.negate`**:\n- The result `neg` represents the additive inverse of the input `self` in 𝔽_p.\n- All the limbs of the result are ≤ 2^(51 + ε).\n- Requires that input limbs of `self` are bounded to avoid underflow. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::negate`**\n• The function always succeeds (no panic) provided every input limb is `< 2 ^ 54`\n• `Field51_as_Nat self + Field51_as_Nat neg ≡ 0 (mod p)`, i.e. `neg` is the additive inverse\n• Every output limb is `< 2 ^ 52`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::negate",
@@ -3769,7 +3771,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "spec_docstring":
-   "/-- **Spec theorem for FieldElement51.pow2k**\nGiven `k > 0`, `pow2k` computes `self^(2^k)` mod p with reduced limbs. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k`**\n• The function always succeeds (no panic) when `k > 0` and every input limb is `< 2 ^ 54`\n• `Field51_as_Nat result ≡ (Field51_as_Nat self) ^ (2 ^ k) (mod p)`\n• Every output limb is `< 2 ^ 52`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k",
@@ -3853,7 +3855,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:\n- All the limbs of the result are small, ≤ 2^(51 + ε)\n- The result is equal to the input mod p.\n- The result value is < 2p. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::reduce`**\n• The function always succeeds (no panic) on any 5-limb input\n• Every output limb is `< 2 ^ 52`\n• `Field51_as_Nat limbs ≡ Field51_as_Nat result (mod p)`, i.e. value is preserved modulo `p`\n• `Field51_as_Nat result < 2 * p`, i.e. weakly reduced\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce",
@@ -3897,7 +3899,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.square`**:\n- No panic (always returns successfully)\n- The result, when converted to a natural number, is congruent to the square of the input modulo p\n- Input bounds: each limb < 2^54\n- Output bounds: each limb < 2^52\n- Note: this implements the `pow2k` function with k=1\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::square`**\n• The function always succeeds (no panic) provided every input limb is `< 2 ^ 54`\n• `Field51_as_Nat result ≡ (Field51_as_Nat a)^2 (mod p)`\n• Every output limb is `< 2 ^ 52`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square",
@@ -3920,7 +3922,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square2.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.square2`**:\n- No panic (always returns successfully)\n- The result, when converted to a natural number, is congruent to twice the square of the input modulo p\n- Input bounds: each limb < 2^54\n- Output bounds: each limb < 2^53\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::square2`**\n• The function always succeeds (no panic) provided every input limb is `< 2 ^ 54`\n• `Field51_as_Nat result ≡ 2 * (Field51_as_Nat self)^2 (mod p)`\n• Every output limb is `< 2 ^ 53`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2",
@@ -3944,7 +3946,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square2.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning the loop in `backend.serial.u64.field.FieldElement51.square2`**:\n- No panic when i ≤ 5\n- Doubles each limb from index i onwards\n- Leaves limbs before index i unchanged\n-/",
+   "/-- **Spec theorem for the inner loop `square2_loop` of `square2`**\n• The function always succeeds (no panic) when `i ≤ 5` and every remaining limb satisfies\n  `square[j] * 2 ≤ U64.max`\n• Each limb from index `i` onwards is doubled: `result[j].val = square[j].val * 2`\n• Limbs before index `i` are left unchanged -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2",
@@ -3966,7 +3968,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:\n\nThis function converts a field element to its canonical 32-byte little-endian representation.\nThe implementation performs reduction modulo p = 2^255-19 to ensure the result is in\ncanonical form.\n\nThe algorithm:\n1. Reduces the field element using `reduce` to ensure all limbs are within bounds\n2. Performs a final conditional reduction to ensure the result is < p\n3. Packs the 5 limbs (each 51 bits) into 32 bytes in little-endian format\n\nSpecification:\n- The function succeeds (no panic)\n- The natural number interpretation of the byte array is congruent to the field element value modulo p\n- The byte array represents the unique canonical form (0 ≤ value < p)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes`**\n• The function always succeeds (no panic)\n• `U8x32_as_Nat result ≡ Field51_as_Nat self (mod p)`, i.e. the byte encoding represents the\n  same residue as the input limb encoding\n• `U8x32_as_Nat result < p`, i.e. the byte array is in canonical form `0 ≤ value < p`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes",
@@ -4203,7 +4205,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Zero.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.scalar.Scalar52.ZERO`**:\n\nThe ZERO constant represents the scalar 0.\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::ZERO`**\n• The natural-number interpretation of the ZERO constant equals 0.\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::ZERO",
@@ -4224,7 +4226,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.add`**:\n- Requires the input values to be bounded by  2 ^ 259\n- The result represents the sum of the two input scalars modulo L\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::add`**\n• The function always succeeds (no panic) when every limb is `< 2^52` and the values\n  represent canonical scalars (`a < L`, `b ≤ L`)\n• `Scalar52_as_Nat result ≡ Scalar52_as_Nat a + Scalar52_as_Nat b (mod L)`\n• `Scalar52_as_Nat result < L`, the canonical reduced representative\n• Every output limb is `< 2 ^ 52`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add",
@@ -4248,7 +4250,8 @@
    "theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)\n    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : i.val = 5 → carry.val < 2 ^ 52)\n    (hcarry' : ∀ i < 5, carry.val < 2 ^ 53)\n    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)\n    (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :\n    add_loop { start := i, «end» := 5#usize } a b sum mask carry ⦃ (sum' : Scalar52) =>\n      (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧\n      (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧\n      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =\n        ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +\n        2 ^ (52 * i.val) * (carry.val / 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec theorem for the inner loop `add_loop` of `Scalar52::add`**\n• The function always succeeds (no panic) provided the loop preconditions hold\n• Every output limb is `< 2 ^ 52`\n• Limbs before index `i` are preserved\n• The remaining limbs realise the limb-wise sum of `a` and `b` plus the incoming carry,\n  yielding the modular arithmetic identity for the suffix\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add",
@@ -4291,7 +4294,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/AsMontgomery.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.as_montgomery`**:\n- No panic (always returns successfully)\n- The result represents the input scalar multiplied by the Montgomery constant R = 2^260, modulo L\n-/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_montgomery`\n• The function always succeeds (no panic) when every input limb is `< 2 ^ 52`\n• `Scalar52_as_Nat result ≡ Scalar52_as_Nat u * R (mod L)`, i.e. multiplication by `R  = 2^260`\n• Every output limb is `< 2 ^ 52`\n• `Scalar52_as_Nat result < L`, the canonical reduced representative\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::as_montgomery",
@@ -4315,7 +4318,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ConditionalAddL.lean",
    "spec_docstring":
-   "/-- **Spec for `scalar.Scalar52.conditional_add_l`** (tailored for use in `sub`):\n- Requires input limbs bounded by 2^52\n- When condition is 1, requires input value in [2^260 - L, 2^260)\n- When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52\n- When condition is 0: result unchanged with limbs < 2^52\n-/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l`\n• The function always succeeds (no panic) when input limbs are `< 2 ^ 52` and the value\n  precondition matches `condition` (see hypotheses)\n• Every output limb is `< 2 ^ 52`\n• When condition is 1, requires input value in [2^260 - L, 2^260)\n• When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52\n• When condition is 0: result unchanged with limbs < 2^52 -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
@@ -4382,7 +4385,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytes.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.from_bytes`**:\n- No panic (always returns successfully)\n- The result represents the same number as the input byte array\n- All limbs are < 2^52 (from masking with `(1 << 52) - 1` and `(1 << 48) - 1`)\n-/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes`\n• The function always succeeds (no panic) on any 32-byte input\n• `Scalar52_as_Nat result = U8x32_as_Nat b`, i.e. the limb and byte encodings agree\n• Every output limb is `< 2 ^ 52`, ensured by masking with `(1 << 52) - 1` / `(1 << 48) - 1`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes",
@@ -4429,7 +4432,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "spec_docstring":
-   "/-- **Spec for `Scalar52::from_bytes_wide`**:\n- No panic\n- Result = input mod L (canonical form)\n- All limbs < 2^52 -/",
+   "/-- Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes_wide`\n• The function always succeeds (no panic) on any 64-byte input `b`\n• `Scalar52_as_Nat result = U8x64_as_Nat b % L`, the canonical residue modulo `L`\n• `Scalar52_as_Nat result < L`, the canonical reduced representative\n• Every output limb is `< 2 ^ 52`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide",
@@ -4479,7 +4482,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean",
    "spec_docstring":
-   "/-- **Spec theroem for `scalar.Scalar52.from_montgomery`**:\n- The result represents the input scalar divided by the Montgomery constant R = 2^260, modulo L -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_montgomery`**\n• The function always succeeds (no panic) when every input limb is `< 2 ^ 62`\n• `(Scalar52_as_Nat result) * R ≡ Scalar52_as_Nat self (mod L)`, i.e. division by `R`\n• `Scalar52_as_Nat result < L`, the canonical reduced representative\n• Every output limb is `< 2 ^ 52`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery",
@@ -4503,7 +4506,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `from_montgomery_loop`**:\n- Specification for the loop that copies limbs from a Scalar52 (5 × U64) into a 9-element U128 array\n- Ensures that:\n  - Limbs at indices [i, 5) are copied from the input Scalar52 to the result array\n  - Limbs at indices [5, 9) remain unchanged from the input limbs array\n  - Limbs at indices [0, i) remain unchanged from the input limbs array -/",
+   "/-- Spec theorem for\n`curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_montgomery_loop`\n• Copies limbs from a `Scalar52` (5 × U64) into a 9-element `U128` array\n• Limbs at indices `[i, 5)` are cast and copied from the input scalar to the result array\n• Limbs at indices `[5, 9)` remain unchanged from the input limbs array\n• Limbs at indices `[0, i)` remain unchanged from the input limbs array\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery",
@@ -4526,7 +4529,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryMul.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_mul`**:\n- No panic (always returns successfully)\n- The result w satisfies the Montgomery multiplication property:\n  (m * m') ≡ w * R (mod L), where R = 2^260 is the Montgomery constant\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_mul`**\n• No panic (always returns successfully)\n• The result w satisfies the Montgomery multiplication property:\n  (m * m') ≡ w * R (mod L), where R = 2^260 is the Montgomery constant -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul",
@@ -4550,7 +4553,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryReduce.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:\n- No panic (always returns successfully)\n- The result m satisfies the Montgomery reduction property:\n  m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant\n\n**Why `h_canonical` (`Scalar52_wide_as_Nat a < R * L`)**:\nThe Rust code (scalar.rs:303-306) truncates `carry` from u128 to u64 and performs a single\nconditional subtraction. This is only correct when the intermediate result `inter < 2*L`:\n- From the REDC identity `inter * R = T + N * L` with `T < R*L` and `N < R`, we get\n  `inter * R < R*L + R*L = 2*R*L`, hence `inter < 2*L`.\n- A single subtraction of L then guarantees `result < L`.\n- Without `T < R*L`, `inter` could be much larger, the u128→u64 truncation would lose bits,\n  and the single subtraction would not produce a canonical result.\nAll callers satisfy this: `mul_internal` produces `m*m' < R*L` when inputs are bounded,\n`square_internal` likewise, and `from_montgomery` embeds values trivially smaller than `R*L`. -/",
+   "/-- Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_reduce`\n• No panic (always returns successfully)\n• The result m satisfies the Montgomery reduction property:\n  m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant\n\n**Why `h_canonical` (`Scalar52_wide_as_Nat a < R * L`)**:\nThe Rust code (scalar.rs:303-306) truncates `carry` from u128 to u64 and performs a single\nconditional subtraction. This is only correct when the intermediate result `inter < 2*L`:\n- From the REDC identity `inter * R = T + N * L` with `T < R*L` and `N < R`, we get\n  `inter * R < R*L + R*L = 2*R*L`, hence `inter < 2*L`.\n- A single subtraction of L then guarantees `result < L`.\n- Without `T < R*L`, `inter` could be much larger, the u128→u64 truncation would lose bits,\n  and the single subtraction would not produce a canonical result.\nAll callers satisfy this: `mul_internal` produces `m*m' < R*L` when inputs are bounded,\n`square_internal` likewise, and `from_montgomery` embeds values trivially smaller than `R*L`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce",
@@ -4620,7 +4623,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomerySquare.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_square`**:\n- No panic (always returns successfully)\n- The result w satisfies the Montgomery squaring property:\n  (m * m) ≡ w * R (mod L), where R = 2^260 is the Montgomery constant\n-/",
+   "/-- Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_square`\n• No panic (always returns successfully)\n• The result w satisfies the Montgomery squaring property:\n  (m * m) ≡ w * R (mod L), where R = 2^260 is the Montgomery constant -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_square",
@@ -4644,7 +4647,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Mul.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `scalar.Scalar52.mul`**:\n- The result represents the product of the two input scalars modulo L\n- Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52\n- `h_value`: The first `montgomery_reduce` needs `a*b < R*L` to guarantee the intermediate\n  result is < 2*L (see `MontgomeryReduce.lean` docstring). The second reduce is auto-satisfied\n  since its input is `ab * RR` where `ab < L` and `RR < L`, so `ab*RR < L² < R*L`. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::mul`**\n• The result represents the product of the two input scalars modulo L\n• Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)\n• Output limbs are bounded by 2^52\n• `h_value`: The first `montgomery_reduce` needs `a*b < R*L` to guarantee the intermediate\n  result is < 2*L (see `MontgomeryReduce.lean` docstring). The second reduce is auto-satisfied\n  since its input is `ab * RR` where `ab < L` and `RR < L`, so `ab*RR < L² < R*L`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul",
@@ -4668,7 +4671,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.scalar.Scalar52.mul_internal`**:\n- The result represents the product of the two input field elements\n- Requires that each input limb is at most 62 bits to prevent overflow -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::mul_internal`**\n• The result represents the product of the two input field elements\n• Requires that each input limb is at most 62 bits to prevent overflow -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal",
@@ -4692,7 +4695,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Square.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.square`**:\n- No panic (always returns successfully)\n- The result represents the square of the input scalar modulo L\n- Input scalar should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52\n- `h_value`: Required by `montgomery_reduce` (see `MontgomeryReduce.lean`). The second\n  reduce is auto-satisfied since `aa < L` and `RR < L` give `aa*RR < L² < R*L`. -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::square`**\n• No panic (always returns successfully)\n• The result represents the square of the input scalar modulo L\n• Input scalar should have limbs bounded by 2^62 (standard Scalar52 representation)\n• Output limbs are bounded by 2^52\n• `h_value`: Required by `montgomery_reduce` (see `MontgomeryReduce.lean`). The second\n  reduce is auto-satisfied since `aa < L` and `RR < L` give `aa*RR < L² < R*L`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square",
@@ -4717,7 +4720,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean",
    "spec_docstring":
-   "/-- **Spec for `square_internal`**:\n- Does not error and hence returns a result\n- The result represents the square of the input field element\n- Requires each limb to be less than 62 bits to prevent overflow\n(The optimal bound on the limbs is 2^64 / √5  ≈ 2^62.839) -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal`**\n• Does not error and hence returns a result\n• The result represents the square of the input field element\n• Requires each limb to be less than 62 bits to prevent overflow\n(The optimal bound on the limbs is 2^64 / √5  ≈ 2^62.839) -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square_internal",
@@ -4741,7 +4744,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.scalar.Scalar52.sub`**:\n- Requires bounded limbs for both inputs\n- Requires both inputs to be bounded from above\n- The result represents (a - b) mod L\n- The result has bounded limbs and is canonical -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub`**\n• Requires bounded limbs for both inputs\n• Requires both inputs to be bounded from above\n• The result represents (a - b) mod L\n• The result has bounded limbs and is canonical -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub",
@@ -4765,7 +4768,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.scalar.Scalar52.sub_loop`**:\n\nThe loop computes the subtraction a - b with borrow propagation.\nAfter processing indices 0..i, the loop invariant holds:\n  partial_a(i) + (borrow / 2^63) * 2^(52*i) = partial_b(i) + partial_diff(i)\n\nWhen the loop completes (i = 5), this gives:\n  A + (borrow / 2^63) * 2^260 = B + D\n\nWhere (borrow / 2^63) = 1 means A < B (underflow occurred), and the difference D\nrepresents (A - B) mod 2^260.\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub_loop`**\n• No panic (always returns successfully) under the stated preconditions\n• Every output difference limb is `< 2 ^ 52`\n• Loop invariant on completion: `A + (borrow / 2^63) * 2^260 = B + D`, where (borrow / 2^63) = 1\n  means A < B (underflow occurred), and the difference D represents (A - B) mod 2^260\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub",
@@ -4808,7 +4811,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ToBytes.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:\n- The result byte array represents the same number as the input unpacked scalar modulo L\n- The result is in canonical form (less than L) -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::to_bytes`**\n• The result byte array represents the same number as the input unpacked scalar modulo L\n• The result is in canonical form (less than L) -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::to_bytes",
@@ -4828,7 +4831,7 @@
    "theorem m_spec (x y : U64) :\n    m x y ⦃ (result : U128) => result.val = x.val * y.val ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/M.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.scalar.m`**:\n- The result equals the product of the two input values -/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::m`**\n• The function always succeeds (no panic)\n• `result.val = x.val * y.val`, i.e. the exact `u128` product of `x` and `y`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::scalar::m",
    "lines": "L56-L58",
@@ -11410,7 +11413,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Invert.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.invert`**:\n- Precondition: The unpacked input scalar self must be non-zero modulo L\n  (inverting zero has undefined behavior)\n- No panic (returns successfully for non-zero input)\n- The result satisfies the multiplicative inverse property:\n  Scalar52_as_Nat(self) * Scalar52_as_Nat(result) ≡ 1 (mod L) -/",
+   "/-- **Spec theorem for `curve25519_dalek::scalar::Scalar52::invert`**\n• The function always succeeds (no panic) when `self` is non-zero modulo `L` and every input\n  limb is `< 2 ^ 52`\n• The result satisfies the multiplicative inverse property:\n  Scalar52_as_Nat(self) * Scalar52_as_Nat(result) ≡ 1 (mod L)\n• Every output limb is `< 2 ^ 52`\n• `Scalar52_as_Nat result < L`, the canonical reduced representative\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::invert",
@@ -11434,7 +11437,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_invert`**:\n- Precondition: u must be non-zero modulo L (i.e., represent a non-zero value in Montgomery form)\n- No panic (always returns successfully for non-zero inputs)\n- The result u' satisfies the property that Montgomery multiplication of u and u'\n  yields R mod L (the Montgomery representation of 1)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::scalar::Scalar52::montgomery_invert`**\n• Precondition: u must be non-zero modulo L (i.e., represent a non-zero value in Montgomery form)\n• No panic (always returns successfully for non-zero inputs)\n• The result u' satisfies the property that Montgomery multiplication of u and u'\n  yields R mod L (the Montgomery representation of 1) -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert",
@@ -11519,7 +11522,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Pack.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `scalar.Scalar52.pack`**:\n- Both the unpacked r and the packed s represent the same natural number modulo L\n- The packed scalar is in canonical form (less than L) -/",
+   "/-- **Spec theorem for `curve25519_dalek::scalar::Scalar52::pack`**\n• Both the unpacked r and the packed s represent the same natural number modulo L\n• The packed scalar is in canonical form (less than L) -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::pack",
