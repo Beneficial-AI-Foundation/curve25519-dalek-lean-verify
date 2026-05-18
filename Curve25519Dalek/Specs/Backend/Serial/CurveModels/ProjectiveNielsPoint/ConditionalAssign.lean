@@ -62,7 +62,9 @@ theorem conditional_assign_spec
   -- grind closes the remaining four conditional-equality goals after step*
   grind
 
-/-- **Point-level wrapper for `ProjectiveNielsPoint::conditional_assign`**:
+/-- Point-level wrapper for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_assign`
+
 Given valid `self` and `other` and a `Choice`, the output is a valid `ProjectiveNielsPoint`
 whose `toPoint` equals `other.toPoint` if `choice.val = 1#u8`, otherwise `self.toPoint`.
 

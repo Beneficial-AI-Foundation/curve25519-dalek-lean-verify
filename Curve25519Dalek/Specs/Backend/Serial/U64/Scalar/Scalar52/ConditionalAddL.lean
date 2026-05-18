@@ -8,9 +8,6 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 
-attribute [-simp] Int.reducePow Nat.reducePow
-set_option exponentiation.threshold 260
-
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l`
 
 This function conditionally adds the group order `L` to a `Scalar52` based on a `Choice`
@@ -85,8 +82,8 @@ After all 5 limbs, the full sum telescopes to:
 Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
-namespace curve25519_dalek
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
+namespace curve25519_dalek
 
 /- Replace the spec currently in FunsExternal.lean with an alternative phrased in terms of
 `Choice.one`/`Choice.zero`.
@@ -109,6 +106,9 @@ end curve25519_dalek
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
+
+attribute [-simp] Int.reducePow Nat.reducePow
+set_option exponentiation.threshold 260
 
 @[step]
 theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)

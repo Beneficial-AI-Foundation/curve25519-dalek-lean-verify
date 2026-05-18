@@ -20,15 +20,13 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.
 open curve25519_dalek.backend.serial.u64.scalar.Scalar52
 namespace curve25519_dalek.scalar.Scalar52
 
-/--
-Specification for the inner loop `square_multiply_loop`.
-It performs `squarings - i` remaining squarings on `y` (all in Montgomery form).
-Inputs must be canonical (limbs < 2^52, value < L) — this is self-maintaining since
-`montgomery_square` always produces canonical output.
-
-Mathematically, if the loop runs `k` times, it computes:
-  res = y^(2^k) * R^{-(2^k - 1)}
--/
+/-- Spec theorem for
+`curve25519_dalek::scalar::Scalar52::montgomery_invert::square_multiply_loop`
+• No panic for canonical input `y` (limbs `< 2 ^ 52`, value `< L`) — self-maintaining since
+  `montgomery_square` always produces canonical output
+• After `k = squarings - i` Montgomery squarings: `res * R ^ (2^k - 1) ≡ y ^ (2^k) (mod L)`
+• Every output limb is `< 2 ^ 52`
+• The output value is canonical (`< L`) -/
 theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.val ≤ squarings.val)
     (h_y_bound : ∀ j < 5, y[j]!.val < 2 ^ 52)
     (h_y_canonical : Scalar52_as_Nat y < L) :

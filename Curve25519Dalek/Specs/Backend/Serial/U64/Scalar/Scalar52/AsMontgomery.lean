@@ -8,8 +8,6 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
-set_option exponentiation.threshold 260
-
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_montgomery`
 
 This function converts a `Scalar52` `u` to Montgomery form by computing `(u * R) mod L`,
@@ -21,6 +19,8 @@ Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
+
+set_option exponentiation.threshold 260
 
 theorem RR_lt : ∀ i < 5, constants.RR[i]!.val < 2 ^ 62 := by
   unfold constants.RR

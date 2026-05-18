@@ -33,7 +33,8 @@ open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldEle
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
 namespace curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
-/-- **Spec theorem for `backend::serial::curve_models::ProjectivePoint::double_spec_aux`**
+/-- Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double_spec_aux`
 • The function always succeeds (no panic)
 • Given input ProjectivePoint with coordinates (X, Y, Z), the output CompletedPoint
   (X', Y', Z', T') satisfies the point doubling formulas modulo p = 2^255 - 19:

@@ -11,7 +11,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
 
 import Mathlib.Data.Int.ModEq
 
-/-! # Spec theorem for `curve25519_dalek::backend::scalar::Scalar52::montgomery_invert`
+/-! # Spec theorem for `curve25519_dalek::scalar::Scalar52::montgomery_invert`
 
 This function computes the multiplicative inverse using Montgomery form.
 
@@ -21,10 +21,9 @@ Source: "curve25519-dalek/src/scalar.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar
 open curve25519_dalek.backend.serial.u64.scalar.Scalar52
 open ZMod
+namespace curve25519_dalek.scalar.Scalar52
 
 set_option exponentiation.threshold 1024
-
-namespace curve25519_dalek.scalar.Scalar52
 
 section MontgomeryInvert_Helpers
 
@@ -110,7 +109,7 @@ lemma run_loop_nat (RZ : ZMod L) (uZ : ZMod L) (h_RZ : (R : (ZMod L)) = RZ) (hRZ
 end MontgomeryInvert_Helpers
 
 set_option maxHeartbeats 600000 in -- heavy step and simp
-/-- **Spec theorem for `curve25519_dalek::backend::scalar::Scalar52::montgomery_invert`**
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar52::montgomery_invert`**
 • Precondition: u must be non-zero modulo L (i.e., represent a non-zero value in Montgomery form)
 • No panic (always returns successfully for non-zero inputs)
 • The result u' satisfies the property that Montgomery multiplication of u and u'

@@ -828,9 +828,10 @@ theorem mul_final_reduce_stage_spec (a' : Array U64 5#usize) (carry i54 : U64)
 
 set_option maxHeartbeats 14000000 in
 -- Required for step*
-/-- Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::mul`
-
-Field multiplication is correct mod p and produces reduced limbs. -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::mul`**
+• No panic (always returns successfully) when every input limb is `< 2 ^ 54`
+• `Field51_as_Nat r ≡ Field51_as_Nat self * Field51_as_Nat _rhs (mod p)`
+• Every output limb is `< 2 ^ 52` -/
 @[step]
 theorem mul_spec (self _rhs : Array U64 5#usize) (hself : ∀ i < 5, self[i]!.val < 2 ^ 54)
     (hrhs : ∀ i < 5, _rhs[i]!.val < 2 ^ 54) :

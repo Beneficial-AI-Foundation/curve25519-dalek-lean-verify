@@ -11,7 +11,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal`
 
-The main statement concerning `square_internal` is `square_internal_spec` (below).
+This function computes `a^2` as a 9-limb wide `U128` product using 52-bit limb optimizations.
 
 Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
@@ -41,14 +41,6 @@ private theorem bounds_add {a b : Nat} (ha : a < 2 ^ 126) (hb : b < 2 ^ 126) :
   nlinarith [ha,hb]
 
 
-/-! ## Spec for `square_internal` -/
-
-/-
-Square_internal computes `a^2` using 52-bit limb optimizations.
-
-Corresponds to the Rust function `Scalar52::square_internal` defined
-in `curve25519-dalek/src/backend/serial/u64/scalar.rs`.
--/
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal`**
 • Does not error and hence returns a result

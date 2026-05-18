@@ -25,7 +25,8 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
-/-- **Spec theorem for `backend::serial::curve_models::CompletedPoint::as_extended`**
+/-- Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended`
 • No panic (always returns successfully)
 • Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')
   satisfies the conversion formulas modulo p = 2^255 - 19:

@@ -79,10 +79,10 @@ covering `bits[0..255)`. Bit 255 (the 256th bit) is discarded — this is the `%
 Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open scoped BigOperators
 open List BitList
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-! ## load8_at specification
 

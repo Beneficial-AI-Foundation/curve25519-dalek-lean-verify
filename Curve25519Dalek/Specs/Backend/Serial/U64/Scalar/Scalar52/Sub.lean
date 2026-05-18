@@ -55,17 +55,12 @@ def Scalar52_partial_as_Nat (limbs : Array U64 5#usize) (n : Nat) : Nat :=
   ∑ j ∈ Finset.range n, 2 ^ (52 * j) * (limbs[j]!).val
 
 set_option maxHeartbeats 300000 in -- proof could be better
-/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub_loop`**
-
-The loop computes the subtraction a - b with borrow propagation.
-After processing indices 0..i, the loop invariant holds:
-  partial_a(i) + (borrow / 2^63) * 2^(52*i) = partial_b(i) + partial_diff(i)
-
-When the loop completes (i = 5), this gives:
-  A + (borrow / 2^63) * 2^260 = B + D
-
-Where (borrow / 2^63) = 1 means A < B (underflow occurred), and the difference D
-represents (A - B) mod 2^260.
+/-- Spec theorem for
+`curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub_loop`
+• No panic (always returns successfully) under the stated preconditions
+• Every output difference limb is `< 2 ^ 52`
+• Loop invariant on completion: `A + (borrow / 2^63) * 2^260 = B + D`, where (borrow / 2^63) = 1
+  means A < B (underflow occurred), and the difference D represents (A - B) mod 2^260
 -/
 @[step]
 theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize)

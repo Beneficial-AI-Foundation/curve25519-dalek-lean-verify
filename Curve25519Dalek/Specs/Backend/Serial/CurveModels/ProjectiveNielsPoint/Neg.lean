@@ -100,7 +100,8 @@ end curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjective
 namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
 namespace CoreOpsArithNegProjectiveNielsPoint
 
-/-- **Spec theorem for `backend::serial::curve_models::ProjectiveNielsPoint::neg`**
+/-- Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg`
 • No panic (always returns successfully) given `self.IsValid`
 • The output is a valid `ProjectiveNielsPoint`
 • It represents `-self.toPoint` on Ed25519

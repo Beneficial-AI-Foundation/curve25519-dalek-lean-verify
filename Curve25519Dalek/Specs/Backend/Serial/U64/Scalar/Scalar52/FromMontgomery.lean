@@ -30,7 +30,8 @@ theorem zero_array (i : ℕ) (hi : i < 9) :
     ((Array.repeat 9#usize 0#u128) : List U128)[i]!.val = 0 := by
   interval_cases i <;> exact rfl
 
-/-- **Spec theorem for the inner loop `from_montgomery_loop` of `from_montgomery`**
+/-- Spec theorem for
+`curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_montgomery_loop`
 • Copies limbs from a `Scalar52` (5 × U64) into a 9-element `U128` array
 • Limbs at indices `[i, 5)` are cast and copied from the input scalar to the result array
 • Limbs at indices `[5, 9)` remain unchanged from the input limbs array

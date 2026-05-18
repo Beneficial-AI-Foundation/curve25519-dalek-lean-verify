@@ -6,7 +6,6 @@ Authors: Markus Dablander, Lim Jin Xing, Oliver Butterley
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.BitList
 
-
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::to_bytes`
 
 This function converts a `Scalar52` to its byte representation.
@@ -82,7 +81,6 @@ We express each of the 32 byte assignments as a `BitList.extract` equality, use
 `List.extract_append_extract` to merge adjacent extracts into limb-level equivalences,
 then convert to `Nat` via `toNat` and close with `grind`.
 -/
-
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52

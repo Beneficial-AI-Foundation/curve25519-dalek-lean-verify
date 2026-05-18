@@ -15,7 +15,7 @@ import Mathlib.Data.Nat.ModEq
 import Mathlib.Data.Int.ModEq
 import Mathlib.Data.ZMod.Basic
 
-/-! Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_reduce`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_reduce`
 
 This function performs Montgomery reduction.
 
@@ -54,7 +54,8 @@ private lemma mont_step (x : Int) (p : Int) (carry_out : Int)
     (hp : p = (x * ↑constants.LFACTOR.val) % (2 ^ 52))
     (hcarry : carry_out = (x + p * ↑constants.L[0]!.val) / (2 ^ 52)) :
     x + p * ↑constants.L[0]!.val = carry_out * (2 ^ 52) := by
-  have h_div : x + p * ↑constants.L[0]!.val = carry_out * (2 ^ 52) + (x + p * ↑constants.L[0]!.val) % (2 ^ 52) := by
+  have h_div : x + p * ↑constants.L[0]!.val =
+    carry_out * (2 ^ 52) + (x + p * ↑constants.L[0]!.val) % (2 ^ 52) := by
     rw [hcarry]
     rw [mul_comm ((x + p * ↑constants.L[0]!.val) / 2 ^ 52)]
     rw [Int.mul_ediv_add_emod]

@@ -679,10 +679,10 @@ private lemma add_spec_algebraic
 
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::add`**
-The theorem states that adding a valid EdwardsPoint with a valid ProjectiveNielsPoint:
-1. Always succeeds
-2. The output CompletedPoint is valid (bounds and algebraic properties)
-3. The output represents the sum of the input points
+• Always succeeds (no panic) when both inputs are valid
+• The output CompletedPoint is valid (bounds and algebraic properties)
+• The output represents the sum of the input points: `c.toPoint = self.toPoint + other.toPoint`
+
 The mixed addition formulas implement elliptic curve point addition on twisted Edwards curves. -/
 @[step]
 theorem add_spec
