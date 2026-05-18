@@ -4526,7 +4526,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ToBytes.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:\n- The result byte array represents the same number as the input unpacked scalar modulo L\n- The result is in canonical form (less than L) -/",
+   "/-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:\n- The result byte array represents the same number as the input unpacked scalar\n- The result is in canonical form (less than L) -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::to_bytes",
