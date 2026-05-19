@@ -6,10 +6,9 @@ Authors: Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
-/-!
-# Spec theorem for `AffineNielsPoint::conditional_assign`
 
-Specification and proof for `AffineNielsPoint::conditional_assign`.
+/-! Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_assign`
 
 This function conditionally assigns the value of another AffineNielsPoint
 to self based on a Choice value. It is a constant-time operation used in
@@ -28,20 +27,20 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 322:4-32
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
 namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
 namespace SubtleConditionallySelectable
 
-/-- **Spec theorem for `backend::serial::curve_models::AffineNielsPoint::conditional_assign`**
-- No panic (always returns successfully)
-- Given inputs:
+/-- **Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_assign`**
+• No panic (always returns successfully)
+• Given inputs:
   • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),
   • an AffineNielsPoint `other` with coordinates (y_plus_x', y_minus_x', xy2d'),
   • a Choice `choice`,
 the output AffineNielsPoint computed by `conditional_assign self other choice` satisfies:
-- Each coordinate is conditionally selected: if choice is 1, output = other;
+• Each coordinate is conditionally selected: if choice is 1, output = other;
   if choice is 0, output = self
-- The operation is performed in constant time for all field elements -/
+• The operation is performed in constant time for all field elements -/
 @[step]
 theorem conditional_assign_spec
     (self other : backend.serial.curve_models.AffineNielsPoint)
