@@ -3571,7 +3571,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:\n- All the limbs of the result are small, ≤ 2^(51 + ε)\n- The result is equal to the input mod p.\n- The result value is < 2p. -/",
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:\n- All the limbs of the result are small, < 2^52\n- The result is equal to the input mod p.\n- The result value is < 2p. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce",
