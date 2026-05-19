@@ -7,15 +7,18 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
-/-!
-# Spec theorem for `ProjectivePoint::as_extended`
 
-Specification and proof for `ProjectivePoint::as_extended`.
+/-! Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended`
 
 This function implements point conversion from projective coordinates (ℙ²) to extended
 twisted Edwards coordinates (ℙ³) on the Curve25519 elliptic curve. Given a point
 P = (X:Y:Z) in projective coordinates, it computes an equivalent representation
 (X':Y':Z':T') in extended coordinates.
+
+Note: We compute the output representation (XZ, YZ, Z², XY) instead of the equivalent
+(and seemingly more straightforward) representation (X, Y, Z, XY/Z) because the former
+representation can be obtained without performing any divisions.
 
 Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 -/
@@ -23,37 +26,15 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
-/-
-natural language description:
-
-• Takes a ProjectivePoint with coordinates (X, Y, Z) in projective ℙ² representation and
-returns an EdwardsPoint (X', Y', Z', T') in extended ℙ³ representation. Arithmetics are
-performed in the field 𝔽_p where p = 2^255 - 19.
-
-natural language specs:
-
-• The function always succeeds (no panic)
-• Given  an input projective point (X, Y, Z), the output EdwardsPoint (X', Y', Z', T') satisfies:
-- X' ≡ X·Z (mod p)
-- Y' ≡ Y·Z (mod p)
-- Z' ≡ Z² (mod p)
-- T' ≡ X·Y (mod p)
-
-Note: We compute the output representation (XZ, YZ, Z², XY) instead of the equivalent
-(and seemingly more straightforward) representation (X, Y, Z, XY/Z) because the former
-representation can be obtained without performing any divisions.
--/
-
 /-- **Spec theorem for
-`curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended`**
-
-Given input ProjectivePoint with coordinates (X, Y, Z), the output EdwardsPoint (X', Y', Z', T')
-satisfies the conversion formulas modulo p:
-- X' ≡ X·Z (mod p)
-- Y' ≡ Y·Z (mod p)
-- Z' ≡ Z² (mod p)
-- T' ≡ X·Y (mod p)
-where p = 2^255 - 19 -/
+`curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended`**
+• The function always succeeds (no panic)
+• Given input ProjectivePoint with coordinates (X, Y, Z), the output EdwardsPoint
+  (X', Y', Z', T') satisfies the conversion formulas modulo p = 2^255 - 19:
+  • X' ≡ X·Z (mod p)
+  • Y' ≡ Y·Z (mod p)
+  • Z' ≡ Z² (mod p)
+  • T' ≡ X·Y (mod p) -/
 @[step]
 theorem as_extended_spec
     (q : ProjectivePoint)

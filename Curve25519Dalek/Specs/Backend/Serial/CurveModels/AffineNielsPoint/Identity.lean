@@ -8,10 +8,8 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ZERO
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
-/-!
-# Spec theorem for `AffineNielsPoint::identity`
 
-Specification and proof for `AffineNielsPoint::identity`.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::identity`
 
 This function returns the identity element of the Edwards curve in AffineNiels coordinates
 (y_plus_x, y_minus_x, xy2d). The identity element on the Edwards curve is the affine point
@@ -30,8 +28,8 @@ namespace Curve25519_dalekTraitsIdentity
 
 /-- **Spec theorem for
 `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::identity`**
-- No panic (always returns successfully)
-- The resulting AffineNielsPoint is the identity element with coordinates:
+• No panic (always returns successfully)
+• The resulting AffineNielsPoint is the identity element with coordinates:
   y_plus_x = 1, y_minus_x = 1, xy2d = 0 -/
 @[step]
 theorem identity_spec :

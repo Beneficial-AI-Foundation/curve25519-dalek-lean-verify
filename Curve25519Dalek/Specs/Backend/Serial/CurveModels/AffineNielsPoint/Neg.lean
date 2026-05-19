@@ -7,10 +7,8 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
-/-!
-# Spec theorem for `AffineNielsPoint::neg`
 
-Specification and proof for `AffineNielsPoint::neg`.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::neg`
 
 This function implements the negation of a point in affine Niels coordinates.
 Given an AffineNielsPoint N = (y+x, y−x, 2dxy), it computes -N by:
@@ -27,22 +25,15 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
-
 namespace curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::neg`**
-- No panic (always returns successfully)
-- Given input:
-  • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),
-the output AffineNielsPoint computed by `neg self` has coordinates
-(y_plus_x', y_minus_x', xy2d') where:
-    - y_plus_x' = y_minus_x (the coordinates are swapped)
-    - y_minus_x' = y_plus_x (the coordinates are swapped)
-    - xy2d' ≡ -xy2d (mod p) (the xy2d coordinate is negated modulo p)
-
-where p = 2^255 - 19.
-
-This implements the negation of a point in affine Niels coordinates. -/
+• The function always succeeds (no panic) for an AffineNielsPoint `self` with coordinates
+(y_plus_x, y_minus_x, xy2d)
+• The output AffineNielsPoint computed by `neg self` has coordinates (y_plus_x', y_minus_x', xy2d')
+  • y_plus_x' = y_minus_x (the coordinates are swapped)
+  • y_minus_x' = y_plus_x (the coordinates are swapped)
+  • `xy2d' ≡ -xy2d (mod p)` (the xy2d coordinate is negated modulo p = 2^255 - 19) -/
 @[step]
 theorem neg_spec
     (self : backend.serial.curve_models.AffineNielsPoint)

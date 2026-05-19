@@ -1,13 +1,14 @@
 /-
-Copyright 2025 The Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
-/-!
-# Spec theorem for `ProjectiveNielsPoint::conditional_select`
+
+/-! Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_select`
 
 This function conditionally selects between two ProjectiveNielsPoint values
 based on a Choice flag. It is implemented by applying
@@ -24,16 +25,16 @@ namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Inst
 namespace SubtleConditionallySelectable
 
 /-- **Spec theorem for
-`backend.serial.curve_models.ProjectiveNielsPoint.conditional_select`**
-- No panic (always returns successfully)
-- Given inputs:
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_select`**
+• No panic (always returns successfully)
+• Given inputs:
   • ProjectiveNielsPoint `a` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),
   • ProjectiveNielsPoint `b` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),
   • a Choice `choice`,
   the output ProjectiveNielsPoint has coordinates selected component-wise:
-  - If choice = 1, each coordinate equals the corresponding one of `b`
-  - If choice = 0, each coordinate equals the corresponding one of `a`
-  - The operation is constant-time (does not branch on choice) -/
+  • If choice = 1, each coordinate equals the corresponding one of `b`
+  • If choice = 0, each coordinate equals the corresponding one of `a`
+  • The operation is constant-time (does not branch on choice) -/
 @[step]
 theorem conditional_select_spec
     (a b : backend.serial.curve_models.ProjectiveNielsPoint)

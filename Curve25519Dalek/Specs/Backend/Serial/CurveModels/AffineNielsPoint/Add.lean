@@ -7,10 +7,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
 
-/-!
-# Spec theorem for `CompletedPoint::add`
-
-Specification and proof for `CompletedPoint::add`.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::add`
 
 This function implements the mixed addition of an AffineNielsPoint to an
 Edwards point in extended coordinates, returning the result in completed
@@ -36,12 +33,11 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
-
 namespace curve25519_dalek.Shared0EdwardsPoint.Insts
 namespace CoreOpsArithAddSharedAAffineNielsPointCompletedPoint
 
-
-/-- **Spec theorem for `CompletedPoint::add`**:
+/-- Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::add`
 • The function always succeeds (no panic)
 • Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')
   satisfies modulo p:

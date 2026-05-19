@@ -8,10 +8,9 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Montgomery.Curve
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
-/-!
-# Spec theorem for `CompletedPoint::as_extended`
 
-Specification and proof for `CompletedPoint::as_extended`.
+/-! Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended`
 
 This function implements point conversion from completed coordinates (ℙ¹ × ℙ¹) to extended
 twisted Edwards coordinates (ℙ³) on the Curve25519 elliptic curve. Given a point
@@ -24,39 +23,19 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field
-
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
-/-
-natural language description:
-
-• Takes a CompletedPoint with coordinates (X, Y, Z, T) in completed ℙ¹ × ℙ¹ representation
-(i.e., with affine coordinates given via X/Z = x and Y/T = y) and returns an EdwardsPoint
-(X', Y', Z', T') in extended ℙ³ representation (i.e., with X'/Z' = x, Y'/Z' = y and T' = X'Y'/Z').
-Arithmetics are performed in the field 𝔽_p where p = 2^255 - 19.
-
-natural language specs:
-
-• The function always succeeds (no panic)
-• Given an input completed point (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T') satisfies:
-- X' ≡ X·T (mod p)
-- Y' ≡ Y·Z (mod p)
-- Z' ≡ Z·T (mod p)
-- T' ≡ X·Y (mod p)
--/
-
-/-- **Spec theorem for `backend.serial.curve_models.CompletedPoint.as_extended`**
-- No panic (always returns successfully)
-- Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')
-satisfies the conversion formulas modulo p:
-- X' ≡ X·T (mod p)
-- Y' ≡ Y·Z (mod p)
-- Z' ≡ Z·T (mod p)
-- T' ≡ X·Y (mod p)
-where p = 2^255 - 19
-- Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)
-These formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended
-twisted Edwards ℙ³ coordinates. -/
+/-- Spec theorem for
+`curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended`
+• No panic (always returns successfully)
+• Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')
+  satisfies the conversion formulas modulo p = 2^255 - 19:
+  • X' ≡ X·T (mod p)
+  • Y' ≡ Y·Z (mod p)
+  • Z' ≡ Z·T (mod p)
+  • T' ≡ X·Y (mod p)
+• Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)
+• The output is a valid EdwardsPoint whose `toPoint` equals `q.toPoint` -/
 @[step]
 theorem as_extended_spec (q : CompletedPoint)
     (h_q_Valid : q.IsValid) :
