@@ -20,8 +20,9 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.IdentityCurveModelsProjectivePoint
 
-/-- **Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity`**
+/-- **Spec theorem**
+
+Specification for `curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity`.
 • No panic (always returns successfully)
 • The resulting ProjectivePoint is the identity element with coordinates (X=0, Y=1, Z=1) -/
 @[step]
