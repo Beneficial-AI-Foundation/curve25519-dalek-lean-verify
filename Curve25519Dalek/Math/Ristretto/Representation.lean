@@ -470,7 +470,8 @@ theorem IsEven_iff_in_doubling_image_left (P : Point Ed25519) :
   have : 1 - ((y^2 + x^2) / (1 - lamVal))^2 = ((1 - lamVal)^2 - (y^2 + x^2)^2) / (1 - lamVal)^2 := by
     field_simp [h_denom_ne]
   rw [this]
-  have h_factor : (1 - lamVal)^2 - (y^2 + x^2)^2 = (1 - lamVal - y^2 - x^2) * (1 - lamVal + y^2 + x^2) := by
+  have h_factor : (1 - lamVal)^2 - (y^2 + x^2)^2 =
+      (1 - lamVal - y^2 - x^2) * (1 - lamVal + y^2 + x^2) := by
     ring
   have h_lam_eq : lamVal = y^2 - x^2 - 1 := by
     have h : y^2 - x^2 - 1 - lamVal = 0 := by linear_combination h_yx
