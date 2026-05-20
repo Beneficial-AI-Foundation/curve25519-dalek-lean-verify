@@ -14,14 +14,7 @@ import Curve25519Dalek.Math.Edwards.Curve
 import Curve25519Dalek.Math.Edwards.Representation
 import Mathlib.Data.ZMod.Basic
 
--- Required for the #setup_aeneas_simps macro below
-set_option linter.hashCommand false
-#setup_aeneas_simps
-
-/-!
-# Spec theorem for `ProjectivePoint::double`
-
-Specification and proof for `ProjectivePoint::double`.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double`
 
 This function implements point doubling on the Curve25519 elliptic curve using projective
 coordinates. Given a point P = (X:Y:Z), it computes 2P (the point added to itself via
@@ -30,44 +23,29 @@ elliptic curve addition).
 Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 -/
 
-open Aeneas Aeneas.Std Result Aeneas.Std.WP
+-- Required for the #setup_aeneas_simps macro below
+set_option linter.hashCommand false
+#setup_aeneas_simps
 
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
-
 namespace curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
-/-
-natural language description:
+/-- **Spec theorem**
 
-• Takes a ProjectivePoint with coordinates (X, Y, Z) and returns a CompletedPoint that results
-from adding the input point to itself via elliptic curve point addition. Arithmetics are
-performed in the field 𝔽_p where p = 2^255 - 19.
-
-natural language specs:
-
+Specification for
+`curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double_spec_aux`.
 • The function always succeeds (no panic)
-• Given input point (X, Y, Z), the output CompletedPoint (X', Y', Z', T') satisfies:
-- X' ≡ 2XY (mod p)
-- Y' ≡ Y² + X² (mod p)
-- Z' ≡ Y² - X² (mod p)
-- T' ≡ 2Z² - Y² + X² (mod p)
--/
-
-/-- **Spec theorem for
-`curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double`**
-
-Given input ProjectivePoint with coordinates (X, Y, Z), the output CompletedPoint (X', Y', Z', T')
-satisfies the point doubling formulas modulo p:
-- X' ≡ 2XY (mod p)
-- Y' ≡ Y² + X² (mod p)
-- Z' ≡ Y² - X² (mod p)
-- T' ≡ 2Z² - Y² + X² (mod p)
-where p = 2^255 - 19
-
-Input bounds: X, Y limbs < 2^53 (for X + Y < 2^54), Z limbs < 2^54.
-Output bounds: X', Z', T' limbs < 2^52, Y' limbs < 2^53.
+• Given input ProjectivePoint with coordinates (X, Y, Z), the output CompletedPoint
+  (X', Y', Z', T') satisfies the point doubling formulas modulo p = 2^255 - 19:
+  • X' ≡ 2XY (mod p)
+  • Y' ≡ Y² + X² (mod p)
+  • Z' ≡ Y² - X² (mod p)
+  • T' ≡ 2Z² - Y² + X² (mod p)
+• Input bounds: X, Y limbs < 2^53 (for X + Y < 2^54), Z limbs < 2^54
+• Output bounds: X', Z', T' limbs < 2^52, Y' limbs < 2^53
 
 TODO: Investigate if c.Y can achieve the tighter < 2^52 bound. Currently c.Y = YY + XX
 where YY, XX < 2^52, giving Y < 2^53. -/
@@ -354,9 +332,9 @@ theorem double_spec_core
             (q.toPoint' hq_on).y) := by
             rw [h_qx, h_qy]; simp only [Ed25519]; ring
 
-/-- Verification of the `double` function for `ProjectivePoint` in WP form.
-Thin wrapper over `double_spec_core`: widens bounds from `< 2^52`
-to `< 2^53` and bridges `toPoint' → toPoint`. -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double`**
+• The function always succeeds (no panic) on any valid input ProjectivePoint
+• The resulting CompletedPoint is valid and represents `2 · q.toPoint` on the Edwards curve -/
 @[step]
 theorem double_spec
     (q : ProjectivePoint) (hq_valid : q.IsValid) :

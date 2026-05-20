@@ -8,8 +8,12 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ZERO
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
+
 /-!
-# Spec theorem for `ProjectiveNielsPoint::identity`
+# Spec theorem
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::identity`.
 
 This function returns the identity element of the Edwards curve in ProjectiveNiels
 coordinates (Y_plus_X=1, Y_minus_X=1, Z=1, T2d=0), representing the affine point (0, 1).
@@ -20,19 +24,19 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
 open backend.serial.u64.field.FieldElement51
 open backend.serial.curve_models
-
 namespace curve25519_dalek
-namespace backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity
+namespace backend.serial.curve_models.ProjectiveNielsPoint.Insts
+namespace Curve25519_dalekTraitsIdentity
 
-/-- **Spec theorem for
-`backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**
+/-- **Spec theorem**
 
-Returns the identity element of the Edwards curve in ProjectiveNiels coordinates:
-- No panic (always returns successfully)
-- The resulting ProjectiveNielsPoint is the identity element with coordinates
+Specification for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::identity`.
+• No panic (always returns successfully)
+• The resulting ProjectiveNielsPoint is the identity element with coordinates
   (Y_plus_X=1, Y_minus_X=1, Z=1, T2d=0)
-- The result is a valid `ProjectiveNielsPoint`.
-- It represents the Edwards curve identity `0 = (0, 1)` (the affine neutral element). -/
+• The result is a valid `ProjectiveNielsPoint`
+• It represents the Edwards curve identity `0 = (0, 1)` (the affine neutral element) -/
 @[step]
 theorem identity_spec :
     identity ⦃ (result : ProjectiveNielsPoint) =>
@@ -55,5 +59,6 @@ theorem identity_spec :
   ext
   all_goals simp [hpx, hpy, toField, h1]
 
-end backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity
+end Curve25519_dalekTraitsIdentity
+end backend.serial.curve_models.ProjectiveNielsPoint.Insts
 end curve25519_dalek

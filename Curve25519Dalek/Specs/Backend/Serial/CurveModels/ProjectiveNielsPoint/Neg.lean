@@ -8,8 +8,11 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Montgomery.Curve
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
+
 /-!
-# Spec theorem for `ProjectiveNielsPoint::neg`
+# Spec theorem
+
+Specification for `curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg`.
 
 This function computes the negation of a ProjectiveNielsPoint. Given a point
 N = (Y+X, Y−X, Z, 2dXY), it returns −N by swapping Y_plus_X and Y_minus_X,
@@ -27,23 +30,19 @@ open Edwards
 open curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint
 open curve25519_dalek.backend.serial.curve_models
 open curve25519_dalek.backend.serial.u64.field
-
 namespace curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint
 
-/-- **Spec theorem for
-`Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg`**:
+/-- **Spec theorem**
 
-- No panic (always returns successfully) given `self.IsValid`.
-- The output is a valid `ProjectiveNielsPoint`.
-- It represents `-self.toPoint` on Ed25519.
+For `curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg` (shared-reference)
+• No panic (always returns successfully) given `self.IsValid`
+• The output is a valid `ProjectiveNielsPoint`
+• It represents `-self.toPoint` on Ed25519
 
 Derived by lifting the Field51-level `FieldElement51.neg_spec` postconditions
 (`r.Y_plus_X = self.Y_minus_X`, `r.Y_minus_X = self.Y_plus_X`, `r.Z = self.Z`,
 `r.T2d ≡ -self.T2d [mod p]` with `r.T2d[i]!.val < 2^52`) through
-`ProjectiveNielsPoint.toPoint'`. `IsValid` is symmetric in `Y_plus_X`/`Y_minus_X`
-at `< 2^54`, so the swap preserves `IsValid` trivially on those fields;
-`Z` is unchanged; `T2d`'s strict `< 2^52` bound is supplied by the tightened
-`FieldElement51.neg_spec`. -/
+`ProjectiveNielsPoint.toPoint'`. -/
 @[step]
 theorem neg_spec
     (self : ProjectiveNielsPoint) (h_self : self.IsValid) :
@@ -104,8 +103,13 @@ end curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjective
 namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
 namespace CoreOpsArithNegProjectiveNielsPoint
 
-/-- **Spec theorem for the owned-value
-`ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg`**.
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg`.
+• No panic (always returns successfully) given `self.IsValid`
+• The output is a valid `ProjectiveNielsPoint`
+• It represents `-self.toPoint` on Ed25519
 
 Mirrors the shared-reference `Shared0…neg_spec`; the owned `neg` is just a
 one-step delegation to it (Rust source: `-&self`). Needed so that `let*`

@@ -8,8 +8,12 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
+
 /-!
-# Spec theorem for `ProjectiveNielsPoint::conditional_assign`
+# Spec theorem
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_assign`.
 
 This function conditionally assigns the value of another ProjectiveNielsPoint
 to self based on a Choice value. It is a constant-time operation used in
@@ -32,36 +36,19 @@ open curve25519_dalek.backend.serial.curve_models
 namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
 namespace SubtleConditionallySelectable
 
-/-
-natural language description:
+/-- **Spec theorem**
 
-• Takes a ProjectiveNielsPoint self = (Y_plus_X, Y_minus_X, Z, T2d) and another
-  ProjectiveNielsPoint other = (Y_plus_X', Y_minus_X', Z', T2d'), along with a
-  Choice value, and conditionally assigns other to self in constant time.
-
-natural language specs:
-
-• The function always succeeds (no panic)
-• Given inputs self = (Y_plus_X, Y_minus_X, Z, T2d), other = (Y_plus_X', Y_minus_X', Z', T2d'),
-  and choice, the output self' = (Y_plus_X'', Y_minus_X'', Z'', T2d'') satisfies:
-  - If choice represents 1 (true):
-    Y_plus_X'' = Y_plus_X', Y_minus_X'' = Y_minus_X', Z'' = Z', T2d'' = T2d'
-  - If choice represents 0 (false):
-    Y_plus_X'' = Y_plus_X, Y_minus_X'' = Y_minus_X, Z'' = Z, T2d'' = T2d
-  - The operation is constant-time (execution time does not depend on choice value)
--/
-
-/-- **Spec theorem for
-`backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign`**
-- No panic (always returns successfully)
-- Given inputs:
+Specification for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_assign`.
+• No panic (always returns successfully)
+• Given inputs:
   • a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),
   • a ProjectiveNielsPoint `other` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),
   • a Choice `choice`,
 the output ProjectiveNielsPoint computed by `conditional_assign self other choice` satisfies:
-- Each coordinate is conditionally selected:
-  if choice is 1, output = other; if choice is 0, output = self
-- The operation is performed in constant time for all field elements -/
+• Each coordinate is conditionally selected: if choice is 1, output = other;
+  if choice is 0, output = self
+• The operation is performed in constant time for all field elements -/
 @[step]
 theorem conditional_assign_spec
     (self other : backend.serial.curve_models.ProjectiveNielsPoint)
@@ -80,7 +67,8 @@ theorem conditional_assign_spec
   -- HACK: aeneas#963 didn't fully fix this — still needed.
   refine ⟨?_, ?_, ?_, ?_⟩ <;> intro i hi <;> split_ifs <;> simp_all
 
-/-- **Point-level wrapper for `ProjectiveNielsPoint::conditional_assign`**:
+/-- **Point-level wrapper for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_assign`**
 Given valid `self` and `other` and a `Choice`, the output is a valid `ProjectiveNielsPoint`
 whose `toPoint` equals `other.toPoint` if `choice.val = 1#u8`, otherwise `self.toPoint`.
 
