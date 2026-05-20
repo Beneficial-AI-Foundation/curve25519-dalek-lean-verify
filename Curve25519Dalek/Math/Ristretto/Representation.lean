@@ -467,8 +467,8 @@ theorem IsEven_iff_in_doubling_image_left (P : Point Ed25519) :
   have h_denom_ne : 1 - lamVal ≠ 0 := by
     have := Ed25519.denomsNeZero Q Q
     convert this.2
-  have : 1 - ((y^2 + x^2) / (1 - lamVal))^2 = ((1 - lamVal)^2 - (y^2 + x^2)^2) / (1 - lamVal)^2 := by
-    field_simp [h_denom_ne]
+  have : 1 - ((y^2 + x^2) / (1 - lamVal))^2 =
+    ((1 - lamVal)^2 - (y^2 + x^2)^2) / (1 - lamVal)^2 := by field_simp [h_denom_ne]
   rw [this]
   have h_factor : (1 - lamVal)^2 - (y^2 + x^2)^2 =
       (1 - lamVal - y^2 - x^2) * (1 - lamVal + y^2 + x^2) := by
