@@ -15,6 +15,9 @@ build*.txt
 # Lean
 .lake
 
+# Verso-blueprint build output
+_out/
+
 # Aeneas
 aeneas
 .aeneas

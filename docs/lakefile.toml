@@ -1,0 +1,14 @@
+name = "Curve25519DalekDocs"
+defaultTargets = ["Curve25519DalekDocs"]
+
+[[require]]
+name = "versoBlueprint"
+git = "https://github.com/leanprover/verso-blueprint"
+rev = "v4.30.0"
+
+[[require]]
+name = "Curve25519Dalek"
+path = ".."
+
+[[lean_lib]]
+name = "Curve25519DalekDocs"

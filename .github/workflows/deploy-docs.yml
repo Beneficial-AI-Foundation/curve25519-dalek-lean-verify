@@ -63,11 +63,52 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install elan
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Cache Lake packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            .lake
+            docs/.lake
+          key: ${{ runner.os }}-lake-blueprint-${{ hashFiles('lake-manifest.json', 'lean-toolchain', 'docs/lake-manifest.json') }}
+          restore-keys: |
+            ${{ runner.os }}-lake-blueprint-
+
+      - name: Download Mathlib cache
+        run: |
+          lake exe cache get 2>&1 || echo "cache get returned non-zero (may be partial)"
+          lake -d docs exe cache get 2>&1 || echo "docs cache get returned non-zero (may be partial)"
+
+      - name: Build Lean parent library
+        run: lake build
+
+      - name: Build Verso blueprint modules
+        run: lake -d docs build Curve25519DalekDocs
+
+      - name: Render blueprint HTML
+        working-directory: docs
+        run: lake env lean --run Main.lean --output ../_out/blueprint
+
       - name: Build Rust docs
         run: npm run docs:rust
 
       - name: Build with VitePress
         run: npm run docs:build
+
+      - name: Copy blueprint into VitePress dist
+        run: |
+          if [ -d _out/blueprint/html-multi ]; then
+            mkdir -p site/.vitepress/dist/blueprint
+            cp -r _out/blueprint/html-multi/* site/.vitepress/dist/blueprint/
+            echo "✓ Blueprint added to site/blueprint/"
+          else
+            echo "ERROR: _out/blueprint/html-multi not found — verso render failed?"
+            exit 1
+          fi
 
       - name: Restore callgraph from cache
         id: cache-callgraph
