@@ -29,19 +29,19 @@ namespace curve25519_dalek.backend.serial.u64.constants
 /-
 natural language description:
 
-    • ED25519_BASEPOINT_POINT is the standard Ed25519 basepoint,
-      which serves as the generator point for the prime order subgroup of the Ed25519 elliptic curve group.
+    • ED25519_BASEPOINT_POINT is the standard Ed25519 basepoint, which serves as the generator point
+      for the prime order subgroup of the Ed25519 elliptic curve group.
     • This constant is used as the base point for scalar multiplication operations in Ed25519.
 
 natural language specs:
 
-    • ED25519_BASEPOINT_POINT is a valid Edwards point (which amongst other things implies that it fulfills the curve equation)
+    • ED25519_BASEPOINT_POINT is a valid Edwards point and so fulfills the curve equation
     • ED25519_BASEPOINT_POINT is of prime order L
 -/
 
-/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`**
+/-- Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`
 
-`ED25519_BASEPOINT_POINT` is a valid Edwards point (fulfilling the curve equation) of prime order L. -/
+`ED25519_BASEPOINT_POINT` is a valid Edwards point of prime order L. -/
 @[step]
 theorem ED25519_BASEPOINT_POINT_spec :
     ED25519_BASEPOINT_POINT ⦃ (result : edwards.EdwardsPoint) =>
