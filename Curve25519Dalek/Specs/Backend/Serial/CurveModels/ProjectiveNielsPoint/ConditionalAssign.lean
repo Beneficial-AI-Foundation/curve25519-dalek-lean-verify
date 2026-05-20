@@ -9,8 +9,11 @@ import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
 
-/-! Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_assign`
+/-!
+# Spec theorem
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_assign`.
 
 This function conditionally assigns the value of another ProjectiveNielsPoint
 to self based on a Choice value. It is a constant-time operation used in
@@ -33,8 +36,10 @@ open curve25519_dalek.backend.serial.curve_models
 namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
 namespace SubtleConditionallySelectable
 
-/-- **Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_assign`**
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_assign`.
 • No panic (always returns successfully)
 • Given inputs:
   • a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),

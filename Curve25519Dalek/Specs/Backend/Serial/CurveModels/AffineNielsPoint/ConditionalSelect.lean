@@ -7,8 +7,11 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
 
-/-! Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_select`
+/-!
+# Spec theorem
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_select`.
 
 This function conditionally selects between two AffineNielsPoint values
 based on a Choice flag. It is implemented by applying
@@ -23,8 +26,10 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
 namespace SubtleConditionallySelectable
 
-/-- **Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_select`**
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_select`.
 • The function always succeeds (no panic) for AffineNielsPoints `a` and `b` and a Choice `choice`
 • The result is an AffineNielsPoint whose coordinates are selected component-wise:
   - If choice = 1, each coordinate equals the corresponding one of `b`

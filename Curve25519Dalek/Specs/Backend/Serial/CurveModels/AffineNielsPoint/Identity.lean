@@ -26,8 +26,9 @@ open backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
 namespace Curve25519_dalekTraitsIdentity
 
-/-- **Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::identity`**
+/-- **Spec theorem**
+
+Specification for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::identity`.
 • No panic (always returns successfully)
 • The resulting AffineNielsPoint is the identity element with coordinates:
   y_plus_x = 1, y_minus_x = 1, xy2d = 0 -/

@@ -7,7 +7,10 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
 
-/-! Spec theorem for `curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::sub`
+/-!
+# Spec theorem
+
+For `curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::sub`
 
 This function implements the mixed subtraction of a ProjectiveNielsPoint from an
 Edwards point in extended coordinates, returning the result in completed
@@ -583,7 +586,9 @@ private lemma sub_isValid_and_toPoint
       hZ1_ne hZ2_ne h_self_x h_self_y h_other_x h_other_y
       hX_factored hY_factored hZ_factored hT_factored
 
-/-- Spec theorem for `curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::sub`
+/-- **Spec theorem**
+
+For `curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::sub`
 • No panic for valid EdwardsPoints `self` and `other`
 • The output is a valid CompletedPoint `c`
 • `c.toPoint = self.toPoint - other.toPoint` -/

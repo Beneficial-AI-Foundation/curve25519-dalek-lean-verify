@@ -9,8 +9,10 @@ import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Montgomery.Curve
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
 
-/-! Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg`
+/-!
+# Spec theorem
+
+Specification for `curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg`.
 
 This function computes the negation of a ProjectiveNielsPoint. Given a point
 N = (Y+X, Y−X, Z, 2dXY), it returns −N by swapping Y_plus_X and Y_minus_X,
@@ -30,8 +32,9 @@ open curve25519_dalek.backend.serial.curve_models
 open curve25519_dalek.backend.serial.u64.field
 namespace curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint
 
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg` (shared-reference)
+/-- **Spec theorem**
+
+For `curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg` (shared-reference)
 • No panic (always returns successfully) given `self.IsValid`
 • The output is a valid `ProjectiveNielsPoint`
 • It represents `-self.toPoint` on Ed25519
@@ -100,8 +103,10 @@ end curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjective
 namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
 namespace CoreOpsArithNegProjectiveNielsPoint
 
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg`
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg`.
 • No panic (always returns successfully) given `self.IsValid`
 • The output is a valid `ProjectiveNielsPoint`
 • It represents `-self.toPoint` on Ed25519

@@ -7,8 +7,11 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
 
-/-! Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_assign`
+/-!
+# Spec theorem
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_assign`.
 
 This function conditionally assigns the value of another AffineNielsPoint
 to self based on a Choice value. It is a constant-time operation used in
@@ -30,8 +33,10 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
 namespace SubtleConditionallySelectable
 
-/-- **Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_assign`**
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_assign`.
 • No panic (always returns successfully)
 • Given inputs:
   • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),

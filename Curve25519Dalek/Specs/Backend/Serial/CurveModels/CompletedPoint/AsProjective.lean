@@ -8,8 +8,10 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Math.Edwards.Representation
 
-/-! Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective`
+/-!
+# Spec theorem
+
+Specification for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective`.
 
 This function implements point conversion from completed coordinates (ℙ¹ × ℙ¹) to projective
 coordinates (ℙ²) on the Curve25519 elliptic curve. Given a point P = (X:Y:Z:T) in
@@ -171,8 +173,9 @@ private lemma as_projective_isValid_and_toPoint
       rw [h_py, hY_F, hZ_F, h_qy]
       field_simp [hq_valid.Z_ne_zero, hq_valid.T_ne_zero]
 
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective`
+/-- **Spec theorem**
+
+For `curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective`.
 • Always succeeds for a valid CompletedPoint
 • Produces a valid ProjectivePoint
 • Preserves the represented affine point (`proj.toPoint = q.toPoint`) -/

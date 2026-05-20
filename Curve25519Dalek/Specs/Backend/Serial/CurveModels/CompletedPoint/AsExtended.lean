@@ -9,8 +9,10 @@ import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Montgomery.Curve
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 
-/-! Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended`
+/-!
+# Spec theorem
+
+Specification for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended`.
 
 This function implements point conversion from completed coordinates (ℙ¹ × ℙ¹) to extended
 twisted Edwards coordinates (ℙ³) on the Curve25519 elliptic curve. Given a point
@@ -25,8 +27,9 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended`
+/-- **Spec theorem**
+
+For `curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended`
 • No panic (always returns successfully)
 • Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')
   satisfies the conversion formulas modulo p = 2^255 - 19:

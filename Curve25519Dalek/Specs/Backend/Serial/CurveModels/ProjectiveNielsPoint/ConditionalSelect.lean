@@ -7,8 +7,11 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
 
-/-! Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_select`
+/-!
+# Spec theorem
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_select`.
 
 This function conditionally selects between two ProjectiveNielsPoint values
 based on a Choice flag. It is implemented by applying
@@ -24,8 +27,10 @@ open curve25519_dalek.backend.serial.curve_models
 namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
 namespace SubtleConditionallySelectable
 
-/-- **Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_select`**
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::conditional_select`.
 • No panic (always returns successfully)
 • Given inputs:
   • ProjectiveNielsPoint `a` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),

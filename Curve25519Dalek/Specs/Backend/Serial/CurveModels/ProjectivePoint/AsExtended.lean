@@ -8,8 +8,10 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 
-/-! Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended`
+/-!
+# Spec theorem
+
+Specification for `curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended`.
 
 This function implements point conversion from projective coordinates (ℙ²) to extended
 twisted Edwards coordinates (ℙ³) on the Curve25519 elliptic curve. Given a point
@@ -26,8 +28,9 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
-/-- **Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended`**
+/-- **Spec theorem**
+
+Specification for `curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended`.
 • The function always succeeds (no panic)
 • Given input ProjectivePoint with coordinates (X, Y, Z), the output EdwardsPoint
   (X', Y', Z', T') satisfies the conversion formulas modulo p = 2^255 - 19:

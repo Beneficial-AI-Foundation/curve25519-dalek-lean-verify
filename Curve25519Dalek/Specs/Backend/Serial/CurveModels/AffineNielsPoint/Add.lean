@@ -36,8 +36,9 @@ open curve25519_dalek.backend.serial.curve_models
 namespace curve25519_dalek.Shared0EdwardsPoint.Insts
 namespace CoreOpsArithAddSharedAAffineNielsPointCompletedPoint
 
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::add`
+/-- **Spec theorem**
+
+Sepcification for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::add`.
 • The function always succeeds (no panic)
 • Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')
   satisfies modulo p:
