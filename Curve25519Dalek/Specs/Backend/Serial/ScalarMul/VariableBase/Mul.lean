@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo
 -/
@@ -16,14 +16,14 @@ import Curve25519Dalek.Specs.Scalar.Scalar.AsRadix2w
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.ExternallyVerified
 
-/-! # Spec Theorem for `variable_base::mul`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::scalar_mul::variable_base::mul`
 
 Top-level constant-time variable-base scalar multiplication. Builds a lookup table
 from `point`, decomposes `scalar` into radix-16 signed digits, unrolls the first
 loop iteration (for digit 63), then runs `mul_loop` for the remaining 63 iterations,
 and finally converts back to `EdwardsPoint`.
 
-**Source**: curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs, lines 11-51
+Source: "curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -82,11 +82,11 @@ private lemma scalar_digit_63_le_8
   nlinarith [h_split, h_inner_lb, h_geom, h_V_Z, h_255_eq, h_pow_pos, h_s63_ge_9,
              mul_pos (show (0:ℤ) < 9 from by norm_num) h_pow_pos]
 
-/-- **Spec and proof concerning `variable_base.mul`**:
-- No panic (always returns successfully) given `point.IsValid` and
+/-- **Spec theorem for `curve25519_dalek::backend::serial::scalar_mul::variable_base::mul`**
+• No panic (always returns successfully) given `point.IsValid` and
   `(scalar.bytes[31]!).val ≤ 127`.
-- The result is a valid `EdwardsPoint`.
-- It represents `(U8x32_as_Nat scalar.bytes) • point.toPoint` on Ed25519.
+• The result is a valid `EdwardsPoint`.
+• It represents `(U8x32_as_Nat scalar.bytes) • point.toPoint` on Ed25519.
 -/
 @[step]
 theorem mul_spec (point : EdwardsPoint) (hpoint : point.IsValid)
