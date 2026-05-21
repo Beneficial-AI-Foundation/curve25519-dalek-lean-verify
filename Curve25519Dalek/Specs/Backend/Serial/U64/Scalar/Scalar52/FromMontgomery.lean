@@ -87,9 +87,9 @@ theorem from_montgomery_spec (self : Scalar52) (h_bounds : ∀ i < 5, self[i]!.v
   step*
   · intro i hi
     by_cases h_lt : i < 5
-    · rw [limbs1_post1 i h_lt (Nat.zero_le i)]; specialize h_bounds i h_lt; simp only [Array.getElem!_Nat_eq,
-      UScalarTy.U64_numBits_eq, UScalarTy.U128_numBits_eq, Nat.reduceLeDiff,
-      UScalar.cast_val_mod_pow_greater_numBits_eq, Nat.reducePow];
+    · rw [limbs1_post1 i h_lt (Nat.zero_le i)]; specialize h_bounds i h_lt;
+      simp only [Array.getElem!_Nat_eq, UScalarTy.U64_numBits_eq, UScalarTy.U128_numBits_eq,
+        Nat.reduceLeDiff, UScalar.cast_val_mod_pow_greater_numBits_eq, Nat.reducePow];
       agrind
     · rw [limbs1_post2 i hi (by omega)]
       simp only [Array.repeat, getElem!, List.getElem?_replicate, *,
