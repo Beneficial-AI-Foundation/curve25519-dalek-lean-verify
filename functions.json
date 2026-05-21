@@ -2486,7 +2486,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VariableBase/Mul.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `variable_base.mul`**:\n- No panic (always returns successfully) given `point.IsValid` and\n  `(scalar.bytes[31]!).val ≤ 127`.\n- The result is a valid `EdwardsPoint`.\n- It represents `(U8x32_as_Nat scalar.bytes) • point.toPoint` on Ed25519.\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::scalar_mul::variable_base::mul`**\n• No panic (always returns successfully) given `point.IsValid` and\n  `(scalar.bytes[31]!).val ≤ 127`.\n• The result is a valid `EdwardsPoint`.\n• It represents `(U8x32_as_Nat scalar.bytes) • point.toPoint` on Ed25519.\n-/",
    "source": "curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::scalar_mul::variable_base::mul",
@@ -2518,7 +2518,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VariableBase/MulLoop.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `variable_base.mul_loop`**:\n- No panic (always returns successfully)\n- Returns a `CompletedPoint` whose Edwards point equals the full radix-16 reconstruction\n  of `scalar_digits`, scaled by `P.toPoint`.\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::scalar_mul::variable_base::mul_loop`**\n• No panic (always returns successfully).\n• The result is a valid `CompletedPoint`.\n• The result's Edwards point equals the full radix-16 reconstruction of `scalar_digits`,\n  scaled by `P.toPoint`.\n-/",
    "source": "curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::scalar_mul::variable_base::mul",
