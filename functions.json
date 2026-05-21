@@ -2572,7 +2572,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Ed25519BasepointPoint.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`**\n\n`ED25519_BASEPOINT_POINT` is a valid Edwards point (fulfilling the curve equation) of prime order L. -/",
+   "/-- Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`\n\n`ED25519_BASEPOINT_POINT` is a valid Edwards point of prime order L. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT",
