@@ -21,23 +21,15 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
+namespace CoreOpsArithSubAssignSharedAFieldElement51
 
-/-
-natural language description:
-
-    • Takes two input FieldElement51s a and b and returns another FieldElement51
-      that is a representant of the difference a - b in the field (modulo p = 2^255 - 19).
-
-    • The implementation directly delegates to `sub`.
-
-natural language specs:
-
-    • For appropriately bounded FieldElement51s a and b:
-      Field51_as_Nat(sub_assign(a, b)) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p), or equivalently
-      Field51_as_Nat(sub_assign(a, b)) + Field51_as_Nat(b) ≡ Field51_as_Nat(a) (mod p)
--/
-
+/-- Spec theorem for `FieldElement51::sub_assign`.
+- Requires:
+  - The limbs of the first input to be bounded by 2^63
+  - The limbs of the second input to be bounded by 2^54
+- Limbs of the result are bounded by 2^52
+- Field51_as_Nat(sub_assign(a, b)) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p) -/
 @[step]
 theorem sub_assign_spec (self _rhs : backend.serial.u64.field.FieldElement51)
     (ha : ∀ i < 5, self[i]!.val < 2 ^ 63)
@@ -48,4 +40,5 @@ theorem sub_assign_spec (self _rhs : backend.serial.u64.field.FieldElement51)
   unfold sub_assign
   step*
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51
+end CoreOpsArithSubAssignSharedAFieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts

@@ -22,7 +22,7 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 /-
 natural language description:
 
-    • Represents the additive inverse of the multiplicative identity element in the field 𝔽_p where p = 2^255 - 19
+    • Represents the additive inverse of the multiplicative identity element in the field 𝔽_p
     • The field element is represented as five u64 limbs:
 
         [2251799813685228, 2251799813685247, 2251799813685247, 2251799813685247, 2251799813685247]
