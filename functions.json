@@ -505,7 +505,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean",
    "spec_docstring":
-   "/-- **Spec for `Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add`**:\n- Does not overflow when limb sums don't exceed U64.max\n- Returns a field element where each limb is the sum of corresponding input limbs\n- This is element-wise addition, not modular field addition (use reduce for that)\n- Input bounds: both inputs have limbs < 2^53\n- Output bounds: output has limbs < 2^54\n- Simply wraps add_assign -/",
+   "/-- Spec for `Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add`:\n- Does not overflow when limb sums don't exceed U64.max\n- Returns a field element where each limb is the sum of corresponding input limbs\n- This is element-wise addition, not modular field addition (use reduce for that)\n- Input bounds: both inputs have limbs < 2^53\n- Output bounds: output has limbs < 2^54\n- Simply wraps add_assign -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::add",
@@ -2572,7 +2572,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Ed25519BasepointPoint.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`**\n\n`ED25519_BASEPOINT_POINT` is a valid Edwards point (fulfilling the curve equation) of prime order L. -/",
+   "/-- Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`\n\n`ED25519_BASEPOINT_POINT` is a valid Edwards point of prime order L. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT",
@@ -3159,7 +3159,8 @@
    "theorem sub_assign_spec (self _rhs : backend.serial.u64.field.FieldElement51)\n    (ha : ∀ i < 5, self[i]!.val < 2 ^ 63)\n    (hb : ∀ i < 5, _rhs[i]!.val < 2 ^ 54) :\n    sub_assign self _rhs ⦃ (result : backend.serial.u64.field.FieldElement51) =>\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧\n      (Field51_as_Nat result + Field51_as_Nat _rhs) % p = Field51_as_Nat self % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/SubAssign.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- Spec theorem for `FieldElement51::sub_assign`.\n- Requires:\n  - The limbs of the first input to be bounded by 2^63\n  - The limbs of the second input to be bounded by 2^54\n- Limbs of the result are bounded by 2^52\n- Field51_as_Nat(sub_assign(a, b)) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p) -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::SubAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::sub_assign",
@@ -3227,7 +3228,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalSelect.lean",
    "spec_docstring":
-   "/--\n**Spec for `backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select`**:\n- No panic (always returns successfully)\n- For each limb i, the result limb equals `b[i]` when `choice = 1`,\n  and equals `a[i]` when `choice = 0` (constant-time conditional select)\n- Consequently, when `choice = Choice.one`, the whole result equals `b`;\n  when `choice = Choice.zero`, the result equals `a`.\n-/",
+   "/--\nSpec for\n  `backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select`:\n- No panic (always returns successfully)\n- For each limb i, the result limb equals `b[i]` when `choice = 1`,\n  and equals `a[i]` when `choice = 0` (constant-time conditional select)\n- Consequently, when `choice = Choice.one`, the whole result equals `b`;\n  when `choice = Choice.zero`, the result equals `a`.\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select",

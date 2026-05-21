@@ -21,10 +21,10 @@ namespace curve25519_dalek.backend.serial.u64.constants
 /-
 natural language description:
 
-    • constants.SQRT_AD_MINUS_ONE is a constant representing one of the square roots of (a*d - 1) (mod p)
-      where a and d are the parameters in the defining curve equation ax^2 + y^2 = 1 + dx^2y^2
-      (for Curve25519 we have a = -1).
-    • The field element constants.SQRT_AD_MINUS_ONE is represented as five u64 limbs (51-bit limbs)
+  • SQRT_AD_MINUS_ONE is a constant representing one of the square roots of (a*d - 1) (mod p)
+    where a and d are the parameters in the defining curve equation ax^2 + y^2 = 1 + dx^2y^2
+    (for Curve25519 we have a = -1).
+  • The field element constants.SQRT_AD_MINUS_ONE is represented as five u64 limbs (51-bit limbs)
 
 natural language specs:
 
