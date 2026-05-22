@@ -8,12 +8,12 @@
   },
   "source": {
     "repo": "https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify.git",
-    "commit": "622e8ba1bc8f356d26c7711646ef043cc3f5823e",
+    "commit": "a70e109ca051cba55a2143ee8e9cb1b581470ae1",
     "language": "rust",
     "package": "curve25519-dalek",
     "package-version": "4.2.0"
   },
-  "timestamp": "2026-05-13T08:48:11Z",
+  "timestamp": "2026-05-22T14:32:06Z",
   "data": {
     "probe:alloc/https://github.com/rust-lang/rust/library/alloc/slice/impl#[`[T]`]to_vec()": {
       "display-name": "to_vec",
