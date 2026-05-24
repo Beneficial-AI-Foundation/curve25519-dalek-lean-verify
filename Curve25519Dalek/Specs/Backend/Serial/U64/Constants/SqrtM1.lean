@@ -30,10 +30,10 @@ def SQRT_M1_raw : backend.serial.u64.field.FieldElement51 :=
 -/
 @[step]
 theorem SQRT_M1_spec :
-    SQRT_M1 ⦃ result =>
-    result = SQRT_M1_raw ∧
-    (Field51_as_Nat result)^2 % p = p - 1 ∧
-    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
+    SQRT_M1 ⦃ (result : field.FieldElement51) =>
+      result = SQRT_M1_raw ∧
+      (Field51_as_Nat result)^2 % p = p - 1 ∧
+      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
   unfold SQRT_M1 field.FieldElement51.from_limbs SQRT_M1_raw
   simp only [spec_ok]
   exact ⟨trivial, by decide, fun i hi => by interval_cases i <;> decide⟩

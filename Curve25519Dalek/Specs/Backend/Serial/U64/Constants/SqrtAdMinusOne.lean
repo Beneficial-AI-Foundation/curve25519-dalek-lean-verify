@@ -32,10 +32,10 @@ def SQRT_AD_MINUS_ONE_raw : backend.serial.u64.field.FieldElement51 :=
 -/
 @[step]
 theorem SQRT_AD_MINUS_ONE_spec :
-    SQRT_AD_MINUS_ONE ⦃ result =>
-    (Field51_as_Nat result)^2 % p = (a * d - 1) % p ∧
-    (∀ i < 5, result[i]!.val < 2^51) ∧
-    result = SQRT_AD_MINUS_ONE_raw ⦄ := by
+    SQRT_AD_MINUS_ONE ⦃ (result : field.FieldElement51) =>
+      (Field51_as_Nat result)^2 % p = (a * d - 1) % p ∧
+      (∀ i < 5, result[i]!.val < 2^51) ∧
+      result = SQRT_AD_MINUS_ONE_raw ⦄ := by
   unfold SQRT_AD_MINUS_ONE field.FieldElement51.from_limbs SQRT_AD_MINUS_ONE_raw
   simp only [spec_ok]
   exact ⟨by decide, fun i hi => by interval_cases i <;> decide, trivial⟩

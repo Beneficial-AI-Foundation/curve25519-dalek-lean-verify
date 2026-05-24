@@ -6,8 +6,11 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! Spec theorem for
-`curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED`
+/-!
+# Spec theorem
+
+Specification for
+`curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED`.
 
 This constant represents `(d - 1)^2 (mod p)`, where `d` is the twisted Edwards curve
 parameter for Curve25519 and `p = 2^255 - 19`. It is encoded as a 5-limb 51-bit
@@ -19,8 +22,10 @@ Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED`
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED`.
 
 • The function always succeeds (no panic)
 • `Field51_as_Nat EDWARDS_D_MINUS_ONE_SQUARED = (d - 1)^2 % p` (canonical reduced form)
