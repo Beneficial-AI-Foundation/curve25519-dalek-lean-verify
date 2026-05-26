@@ -6,12 +6,11 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec theorem for `constants::INVSQRT_A_MINUS_D`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D`
 
-Specification and proof for the constant `INVSQRT_A_MINUS_D`.
-
-This constant represents 1/sqrt(a-d) where a and d are the twisted Edwards curve parameters
-in the defining equation ax^2 + y^2 = 1 + dx^2y^2.
+This constant represents `1 / sqrt(a - d) (mod p)`, where `a` and `d` are the twisted Edwards
+curve parameters appearing in the defining equation `a*x^2 + y^2 = 1 + d*x^2*y^2` and
+`p = 2^255 - 19`. It is encoded as a 5-limb 51-bit `FieldElement51`.
 
 Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 -/
@@ -20,10 +19,10 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D`**
-
-Field51_as_Nat(constants.INVSQRT_A_MINUS_D)^2 * (a - d) ≡ 1 (mod p), which is equivalent
-to Field51_as_Nat(constants.INVSQRT_A_MINUS_D) ≡ 1/sqrt(a-d) (mod p). Here, a and d are the
-mathematical representations of the Edwards curve parameters as integers. -/
+• The function always succeeds (no panic)
+• `(Field51_as_Nat INVSQRT_A_MINUS_D)^2 * (a - d) ≡ 1 (mod p)`, i.e. it inverts `sqrt(a - d)`
+• Every limb is bounded by `2 ^ 51`
+-/
 @[step]
 theorem INVSQRT_A_MINUS_D_spec :
     INVSQRT_A_MINUS_D ⦃ (result : field.FieldElement51) =>
