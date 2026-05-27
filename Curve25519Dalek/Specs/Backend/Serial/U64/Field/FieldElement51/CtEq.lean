@@ -1,43 +1,27 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
-/-! # Spec Theorem for `FieldElement51::ct_eq`
 
-Specification and proof for constant-time equality on FieldElement51.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::ct_eq`
 
-The Rust implementation normalizes both operands to canonical wire format with
-`to_bytes()` and then compares the two byte slices in constant time.
+This function compares two `FieldElement51` values for equality in constant time. It
+normalises both operands to their canonical 32-byte little-endian wire format via
+`to_bytes()` and then compares the two byte slices using `ConstantTimeEq` on `[u8]`.
 
-Source: curve25519-dalek/src/field.rs (lines 96:4-98:5)
+Source: "curve25519-dalek/src/field.rs#L96-L98"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq
 
-/-!
-Natural language description:
-
-  • Compares two field elements for equality in constant time by comparing their
-    canonical 32-byte encodings.
-
-  • Internally computes `a_bytes ← a.to_bytes()` and `b_bytes ← b.to_bytes()`,
-    then returns `ConstantTimeEqSlice<u8>(a_bytes, b_bytes)`.
-
-Spec:
-
-  • No panic (always returns successfully)
-  • The result is `Choice.one` iff the canonical encodings are equal
-    (i.e. iff `to_bytes a = to_bytes b`).
--/
-
-
-/-- **Spec for `field.ConstantTimeEqFieldElement51.ct_eq`**:
-- No panic (always returns successfully)
-- Returns `Choice.one` iff the canonical encodings (32-byte LE) are equal
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::ct_eq`**
+• The function always succeeds (no panic)
+• The result equals `Choice.one` iff the canonical 32-byte encodings of the inputs agree
+  (i.e. iff `a.to_bytes = b.to_bytes`)
 -/
 @[step]
 theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :

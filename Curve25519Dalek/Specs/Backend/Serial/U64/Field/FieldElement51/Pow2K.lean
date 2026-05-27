@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong, Oliver Butterley
 -/
@@ -7,11 +7,9 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
-/-! # Specification for `FieldElement51::pow2k`.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k`
 
-This function computes the 2^k-th power of a field element.
-
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
+This function computes the `2^k`-th power of a `FieldElement51` modulo `p = 2^255 - 19`.
 
 ## Source code
 
@@ -100,13 +98,14 @@ prove that the inline monadic code equals calls to the helpers. Each is proved b
 `simp only [helper, bind_assoc_eq, bind_tc_ok]`. In `pow2k_loop_spec`, the three folds
 are applied via `simp_rw [fold_*]`, collapsing the 90-line loop body into 3 helper calls.
 Then `step*` applies the `@[step]` specs automatically.
+
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 set_option linter.hashCommand false
 #setup_aeneas_simps
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 open pow2k (m LOW_51_BIT_MASK)
@@ -824,8 +823,11 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   termination_by k.val
   decreasing_by agrind
 
-/-- **Spec theorem for FieldElement51.pow2k**
-Given `k > 0`, `pow2k` computes `self^(2^k)` mod p with reduced limbs. -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k`**
+• The function always succeeds (no panic) when `k > 0` and every input limb is `< 2 ^ 54`
+• `Field51_as_Nat result ≡ (Field51_as_Nat self) ^ (2 ^ k) (mod p)`
+• Every output limb is `< 2 ^ 52`
+-/
 @[step]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
     (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :

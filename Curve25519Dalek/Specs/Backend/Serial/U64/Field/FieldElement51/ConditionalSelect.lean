@@ -1,35 +1,31 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 
-/-! # ConditionalSelect
+/-! Spec theorem for
+`curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_select`
 
-Specification for `FieldElement51::conditional_select`.
+This function returns, limb-wise, either `a` or `b` depending on the constant-time `Choice`
+flag. At the limb level it uses `u64`'s `ConditionallySelectable::conditional_select`, which
+returns the first operand when `choice = 0` and the second operand when `choice = 1`.
 
-This function returns, limb-wise, either `a` or `b` depending on the
-constant-time `Choice` flag. At the limb level, it uses `u64`'s
-`ConditionallySelectable::conditional_select`, which returns the first
-operand when `choice = 0` and the second operand when `choice = 1`.
-
-Source: curve25519-dalek/src/backend/serial/u64/field.rs (lines 228:4-240:5)
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs#L228-L240"
 -/
 
-open Aeneas Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
 namespace SubtleConditionallySelectable
 
-/-! ## Spec for `conditional_select` -/
-
 /--
-Spec for
-  `backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select`:
-- No panic (always returns successfully)
-- For each limb i, the result limb equals `b[i]` when `choice = 1`,
-  and equals `a[i]` when `choice = 0` (constant-time conditional select)
-- Consequently, when `choice = Choice.one`, the whole result equals `b`;
+Spec theorem for
+`curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_select`
+• The function always succeeds (no panic)
+• For each limb `i`, the result limb equals `b[i]` when `choice = 1`, and `a[i]` when
+  `choice = 0` (constant-time conditional select)
+• Consequently, when `choice = Choice.one`, the whole result equals `b`;
   when `choice = Choice.zero`, the result equals `a`.
 -/
 @[step]
