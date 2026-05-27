@@ -173,6 +173,35 @@ theorem plain_binder_wrap_ok (n : Nat)
   (_h : n > 0) : n = n := by
   rfl
 
+-- No warning: `by` and the first tactic share a line — the proof body must start on a
+-- NEW line below `by` for Check 4 to fire, so `:= by rfl` is fine.
+#guard_msgs in
+theorem plain_proof_same_line_ok (n : Nat) : n = n := by rfl
+
+-- No warning: term-mode proof (`:= rfl`, not `:= by …`) has no by-tactic block at all,
+-- so `runProofBodyCheck` exits before reaching the indent comparison.
+#guard_msgs in
+theorem plain_proof_term_mode_ok (n : Nat) : n = n := rfl
+
+/--
+warning: Proof body is at column 4, expected 2. Tactics after `by` should be indented 2 spaces per the project style guide.
+
+Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
+-/
+#guard_msgs in
+-- Plain theorem with BOTH a wrapped binder at column 2 (would-be Check 1 violation) and
+-- a proof body at column 4.  Confirms that `runStepChecks` is gated off, so only the
+-- universal Check 4 warning is emitted — not Check 1.
+theorem plain_both_violations_only_check4 (n : Nat)
+  (_h : n > 0) : n = n := by
+    rfl
+
+-- No warning: suppression via `set_option` must work on plain theorems too.
+#guard_msgs in
+set_option linter.curve25519.specIndent false in
+theorem plain_proof_suppressed_ok (n : Nat) : n = n := by
+    rfl
+
 /-! ## Suppression -/
 
 -- No warning expected: the whole indentation linter is suppressed.
