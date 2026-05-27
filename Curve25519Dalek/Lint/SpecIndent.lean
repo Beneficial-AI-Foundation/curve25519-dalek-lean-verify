@@ -9,17 +9,19 @@ import Mathlib.Tactic.Linter
 /-!
 # Linter: `specIndent` — spec theorem indentation style
 
-Enforces the four indentation rules for `@[step]` spec theorems defined in `doc/STYLE_GUIDE.md`:
+Enforces the four indentation rules defined in `doc/STYLE_GUIDE.md`:
 
-| Location | Expected column (0-indexed) |
-|---|---|
-| Continuation line on a new line after the `theorem` line | 4 |
-| Postcondition body on a new line after `=>` in the WP binder | 6 |
-| `∧` RHS postcondition on a new line inside the WP binder | 6 |
-| Proof body after `by` (when on a new line) | 2 |
+| Location | Expected column (0-indexed) | Scope |
+|---|---|---|
+| Continuation line on a new line after the `theorem` line | 4 | `@[step]` only |
+| Postcondition body on a new line after `=>` in the WP binder | 6 | `@[step]` only |
+| `∧` RHS postcondition on a new line inside the WP binder | 6 | `@[step]` only |
+| Proof body after `by` (when on a new line) | 2 | all theorems |
 
-All checks apply only to `@[step]` theorems.  The linter is controlled by a single option
-`linter.curve25519.specIndent` so that a justified deviation can be suppressed uniformly.
+The first three checks apply only to `@[step]` Aeneas spec theorems; the proof-body indent
+rule applies to every theorem so that the project's 2-space proof style is uniform.  The
+linter is controlled by a single option `linter.curve25519.specIndent` so that a justified
+deviation can be suppressed uniformly.
 -/
 
 namespace Curve25519Dalek.Lint
@@ -28,11 +30,11 @@ open Lean Elab Command Linter
 
 /-! ## Option -/
 
-/-- Warns when a `@[step]` theorem's indentation deviates from the project spec style guide.
+/-- Warns when a theorem's indentation deviates from the project style guide.
 See `doc/STYLE_GUIDE.md` §"Indentation Structure". -/
 register_option linter.curve25519.specIndent : Bool := {
   defValue := true
-  descr := "Warns when a `@[step]` theorem's indentation deviates from the style guide."
+  descr := "Warns when a theorem's indentation deviates from the style guide."
 }
 
 /-! ## Helpers -/
@@ -144,24 +146,12 @@ private partial def collectMisindentedAndRhs
 
 /-! ## Linter -/
 
-/-- Implementation of `linter.curve25519.specIndent`. -/
-def specIndentLinter : Linter where run stx := do
-  unless getLinterValue linter.curve25519.specIndent (← getLinterOptions) do return
-  unless stx.isOfKind ``Lean.Parser.Command.declaration do return
-  let some inner := stx.getArgs[1]? | return
-  unless inner.isOfKind ``Lean.Parser.Command.theorem do return
-  unless hasStepAttr stx do return
-  let fm ← getFileMap
-  -- ── Extract key sub-trees ─────────────────────────────────────────────────
-  let some kwNode  := inner.getArgs[0]? | return   -- "theorem" keyword
-  let some sig     := inner.getArgs[2]? | return   -- declSig
-  let some declVal := inner.getArgs[3]? | return   -- declVal
-  let some kwLine  := lineOf kwNode fm  | return
-  -- declSig[0] = binder array,  declSig[1] = typeSpec
-  let some bindersNode := sig.getArgs[0]? | return
-  let some typeSpec    := sig.getArgs[1]? | return
-  -- typeSpec[0] = ":" atom,  typeSpec[1] = type term
-  let some typeTerm  := typeSpec.getArgs[1]? | return
+/-- `@[step]`-gated checks: continuation lines (col 4), postcondition body (col 6),
+and `∧` RHS (col 6).  Runs only when the theorem carries `@[step]`. -/
+private def runStepChecks
+    (inner : Syntax) (bindersNode typeTerm : Syntax) (kwLine : Nat) (fm : FileMap)
+    : CommandElabM Unit := do
+  let _ := inner
   -- ── Check 1: Continuation lines at column 4 ─────────────────────────────
   -- Arguments, preconditions, and the function application line all share the
   -- same 4-space rule.  Keep only the first node on each continuation line so
@@ -194,7 +184,10 @@ def specIndentLinter : Linter where run stx := do
   for body in collectWpBodies typeTerm do
     for (node, msg) in collectMisindentedAndRhs body fm 6 do
       logLint linter.curve25519.specIndent node m!"{msg}"
-  -- ── Check 4: Proof body at column 2 ──────────────────────────────────────
+
+/-- Check 4 (applies to every theorem): proof body after `by` must be at column 2
+when it starts on a new line. -/
+private def runProofBodyCheck (declVal : Syntax) (fm : FileMap) : CommandElabM Unit := do
   unless declVal.isOfKind ``Lean.Parser.Command.declValSimple do return
   -- declValSimple[0]=":=", [1]=declBody, [2]=Termination.suffix, [3]=whereDecls
   let some proofTerm := declVal.getArgs[1]? | return
@@ -210,7 +203,30 @@ def specIndentLinter : Linter where run stx := do
             logLint linter.curve25519.specIndent tacticSeq
               m!"Proof body is at column {tacCol}, expected 2. \
                 Tactics after `by` should be indented 2 spaces \
-                per the spec theorem style guide."
+                per the project style guide."
+
+/-- Implementation of `linter.curve25519.specIndent`. -/
+def specIndentLinter : Linter where run stx := do
+  unless getLinterValue linter.curve25519.specIndent (← getLinterOptions) do return
+  unless stx.isOfKind ``Lean.Parser.Command.declaration do return
+  let some inner := stx.getArgs[1]? | return
+  unless inner.isOfKind ``Lean.Parser.Command.theorem do return
+  let fm ← getFileMap
+  -- ── Extract key sub-trees ─────────────────────────────────────────────────
+  let some kwNode  := inner.getArgs[0]? | return   -- "theorem" keyword
+  let some sig     := inner.getArgs[2]? | return   -- declSig
+  let some declVal := inner.getArgs[3]? | return   -- declVal
+  let some kwLine  := lineOf kwNode fm  | return
+  -- declSig[0] = binder array,  declSig[1] = typeSpec
+  let some bindersNode := sig.getArgs[0]? | return
+  let some typeSpec    := sig.getArgs[1]? | return
+  -- typeSpec[0] = ":" atom,  typeSpec[1] = type term
+  let some typeTerm  := typeSpec.getArgs[1]? | return
+  -- `@[step]`-gated structural checks (continuation lines, postcondition body, ∧ RHS).
+  if hasStepAttr stx then
+    runStepChecks inner bindersNode typeTerm kwLine fm
+  -- Universal proof-body indent check (applies to every theorem).
+  runProofBodyCheck declVal fm
 
 initialize addLinter specIndentLinter
 

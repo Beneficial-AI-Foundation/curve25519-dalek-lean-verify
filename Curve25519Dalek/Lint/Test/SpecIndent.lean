@@ -9,7 +9,8 @@ import Curve25519Dalek.Lint.Basic
 /-!
 # Tests for `linter.curve25519.specIndent`
 
-Tests for the four indentation checks on `@[step]` spec theorems.  Each `#guard_msgs` block
+Tests for the four indentation checks.  The first three checks fire only on `@[step]`
+theorems; the proof-body (Check 4) rule fires on every theorem.  Each `#guard_msgs` block
 targets exactly one violation so the expected-output annotation stays minimal.
 
 This module docstring includes a `Source:` line so that `linter.curve25519.specSourceDoc`
@@ -127,7 +128,7 @@ theorem dummyP_postcond_ok_spec (n : Nat) :
 /-! ## Check 4 — proof body after `by` at wrong column -/
 
 /--
-warning: Proof body is at column 4, expected 2. Tactics after `by` should be indented 2 spaces per the spec theorem style guide.
+warning: Proof body is at column 4, expected 2. Tactics after `by` should be indented 2 spaces per the project style guide.
 
 Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
 -/
@@ -146,6 +147,31 @@ theorem dummyI_proof_ok_spec (n : Nat) :
     dummyI n ⦃ (r : Nat) =>
       r = n ⦄ := by
   simp [dummyI]
+
+/-! ## Check 4 — non-`@[step]` theorems still get the proof-body indent rule -/
+
+/--
+warning: Proof body is at column 4, expected 2. Tactics after `by` should be indented 2 spaces per the project style guide.
+
+Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
+-/
+#guard_msgs in
+-- Plain theorem (no `@[step]`): only Check 4 applies, and it must fire on the bad indent.
+theorem plain_proof_wrong (n : Nat) : n = n := by
+    rfl
+
+-- No warning: plain theorem with proof body correctly at column 2.
+#guard_msgs in
+theorem plain_proof_ok (n : Nat) : n = n := by
+  rfl
+
+-- No warning: plain theorem violating the `@[step]`-only continuation-line rule
+-- (binder wraps to a new line at column 2) must NOT trigger any check, because
+-- Checks 1, 3a, 3b are gated on `@[step]`.
+#guard_msgs in
+theorem plain_binder_wrap_ok (n : Nat)
+  (_h : n > 0) : n = n := by
+  rfl
 
 /-! ## Suppression -/
 
