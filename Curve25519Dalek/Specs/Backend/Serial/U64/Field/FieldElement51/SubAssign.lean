@@ -21,11 +21,12 @@ open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldEle
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
 namespace CoreOpsArithSubAssignSharedAFieldElement51
 
-/-- Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign`
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign`**
 • The function always succeeds (no panic) provided `self[i].val < 2^63` and `_rhs[i].val < 2^54`
 • Every output limb is `< 2 ^ 52`
 • `Field51_as_Nat result + Field51_as_Nat _rhs ≡ Field51_as_Nat self (mod p)`,
-  i.e. the result represents `self - _rhs` modulo `p` -/
+  i.e. the result represents `self - _rhs` modulo `p`
+-/
 @[step]
 theorem sub_assign_spec (self _rhs : backend.serial.u64.field.FieldElement51)
     (ha : ∀ i < 5, self[i]!.val < 2 ^ 63)

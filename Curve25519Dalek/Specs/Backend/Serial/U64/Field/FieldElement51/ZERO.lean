@@ -24,9 +24,10 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 • Every limb is bounded by `2 ^ 51`
 -/
 @[step]
-theorem ZERO_spec : ZERO ⦃ (result : FieldElement51) =>
-    Field51_as_Nat result = 0 ∧
-    (∀ i< 5, (result[i]!.val) < 2^51 )⦄ := by
+theorem ZERO_spec :
+    ZERO ⦃ (result : FieldElement51) =>
+      Field51_as_Nat result = 0 ∧
+      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
   unfold ZERO
   step*
   simp only [*]

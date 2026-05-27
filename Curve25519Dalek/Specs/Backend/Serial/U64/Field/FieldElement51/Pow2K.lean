@@ -110,14 +110,24 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 open pow2k (m LOW_51_BIT_MASK)
 
+/-- **Spec theorem for `pow2k.m`**
+• The function always succeeds (no panic)
+• The result equals the 128-bit product `x * y`
+-/
 @[step]
 theorem m_spec (x y : U64) :
-    m x y ⦃ (result : U128) => result.val = x.val * y.val ⦄ := by
+    m x y ⦃ (result : U128) =>
+      result.val = x.val * y.val ⦄ := by
   unfold m; step*
 
+/-- **Spec theorem for `pow2k.LOW_51_BIT_MASK`**
+• The function always succeeds (no panic)
+• The result equals `2 ^ 51 - 1`
+-/
 @[step]
 theorem LOW_51_BIT_MASK_spec :
-    LOW_51_BIT_MASK ⦃ (result : U64) => result.val = 2^51 - 1 ⦄ := by
+    LOW_51_BIT_MASK ⦃ (result : U64) =>
+      result.val = 2^51 - 1 ⦄ := by
   unfold LOW_51_BIT_MASK; step*
 
 /-! ## Helper Functions -/
@@ -432,6 +442,11 @@ private lemma c4_lt_tight (a0 a1 a2 a3 a4 : ℕ)
 
 /-! ## Helper Specs -/
 
+/-- **Spec theorem for `square_stage`**
+• The function always succeeds (no panic) when every input limb is `< 2 ^ 54`
+• Each `c_i` matches the radix-2⁵¹ squaring formula for limb `i`
+• Each `c_i < 2 ^ 115`; tighter bounds hold for `c1..c4`
+-/
 @[step]
 theorem square_stage_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     square_stage a ⦃ ((c0, c1, c2, c3, c4) : U128 × U128 × U128 × U128 × U128) =>
@@ -512,6 +527,11 @@ theorem square_stage_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through ~30 monadic operations
+/-- **Spec theorem for `carry_prop_stage`**
+• The function always succeeds (no panic) under the carry-chain bounds
+• Each output limb is the radix-2⁵¹ reduced limb of the carry chain
+• The mask equals `2 ^ 51 - 1` and the carry is bounded by `6 * 2 ^ 57`
+-/
 @[step]
 theorem carry_prop_stage_spec (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128)
     (hc0 : c0.val < 2 ^ 115) (_hc1 : c1.val < 2 ^ 115) (_hc2 : c2.val < 2 ^ 115)
@@ -655,6 +675,11 @@ theorem carry_prop_stage_spec (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128)
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through ~30 monadic operations
+/-- **Spec theorem for `final_reduce_stage`**
+• The function always succeeds (no panic) under the input bounds
+• Limb 0 becomes `(a'[0] + 19 * carry) % 2 ^ 51`, with the overflow folded into limb 1
+• Limbs 2..4 are unchanged and every output limb is `< 2 ^ 52`
+-/
 @[step]
 theorem final_reduce_stage_spec (a' : Array U64 5#usize) (carry i34 : U64)
     (ha' : ∀ i < 5, a'[i]!.val < 2 ^ 51) (hcarry : carry.val < 6 * 2 ^ 57)
@@ -733,6 +758,11 @@ theorem final_reduce_stage_spec (a' : Array U64 5#usize) (carry i34 : U64)
 
 set_option maxHeartbeats 14000000 in
 -- Required for step* through fold-decomposed loop body
+/-- **Spec theorem for `pow2k_loop`**
+• The function always succeeds (no panic) when every input limb is `< 2 ^ 54`
+• `Field51_as_Nat result ≡ (Field51_as_Nat a) ^ (2 ^ k) (mod p)`
+• If `k = 0` the result equals `a`; otherwise every output limb is `< 2 ^ 52`
+-/
 @[step]
 theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :

@@ -27,9 +27,9 @@ namespace CoreOpsArithAddSharedAFieldElement51FieldElement51
 @[step]
 theorem add_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53) (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :
-    add a b ⦃ result =>
-    (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
-    (∀ i < 5, result[i]!.val < 2^54) ⦄ := by
+    add a b ⦃ (result : backend.serial.u64.field.FieldElement51) =>
+      (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
+      (∀ i < 5, result[i]!.val < 2^54) ⦄ := by
   unfold add
   step*
 

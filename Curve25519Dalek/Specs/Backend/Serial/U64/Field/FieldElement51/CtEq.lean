@@ -25,8 +25,8 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleC
 -/
 @[step]
 theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :
-    ct_eq a b ⦃ c =>
-    (c = Choice.one ↔ a.to_bytes = b.to_bytes ) ⦄ := by
+    ct_eq a b ⦃ (c : subtle.Choice) =>
+      (c = Choice.one ↔ a.to_bytes = b.to_bytes) ⦄ := by
   unfold ct_eq
   have ⟨a_bytes, ha_ok, _⟩ := spec_imp_exists (to_bytes_spec a)
   have ⟨b_bytes, hb_ok, _⟩ := spec_imp_exists (to_bytes_spec b)

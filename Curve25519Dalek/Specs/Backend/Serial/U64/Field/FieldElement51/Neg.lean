@@ -14,8 +14,8 @@ Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-namespace curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51
 open curve25519_dalek.backend.serial.u64.field FieldElement51
+namespace curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::neg`**
 • The function always succeeds (no panic) provided every input limb is `< 2 ^ 54`

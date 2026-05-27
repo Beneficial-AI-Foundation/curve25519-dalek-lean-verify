@@ -23,9 +23,14 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
+/-- **Spec theorem for `reduce.LOW_51_BIT_MASK`**
+• The function always succeeds (no panic)
+• The result equals `2 ^ 51 - 1`
+-/
 @[step]
 theorem LOW_51_BIT_MASK_spec :
-    LOW_51_BIT_MASK ⦃ result => result.val = 2^51 - 1 ⦄ := by
+    LOW_51_BIT_MASK ⦃ (result : U64) =>
+      result.val = 2^51 - 1 ⦄ := by
   unfold LOW_51_BIT_MASK
   step*
 

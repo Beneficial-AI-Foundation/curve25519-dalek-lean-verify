@@ -24,9 +24,9 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 -/
 @[step]
 theorem ONE_spec :
-    ONE ⦃ result =>
-    Field51_as_Nat result = 1 ∧
-    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
+    ONE ⦃ (result : FieldElement51) =>
+      Field51_as_Nat result = 1 ∧
+      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
   unfold ONE from_limbs
   simp only [spec_ok]
   exact ⟨by decide, fun i hi => by interval_cases i <;> decide⟩

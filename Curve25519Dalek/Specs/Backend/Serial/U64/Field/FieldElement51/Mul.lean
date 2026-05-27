@@ -31,6 +31,10 @@ open MulShared0FieldElement51SharedAFieldElement51FieldElement51 (mul.m mul.LOW_
 namespace curve25519_dalek.Shared0FieldElement51.Insts
 namespace CoreOpsArithMulSharedAFieldElement51FieldElement51
 
+/-- **Spec theorem for `mul.m`**
+• The function always succeeds (no panic)
+• The result equals the 128-bit product `x * y`
+-/
 @[step]
 theorem m_spec (x y : U64) :
     mul.m x y ⦃ (r : U128) =>
@@ -38,9 +42,14 @@ theorem m_spec (x y : U64) :
   unfold mul.m
   step*
 
+/-- **Spec theorem for `mul.LOW_51_BIT_MASK`**
+• The function always succeeds (no panic)
+• The result equals `2 ^ 51 - 1`
+-/
 @[step]
 theorem LOW_51_BIT_MASK_spec :
-    mul.LOW_51_BIT_MASK ⦃ (result : U64) => result.val = 2^51 - 1 ⦄ := by
+    mul.LOW_51_BIT_MASK ⦃ (result : U64) =>
+      result.val = 2^51 - 1 ⦄ := by
   unfold mul.LOW_51_BIT_MASK
   step*
 
@@ -481,6 +490,11 @@ private lemma carry_chain_eq (c0 c1 c2 c3 c4 a0 a1 a2 a3 a4 carry c1' c2' c3' c4
 
 set_option maxHeartbeats 8000000 in
 -- Required for step*
+/-- **Spec theorem for `mul_product_stage`**
+• The function always succeeds (no panic) when every input limb is `< 2 ^ 54`
+• Each `c_i` matches the radix-2⁵¹ product formula for limb `i`
+• Each `c_i < 2 ^ 115`; tighter bounds hold for `c1..c4`
+-/
 @[step]
 theorem mul_product_stage_spec (self _rhs : Array U64 5#usize)
     (hlhs : ∀ i < 5, self[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, _rhs[i]!.val < 2 ^ 54) :
@@ -623,6 +637,11 @@ theorem mul_product_stage_spec (self _rhs : Array U64 5#usize)
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through ~30 monadic carry propagation operations
+/-- **Spec theorem for `mul_carry_prop_stage`**
+• The function always succeeds (no panic) under the carry-chain bounds
+• Each output limb is the radix-2⁵¹ reduced limb of the carry chain
+• The mask equals `2 ^ 51 - 1` and the carry is bounded by `6 * 2 ^ 57`
+-/
 @[step]
 theorem mul_carry_prop_stage_spec (c0 c1 c2 c3 c4 : U128)
     (hc0 : c0.val < 2 ^ 115) (_hc1 : c1.val < 2 ^ 115) (_hc2 : c2.val < 2 ^ 115)
@@ -758,6 +777,11 @@ theorem mul_carry_prop_stage_spec (c0 c1 c2 c3 c4 : U128)
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through final reduction operations
+/-- **Spec theorem for `mul_final_reduce_stage`**
+• The function always succeeds (no panic) under the input bounds
+• Limb 0 becomes `(a'[0] + 19 * carry) % 2 ^ 51`, with the overflow folded into limb 1
+• Limbs 2..4 are unchanged and every output limb is `< 2 ^ 52`
+-/
 @[step]
 theorem mul_final_reduce_stage_spec (a' : Array U64 5#usize) (carry i54 : U64)
     (ha' : ∀ i < 5, a'[i]!.val < 2 ^ 51) (hcarry : carry.val < 6 * 2 ^ 57)

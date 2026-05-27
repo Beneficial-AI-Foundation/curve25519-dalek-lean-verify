@@ -7,8 +7,10 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
 import Mathlib.Tactic
 
-/-! Spec theorem for
-`curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign`
+/-! # Spec theorem
+
+Specification for
+`curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign`.
 
 This function conditionally assigns the limbs from `other` into `self` depending on the
 constant-time `Choice` flag. At the limb level it uses `u64`'s
@@ -22,13 +24,16 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
 namespace SubtleConditionallySelectable
 
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign`
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign`.
 • The function always succeeds (no panic)
 • For each limb `i`, the result limb equals `other[i]` when `choice = 1`, and `self[i]`
   when `choice = 0` (constant-time conditional select)
 • Consequently, when `choice = Choice.one`, the whole result equals `other`;
-  when `choice = Choice.zero`, the result equals `self`. -/
+  when `choice = Choice.zero`, the result equals `self`.
+-/
 @[step]
 theorem conditional_assign_spec (self other : backend.serial.u64.field.FieldElement51)
     (choice : subtle.Choice) :
