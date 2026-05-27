@@ -6,12 +6,10 @@ Authors: Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec theorem for `constants::MONTGOMERY_A`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A`
 
-Specification and proof for the constant `MONTGOMERY_A`.
-
-This constant represents the Montgomery curve parameter A in the curve equation
-By^2 = x^3 + Ax^2 + x.
+This constant represents the Montgomery curve parameter `A` in the curve equation
+`B*y^2 = x^3 + A*x^2 + x` for Curve25519, where `A = 486662`.
 
 Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 -/
@@ -20,7 +18,10 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A`**
-The value of constants.MONTGOMERY_A when converted to a natural number equals 486662. -/
+• The function always succeeds (no panic)
+• `Field51_as_Nat MONTGOMERY_A = 486662`
+• Every limb is bounded by `2 ^ 51`
+-/
 @[step]
 theorem MONTGOMERY_A_spec :
     MONTGOMERY_A ⦃ (result : field.FieldElement51) =>
