@@ -4,7 +4,7 @@ keywords = ["formal verification"]
 defaultTargets = ["Curve25519Dalek"]
 
 [leanOptions]
-pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+pp.unicode.fun = true            # pretty-prints `fun a ↦ b`
 autoImplicit = false
 relaxedAutoImplicit = false
 linter.mathlibStandardSet = true
@@ -20,7 +20,7 @@ rev = "1b39931d"
 [[require]]
 name = "PrimeCert"
 git = "https://github.com/b-mehta/PrimeCert.git"
-rev = "3bc7e58f74bbb15a9d4259c0accd7decc31bcdec"
+# rev = "3bc7e58f74bbb15a9d4259c0accd7decc31bcdec"
 
 [[lean_lib]]
 name = "Curve25519Dalek"
