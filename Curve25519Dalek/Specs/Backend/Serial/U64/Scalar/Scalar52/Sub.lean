@@ -10,8 +10,6 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ConditionalAddL
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 
-set_option exponentiation.threshold 260
-
 /-! # Sub
 
 Specification and proof for `Scalar52::sub`.
@@ -45,6 +43,8 @@ The subtraction uses base-2^52 arithmetic with borrow propagation:
 When `A < B`, the difference array stores `2^260 + (A - B)` (the representation in Z/(2^260)Z).
 Adding L causes wrap-around: `(2^260 + (A - B) + L) mod 2^260 = A - B + L ∈ (0, L)`.
 -/
+
+set_option exponentiation.threshold 260
 
 open Aeneas Aeneas.Std Result
 open Aeneas.Std.WP

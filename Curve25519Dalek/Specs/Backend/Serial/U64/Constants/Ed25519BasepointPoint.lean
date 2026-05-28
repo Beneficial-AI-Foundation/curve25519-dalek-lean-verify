@@ -9,9 +9,6 @@ import Curve25519Dalek.Math.Edwards.Basepoint
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
 
--- nativeDecide is suppressed because `decide` in the proof elaborates via the native kernel
-set_option linter.style.nativeDecide false
-
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`
 
 This constant represents the Ed25519 basepoint, which is the standard generator point for
@@ -19,6 +16,9 @@ the prime order subgroup of the Ed25519 elliptic curve group.
 
 Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 -/
+
+-- nativeDecide is suppressed because `decide` in the proof elaborates via the native kernel
+set_option linter.style.nativeDecide false
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants

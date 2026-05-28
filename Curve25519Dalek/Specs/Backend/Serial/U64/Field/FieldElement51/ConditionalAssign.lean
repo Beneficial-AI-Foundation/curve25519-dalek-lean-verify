@@ -5,7 +5,7 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
-import Mathlib.Tactic
+import Mathlib.Tactic.IntervalCases
 
 /-! # ConditionalAssign
 
