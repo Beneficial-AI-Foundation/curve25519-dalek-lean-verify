@@ -8,69 +8,25 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
 
-/-! # Spec Theorem for `Scalar52::montgomery_invert::square_multiply`
-
-Specification and proof for `Scalar52::montgomery_invert::square_multiply`.
+/-! # Spec theorem for `curve25519_dalek::scalar::Scalar52::montgomery_invert::square_multiply`
 
 This is a helper function for the addition chain in the inversion algorithm.
 It performs repeated Montgomery squaring followed by a Montgomery multiplication.
 
-**Source**: curve25519-dalek/src/scalar.rs
-
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
-open Aeneas Aeneas.Std Aeneas.Std.WP Result curve25519_dalek.backend.serial.u64.scalar
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar
 open curve25519_dalek.backend.serial.u64.scalar.Scalar52
-
 namespace curve25519_dalek.scalar.Scalar52
 
-/-
-natural language description:
-
-    • Takes as input:
-      - `y`: An accumulator in Montgomery form.
-      - `squarings`: The number of times to square `y`.
-      - `x`: A value to multiply into the accumulator after squaring.
-
-    • It computes `y` raised to the power of `2^squarings`, and then multiplies by `x`.
-      Since all operations are in Montgomery form, this efficiently computes:
-      result = (y^(2^s) * x) * R^(-2^s)  (modulo L)
-
-    • This pattern corresponds to a "window" or "chain" step in the addition chain
-      for computing the inverse.
-
-Rust source (scalar.rs):
-
-    fn square_multiply(y: &mut Scalar52, squarings: usize, x: &Scalar52) {
-        for _ in 0..squarings {
-            *y = Scalar52::montgomery_square(y);
-        }
-        *y = Scalar52::montgomery_mul(y, x);
-    }
-
-All inputs are canonical (limbs < 2^52, value < L) because every value in the
-montgomery_invert addition chain is the output of a montgomery_square or montgomery_mul,
-which always produce canonical results. This matches the Verus (dalek-lite) design
-where `is_canonical_scalar52` is both the precondition and the loop invariant.
-
-natural language specs:
-
-    • For any canonical inputs `y`, `x` and `squarings` s:
-      - The function returns successfully.
-      - The result satisfies the algebraic relation:
-        result * R^(2^s) = y^(2^s) * x (mod L)
-      - The result is canonical.
--/
-
-/--
-Specification for the inner loop `square_multiply_loop`.
-It performs `squarings - i` remaining squarings on `y` (all in Montgomery form).
-Inputs must be canonical (limbs < 2^52, value < L) — this is self-maintaining since
-`montgomery_square` always produces canonical output.
-
-Mathematically, if the loop runs `k` times, it computes:
-  res = y^(2^k) * R^{-(2^k - 1)}
--/
+/-- Spec theorem for
+`curve25519_dalek::scalar::Scalar52::montgomery_invert::square_multiply_loop`
+• No panic for canonical input `y` (limbs `< 2 ^ 52`, value `< L`) — self-maintaining since
+  `montgomery_square` always produces canonical output
+• After `k = squarings - i` Montgomery squarings: `res * R ^ (2^k - 1) ≡ y ^ (2^k) (mod L)`
+• Every output limb is `< 2 ^ 52`
+• The output value is canonical (`< L`) -/
 theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.val ≤ squarings.val)
     (h_y_bound : ∀ j < 5, y[j]!.val < 2 ^ 52)
     (h_y_canonical : Scalar52_as_Nat y < L) :
@@ -118,13 +74,11 @@ theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.v
       agrind
 
 
-/--
-**Spec and proof concerning `montgomery_invert.square_multiply`**:
-- Preconditions: Inputs `y` and `x` are canonical (limbs < 2^52, value < L).
-- Postcondition:
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar52::montgomery_invert::square_multiply`**
+• Preconditions: Inputs `y` and `x` are canonical (limbs < 2^52, value < L).
+• Postcondition:
   The result `res` satisfies: res * R^(2^squarings) = y^(2^squarings) * x (mod L)
-  and is canonical.
--/
+  and is canonical. -/
 @[step]
 theorem square_multiply_spec (y : Scalar52) (squarings : Usize) (x : Scalar52)
     (hy : ∀ i < 5, y[i]!.val < 2 ^ 52) (hx : ∀ i < 5, x[i]!.val < 2 ^ 52)

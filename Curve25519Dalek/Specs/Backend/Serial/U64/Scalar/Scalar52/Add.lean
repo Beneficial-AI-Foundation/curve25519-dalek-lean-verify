@@ -11,14 +11,12 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Mathlib.Data.Nat.ModEq
 
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::add`
 
-/-! # Spec Theorem for `Scalar52::add`
+This function adds two `Scalar52` values (unpacked scalars in radix-`2^52` form), producing
+the canonical representative of their sum modulo the group order `L` of Curve25519.
 
-Specification and proof for `Scalar52::add`.
-
-This function adds two elements.
-
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 set_option exponentiation.threshold 280
@@ -64,23 +62,13 @@ private theorem next_spec (range : core.ops.range.Range Usize) :
   · rw [if_neg hlt]
     exact ⟨none, range, rfl, fun _ => ⟨rfl, rfl⟩, fun h => absurd h hlt⟩
 
-/-
-natural language description:
-
-    • Takes two input unpacked scalars u and u' and returns an unpacked scalar v representing
-      the sum (u + u') mod L where L is the group order.
-
-natural language specs:
-
-    • scalar_to_nat(v) = (scalar_to_nat(u) + scalar_to_nat(u')) mod L
+/-- **Spec theorem for the inner loop `add_loop` of `Scalar52::add`**
+• The function always succeeds (no panic) provided the loop preconditions hold
+• Every output limb is `< 2 ^ 52`
+• Limbs before index `i` are preserved
+• The remaining limbs realise the limb-wise sum of `a` and `b` plus the incoming carry,
+  yielding the modular arithmetic identity for the suffix
 -/
-
-/- **Spec for `backend.serial.u64.scalar.Scalar52.add_loop`**:
-- Starting from index `i` with accumulator `sum` and carry `carry`
-- Computes limb-wise addition with carry propagation
-- Result limbs are bounded by 2^52
-- Parts of sum before index i are preserved
-- The result satisfies the modular arithmetic property -/
 @[step]
 theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)
@@ -244,9 +232,12 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
       rw[h_start_val]
       grind
 
-/-- **Spec and proof concerning `scalar.Scalar52.add`**:
-- Requires the input values to be bounded by  2 ^ 259
-- The result represents the sum of the two input scalars modulo L
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::add`**
+• The function always succeeds (no panic) when every limb is `< 2^52` and the values
+  represent canonical scalars (`a < L`, `b ≤ L`)
+• `Scalar52_as_Nat result ≡ Scalar52_as_Nat a + Scalar52_as_Nat b (mod L)`
+• `Scalar52_as_Nat result < L`, the canonical reduced representative
+• Every output limb is `< 2 ^ 52`
 -/
 @[step]
 theorem add_spec (a b : Scalar52)
