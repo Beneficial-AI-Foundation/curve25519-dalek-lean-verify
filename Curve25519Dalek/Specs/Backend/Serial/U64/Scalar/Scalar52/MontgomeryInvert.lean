@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -8,17 +8,19 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
-
 import Mathlib.Data.Int.ModEq
 
-/-! # Spec Theorem for `Scalar52::montgomery_invert`
+/-! # Spec theorem
 
-Specification and proof for `Scalar52::montgomery_invert`.
+Specification for `curve25519_dalek::scalar::Scalar52::montgomery_invert`.
 
-This function computes the multiplicative inverse using Montgomery form.
+Takes an `UnpackedScalar u` in Montgomery form with `Scalar52_as_Nat u ≢ 0 (mod L)` and
+returns an `UnpackedScalar u'` (also in Montgomery form) representing its multiplicative
+inverse with respect to Montgomery multiplication: Montgomery-multiplying `u` and `u'`
+produces the Montgomery representation of `1`, i.e. `R mod L`. Equivalently,
+`(Scalar52_as_Nat u * Scalar52_as_Nat u') mod L = R^2 mod L`.
 
-**Source**: curve25519-dalek/src/scalar.rs
-
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar
@@ -112,40 +114,26 @@ lemma run_loop_nat (RZ : ZMod L) (uZ : ZMod L) (h_RZ : (R : (ZMod L)) = RZ) (hRZ
 
 end MontgomeryInvert_Helpers
 
-/-
-natural language description:
-
-    • Takes as input an UnpackedScalar u that is assumed to be
-      in Montgomery form. Then efficiently computes and returns an
-      UnpackedScalar u' (also in Montgomery form) that represents
-      the multiplicative inverse of u with respect to Montgomery multiplication.
-
-    • This means: if we apply Montgomery multiplication to u and u',
-      we get the Montgomery representation of 1, which is R mod L.
-
-natural language specs:
-
-    • For any UnpackedScalar u in Montgomery form with scalar_to_nat(u) ≢ 0 (mod L):
-      - The function returns successfully with result u'
-      - (Scalar52_as_Nat u * Scalar52_as_Nat u') mod L = R² mod L
-      - This is equivalent to: montgomery_mul(u, u') = R mod L
--/
-
 set_option maxHeartbeats 1200000 in -- heavy step and simp
-/-- **Spec and proof concerning `scalar.Scalar52.montgomery_invert`**:
-- Precondition: u must be non-zero modulo L (i.e., represent a non-zero value in Montgomery form)
-- No panic (always returns successfully for non-zero inputs)
-- The result u' satisfies the property that Montgomery multiplication of u and u'
-  yields R mod L (the Montgomery representation of 1)
+/-- **Spec theorem**
+
+Specification for `curve25519_dalek::scalar::Scalar52::montgomery_invert`.
+• Precondition: `u` must be non-zero modulo `L` (i.e. represent a non-zero value in Montgomery
+  form)
+• No panic (always returns successfully for non-zero inputs)
+• `(Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L`, i.e. Montgomery-multiplying `u`
+  and `u'` yields `R mod L` (the Montgomery representation of `1`)
+• Every output limb is `< 2 ^ 52`
+• `Scalar52_as_Nat u' < L`, the canonical reduced representative
 -/
 @[step]
 theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
     (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62)
     (h_value : Scalar52_as_Nat u * Scalar52_as_Nat u < R * L) :
-    montgomery_invert u ⦃ u' =>
-    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧
-    (∀ i < 5, u'[i]!.val < 2 ^ 52) ∧
-    Scalar52_as_Nat u' < L ⦄ := by
+    montgomery_invert u ⦃ (u' : Scalar52) =>
+      (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧
+      (∀ i < 5, u'[i]!.val < 2 ^ 52) ∧
+      Scalar52_as_Nat u' < L ⦄ := by
   unfold montgomery_invert
   -- Helper: canonical inputs (< L) give product < L*L < R*L
   have RL : L * L < R * L :=

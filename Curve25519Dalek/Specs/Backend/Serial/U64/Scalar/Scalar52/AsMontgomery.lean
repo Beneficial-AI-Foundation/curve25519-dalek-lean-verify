@@ -26,8 +26,10 @@ theorem RR_lt : ∀ i < 5, constants.RR[i]!.val < 2 ^ 62 := by
   unfold constants.RR
   decide
 
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_montgomery`
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_montgomery`.
 • The function always succeeds (no panic) when every input limb is `< 2 ^ 52`
 • `Scalar52_as_Nat result ≡ Scalar52_as_Nat u * R (mod L)`, i.e. multiplication by `R  = 2^260`
 • Every output limb is `< 2 ^ 52`
@@ -35,10 +37,10 @@ theorem RR_lt : ∀ i < 5, constants.RR[i]!.val < 2 ^ 62 := by
 -/
 @[step]
 theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 52) :
-    as_montgomery u ⦃ m =>
-    Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧
-    (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
-    Scalar52_as_Nat m < L ⦄ := by
+    as_montgomery u ⦃ (m : Scalar52) =>
+      Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧
+      (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
+      Scalar52_as_Nat m < L ⦄ := by
   unfold as_montgomery
   let* ⟨ m, m_post1, m_post2, m_post3 ⟩ ← montgomery_mul_spec
   · exact RR_lt

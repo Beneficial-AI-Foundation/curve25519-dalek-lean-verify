@@ -10,74 +10,16 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l`
 
-This function conditionally adds the group order `L` to a `Scalar52` based on a `Choice`
-parameter, returning the carry-out and the updated scalar.
+This function conditionally adds the group order `L` to a `Scalar52` `self` based on a `Choice`
+`condition`, returning the carry-out and the updated scalar. Concretely, for each limb `i` it
+performs `carry' = (carry >> 52) + self[i] + addend` with `addend = L[i]` if `condition = 1`
+or `0` otherwise, masks `self[i]` to the low 52 bits, and propagates the carry. The 52-bit
+limb bound on the input keeps the intermediate `carry` below `2^53`, ruling out U64 overflow.
 
-## Rust source
-
-```rust
-pub(crate) fn conditional_add_l(&mut self, condition: Choice) -> u64 {
-    let mut carry: u64 = 0;
-    let mask = (1u64 << 52) - 1;
-
-    let mut i = 0;
-    while i < 5 {
-        let addend = u64::conditional_select(&0, &constants::L[i], condition);
-        carry = (carry >> 52) + self[i] + addend;
-        self[i] = carry & mask;
-        i += 1;
-    }
-
-    carry
-}
-```
-
-## Proof overview
-
-The function iterates over 5 limbs, at each step computing:
-
-```rust
-carry' = (carry >> 52) + self[i] + addend
-self[i] = carry' & mask
-```
-
-where `addend = L[i]` if `condition=1` or `0` otherwise, and `mask = 2^52 - 1`.
-
-**No overflow**: The key invariant is `carry < 2^53` at each iteration.
-This follows from the precondition `self[i] < 2^52` and the fact that `L[i] < 2^52`:
-  `carry >> 52 < 2`  (since carry < 2^53)
-  `self[i]     < 2^52`
-  `addend      ≤ L[i] < 2^52`
-  `total       < 2 + 2^52 + 2^52 < 2^53 < 2^64`
-Without the bound `self[i] < 2^52`, the addition could overflow u64.
-
-**Value invariant**: After processing limb i, the loop maintains:
-```
-  Scalar52_as_Nat(self') + 2^(52*(i+1)) * (carry'/2^52)
-    = Scalar52_as_Nat(self_orig) + condition * Σ_{j < i+1} 2^(52*j) * L[j]
-         + 2^(52*0) * (carry_init/2^52)
-```
-This follows from the standard radix-2^52 addition with carry propagation:
-each `self[i] = carry' mod 2^52` stores the low bits, while `carry'/2^52`
-propagates to the next limb.
-
-After all 5 limbs, the full sum telescopes to:
-```
-  Scalar52_as_Nat(result) + 2^260 * (carry_final/2^52)
-    = Scalar52_as_Nat(self) + condition * Scalar52_as_Nat(L)
-```
-
-**Natural language spec**:
-
-  • Input: limbs bounded by `2^52`
-  • If `condition = 1` and the input lies in `[2^260 - L, 2^260)`:
-    - Output value: `u' + 2^260 = u + L`
-    - Output canonical: `u' < L`
-    - Output limbs: `< 2^52`
-  • If `condition = 0`:
-    - Output value: `u' = u`
-    - Output limbs: `< 2^52`
-  • Carry value: not used by caller
+After the 5 limbs telescope, `Scalar52_as_Nat result + 2^260 * (final_carry / 2^52) =
+Scalar52_as_Nat self + condition * Scalar52_as_Nat L`. When `condition = 1` and the input
+lies in `[2^260 - L, 2^260)`, the output is the canonical representative of `self + L`;
+when `condition = 0`, the output equals the input.
 
 Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
@@ -110,6 +52,18 @@ namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 attribute [-simp] Int.reducePow Nat.reducePow
 set_option exponentiation.threshold 260
 
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l_loop`.
+• The function always succeeds (no panic) under the loop invariants on `self`, `mask`, `i`
+  and `carry`
+• Every output limb is `< 2 ^ 52`
+• The value invariant holds:
+  `Scalar52_as_Nat result.2 + 2^260 * (result.1 / 2^52) =
+   Scalar52_as_Nat self + (if condition = 1 then Scalar52_as_Nat L else 0) +
+   2^(52*i) * (carry / 2^52) -
+   (if condition = 1 then ∑ j ∈ Ico 0 i, 2^(52*j) * L[j] else 0)` -/
 @[step]
 theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)
     (carry : U64) (mask : U64) (i : Usize) (hself : ∀ j < 5, self[j]!.val < 2 ^ 52)
@@ -241,8 +195,10 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
 termination_by 5 - i.val
 decreasing_by agrind
 
-/-- Spec theorem for
-`curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l`
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l`.
 • The function always succeeds (no panic) when input limbs are `< 2 ^ 52` and the value
   precondition matches `condition` (see hypotheses)
 • Every output limb is `< 2 ^ 52`

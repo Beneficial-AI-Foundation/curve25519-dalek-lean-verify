@@ -45,7 +45,7 @@ private theorem cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD
 theorem square_spec (self : Scalar52)
     (hself : ∀ i < 5, self[i]!.val < 2 ^ 62)
     (h_value : Scalar52_as_Nat self * Scalar52_as_Nat self < R * L) :
-    square self ⦃ ( result : Scalar52 ) =>
+    square self ⦃ (result : Scalar52) =>
       Scalar52_as_Nat result ≡ Scalar52_as_Nat self * Scalar52_as_Nat self [MOD L] ∧
       Scalar52_as_Nat result < L ∧
       ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by

@@ -19,12 +19,11 @@ the canonical representative of their sum modulo the group order `L` of Curve255
 Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
-set_option exponentiation.threshold 280
-
-attribute [-simp] Int.reducePow Nat.reducePow
-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
+
+set_option exponentiation.threshold 280
+attribute [-simp] Int.reducePow Nat.reducePow
 
 private theorem next_spec (range : core.ops.range.Range Usize) :
     ∃ opt range',

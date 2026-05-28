@@ -7,9 +7,9 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
-/-! # Spec Theorem for `Scalar52::from_bytes`
+/-! # Spec theorem
 
-Specification and proof for `Scalar52::from_bytes`.
+Specification for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes`.
 
 This function constructs an unpacked scalar from a byte array by:
 1. Packing 32 bytes into 4 little-endian U64 words (loop)
@@ -376,10 +376,12 @@ theorem from_bytes_limb4_spec
 
 /-! ### Main spec, composed via `from_bytes_eq` -/
 
-/-- **Spec and proof concerning `scalar.Scalar52.from_bytes`**:
-- No panic (always returns successfully)
-- The result represents the same number as the input byte array
-- All limbs are < 2^52 (from masking with `(1 << 52) - 1` and `(1 << 48) - 1`) -/
+/-- **Spec theorem**
+
+Specification for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes`.
+• No panic (always returns successfully)
+• The result represents the same number as the input byte array
+• All limbs are < 2^52 (from masking with `(1 << 52) - 1` and `(1 << 48) - 1`) -/
 @[step]
 theorem from_bytes_spec (b : Array U8 32#usize) :
     from_bytes b ⦃ (u : Scalar52) =>

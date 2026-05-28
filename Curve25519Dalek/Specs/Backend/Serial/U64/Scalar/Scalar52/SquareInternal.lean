@@ -3,7 +3,6 @@ Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Alessandro D'Angelo, Liao Zhang
 -/
-
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Tactics
@@ -40,8 +39,6 @@ private theorem bounds_add {a b : Nat} (ha : a < 2 ^ 126) (hb : b < 2 ^ 126) :
     a + b < 2^127 := by
   nlinarith [ha,hb]
 
-
-
 /-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal`**
 • Does not error and hence returns a result
 • The result represents the square of the input field element
@@ -49,9 +46,9 @@ private theorem bounds_add {a b : Nat} (ha : a < 2 ^ 126) (hb : b < 2 ^ 126) :
 (The optimal bound on the limbs is 2^64 / √5  ≈ 2^62.839) -/
 @[step]
 theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62) :
-    square_internal a ⦃ result =>
-    Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a ∧
-    (∀ i < 9, result[i]!.val < 2 ^ 127) ⦄ := by
+    square_internal a ⦃ (result : Array U128 9#usize) =>
+      Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a ∧
+      (∀ i < 9, result[i]!.val < 2 ^ 127) ⦄ := by
   unfold square_internal backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   step*
   · -- Main Proof

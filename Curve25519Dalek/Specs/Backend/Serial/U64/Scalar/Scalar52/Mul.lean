@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jinxing Lim
 -/
@@ -32,7 +32,7 @@ set_option exponentiation.threshold 262
 theorem mul_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62)
     (h_value : Scalar52_as_Nat a * Scalar52_as_Nat b < R * L) :
-    mul a b ⦃ ( result : Scalar52 ) =>
+    mul a b ⦃ (result : Scalar52) =>
       Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧
       Scalar52_as_Nat result < L ∧ ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by
   unfold mul

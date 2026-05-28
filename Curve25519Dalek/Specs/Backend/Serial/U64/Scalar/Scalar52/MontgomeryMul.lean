@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang
 -/
@@ -28,10 +28,10 @@ set_option exponentiation.threshold 262
 theorem montgomery_mul_spec (m m' : Scalar52)
     (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62)
     (h_value : Scalar52_as_Nat m * Scalar52_as_Nat m' < R * L) :
-    montgomery_mul m m' ⦃ w =>
-    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧
-    (∀ i < 5, w[i]!.val < 2 ^ 52) ∧
-    Scalar52_as_Nat w < L ⦄ := by
+    montgomery_mul m m' ⦃ (w : Scalar52) =>
+      (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧
+      (∀ i < 5, w[i]!.val < 2 ^ 52) ∧
+      Scalar52_as_Nat w < L ⦄ := by
   unfold montgomery_mul
   step*
   refine ⟨?_, w_post2, w_post3⟩
