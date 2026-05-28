@@ -7,11 +7,12 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Aux
 import Curve25519Dalek.ExternallyVerified
 
-/-! # FromBytes
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes`
 
-Specification and proof for `FieldElement51::from_bytes`.
-This function constructs a field element from a 32-byte array.
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
+This function constructs a field element from a 32-byte little-endian array, returning the
+little-endian integer encoded by `bytes`, taken modulo `2 ^ 255`, as a `FieldElement51`.
+
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 
 ## Rust source
 
@@ -52,9 +53,10 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 5. `from_bytes_spec`: glues the `step*` posts to the limb-level postcondition.
 -/
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open scoped BigOperators
+
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-! ## load8_at specification (Nat-level only) -/
 
@@ -168,6 +170,12 @@ private lemma limb_eq_aux (B k s : Nat) (hs : s + 51 ≤ 64) :
 
 /-! ## Final spec -/
 
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes`**
+• The function always succeeds (no panic) for any 32-byte input
+• `Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2 ^ 255) (mod p)`,
+  i.e. the byte and limb encodings agree modulo `p`
+• Every output limb is `< 2 ^ 51`
+-/
 @[step]
 theorem from_bytes_spec (bytes : Array U8 32#usize) :
     from_bytes bytes ⦃ (result : FieldElement51) =>
