@@ -6,13 +6,11 @@ Authors: Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec theorem for `constants::MONTGOMERY_A_NEG`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A_NEG`
 
-Specification and proof for the constant `MONTGOMERY_A_NEG`.
-
-This constant represents the negation of the Montgomery curve parameter A
-in the curve equation By^2 = x^3 + Ax^2 + x. This is used internally within
-the Elligator map.
+This constant represents `-A (mod p)` where `A = 486662` is the Montgomery curve parameter
+in the equation `B*y^2 = x^3 + A*x^2 + x`. It is used internally within the Elligator map
+and encoded as a 5-limb 51-bit `FieldElement51`.
 
 Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 -/
@@ -21,9 +19,10 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A_NEG`**
-
-Field51_as_Nat(constants.MONTGOMERY_A_NEG) + 486662 = p, i.e. MONTGOMERY_A_NEG represents
-−486662 modulo p, the negation of the Montgomery curve parameter A. -/
+• The function always succeeds (no panic)
+• `Field51_as_Nat MONTGOMERY_A_NEG + 486662 = p`, i.e. it represents `-486662 (mod p)`
+• Every limb is bounded by `2 ^ 51`
+-/
 @[step]
 theorem MONTGOMERY_A_NEG_spec :
     MONTGOMERY_A_NEG ⦃ (result : field.FieldElement51) =>

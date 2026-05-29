@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong, Oliver Butterley
 -/
@@ -7,11 +7,9 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
-/-! # Specification for `FieldElement51::pow2k`.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k`
 
-This function computes the 2^k-th power of a field element.
-
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
+This function computes the `2^k`-th power of a `FieldElement51` modulo `p = 2^255 - 19`.
 
 ## Source code
 
@@ -100,25 +98,36 @@ prove that the inline monadic code equals calls to the helpers. Each is proved b
 `simp only [helper, bind_assoc_eq, bind_tc_ok]`. In `pow2k_loop_spec`, the three folds
 are applied via `simp_rw [fold_*]`, collapsing the 90-line loop body into 3 helper calls.
 Then `step*` applies the `@[step]` specs automatically.
+
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 set_option linter.hashCommand false
 #setup_aeneas_simps
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 open pow2k (m LOW_51_BIT_MASK)
 
+/-- **Spec theorem for `pow2k.m`**
+• The function always succeeds (no panic)
+• The result equals the 128-bit product `x * y`
+-/
 @[step]
 theorem m_spec (x y : U64) :
-    m x y ⦃ (result : U128) => result.val = x.val * y.val ⦄ := by
+    m x y ⦃ (result : U128) =>
+      result.val = x.val * y.val ⦄ := by
   unfold m; step*
 
+/-- **Spec theorem for `pow2k.LOW_51_BIT_MASK`**
+• The function always succeeds (no panic)
+• The result equals `2 ^ 51 - 1`
+-/
 @[step]
 theorem LOW_51_BIT_MASK_spec :
-    LOW_51_BIT_MASK ⦃ (result : U64) => result.val = 2^51 - 1 ⦄ := by
+    LOW_51_BIT_MASK ⦃ (result : U64) =>
+      result.val = 2^51 - 1 ⦄ := by
   unfold LOW_51_BIT_MASK; step*
 
 /-! ## Helper Functions -/
@@ -433,6 +442,11 @@ private lemma c4_lt_tight (a0 a1 a2 a3 a4 : ℕ)
 
 /-! ## Helper Specs -/
 
+/-- **Spec theorem for `square_stage`**
+• The function always succeeds (no panic) when every input limb is `< 2 ^ 54`
+• Each `c_i` matches the radix-2⁵¹ squaring formula for limb `i`
+• Each `c_i < 2 ^ 115`; tighter bounds hold for `c1..c4`
+-/
 @[step]
 theorem square_stage_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     square_stage a ⦃ ((c0, c1, c2, c3, c4) : U128 × U128 × U128 × U128 × U128) =>
@@ -513,6 +527,11 @@ theorem square_stage_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through ~30 monadic operations
+/-- **Spec theorem for `carry_prop_stage`**
+• The function always succeeds (no panic) under the carry-chain bounds
+• Each output limb is the radix-2⁵¹ reduced limb of the carry chain
+• The mask equals `2 ^ 51 - 1` and the carry is bounded by `6 * 2 ^ 57`
+-/
 @[step]
 theorem carry_prop_stage_spec (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128)
     (hc0 : c0.val < 2 ^ 115) (_hc1 : c1.val < 2 ^ 115) (_hc2 : c2.val < 2 ^ 115)
@@ -656,6 +675,11 @@ theorem carry_prop_stage_spec (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128)
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through ~30 monadic operations
+/-- **Spec theorem for `final_reduce_stage`**
+• The function always succeeds (no panic) under the input bounds
+• Limb 0 becomes `(a'[0] + 19 * carry) % 2 ^ 51`, with the overflow folded into limb 1
+• Limbs 2..4 are unchanged and every output limb is `< 2 ^ 52`
+-/
 @[step]
 theorem final_reduce_stage_spec (a' : Array U64 5#usize) (carry i34 : U64)
     (ha' : ∀ i < 5, a'[i]!.val < 2 ^ 51) (hcarry : carry.val < 6 * 2 ^ 57)
@@ -734,6 +758,11 @@ theorem final_reduce_stage_spec (a' : Array U64 5#usize) (carry i34 : U64)
 
 set_option maxHeartbeats 14000000 in
 -- Required for step* through fold-decomposed loop body
+/-- **Spec theorem for `pow2k_loop`**
+• The function always succeeds (no panic) when every input limb is `< 2 ^ 54`
+• `Field51_as_Nat result ≡ (Field51_as_Nat a) ^ (2 ^ k) (mod p)`
+• If `k = 0` the result equals `a`; otherwise every output limb is `< 2 ^ 52`
+-/
 @[step]
 theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
@@ -744,8 +773,11 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   split
   case isTrue hlt =>
     simp_rw [fold_square_stage, fold_carry_prop_stage, fold_final_reduce_stage]
-    step as ⟨ sq, sq_post ⟩
-    step as ⟨ cp, cp_post ⟩
+    -- aeneas#963: postcondition elaborator now uncurries pair patterns, so
+    -- `step as` binds each tuple component as a separate hypothesis (the
+    -- conjunction becomes the final binder).
+    step as ⟨ sq0, sq1, sq2, sq3, sq4, sq_post ⟩
+    step as ⟨ cp, cp_carry, cp_mask, cp_post ⟩
     step as ⟨ red, red_post1, red_post2, red_post3, red_post4, red_post5, red_post6 ⟩
     · intro i hi; obtain ⟨h0, h1, h2, h3, h4, _⟩ := cp_post
       interval_cases i <;> exact lt_of_eq_mod _ _ ‹_›
@@ -759,8 +791,8 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     have ha'_4 := cp_post.2.2.2.2.1
     have hcarry_val := cp_post.2.2.2.2.2.1
     -- Squaring identity mod p
-    have a_pow_two : (sq.1.val + 2^51 * sq.2.1.val + 2^102 * sq.2.2.1.val +
-        2^153 * sq.2.2.2.1.val + 2^204 * sq.2.2.2.2.val)
+    have a_pow_two : (sq0.val + 2^51 * sq1.val + 2^102 * sq2.val +
+        2^153 * sq3.val + 2^204 * sq4.val)
         ≡ (Field51_as_Nat a)^2 [MOD p] := by
       have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
       have := sq_post.1; have := sq_post.2.1; have := sq_post.2.2.1
@@ -768,9 +800,9 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       simp_all only [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
         Finset.sum_singleton, mul_zero, pow_zero, one_mul]
     -- Carry chain conservation
-    set v0 := sq.1.val; set v1 := sq.2.1.val
-    set v2 := sq.2.2.1.val; set v3 := sq.2.2.2.1.val
-    set v4 := sq.2.2.2.2.val
+    set v0 := sq0.val; set v1 := sq1.val
+    set v2 := sq2.val; set v3 := sq3.val
+    set v4 := sq4.val
     have h_chain := carry_chain_eq v0 v1 v2 v3 v4
         _ _ _ _ _ _
         (v1 + v0 / 2 ^ 51)
@@ -782,22 +814,22 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
         rfl rfl rfl rfl rfl rfl rfl rfl rfl rfl
     -- Field51_as_Nat of the reduced result
     have hf_r : Field51_as_Nat red =
-        (cp.1[0]!.val + 19 * cp.2.1.val) + 2^51 * cp.1[1]!.val + 2^102 * cp.1[2]!.val +
-        2^153 * cp.1[3]!.val + 2^204 * cp.1[4]!.val := by
+        (cp[0]!.val + 19 * cp_carry.val) + 2^51 * cp[1]!.val + 2^102 * cp[2]!.val +
+        2^153 * cp[3]!.val + 2^204 * cp[4]!.val := by
       unfold Field51_as_Nat
       simp only [Finset.sum_range_succ, Finset.sum_range_zero]
       rw [red_post1, red_post2, red_post3, red_post4, red_post5]
-      have := Nat.mod_add_div (cp.1[0]!.val + 19 * cp.2.1.val) (2 ^ 51)
+      have := Nat.mod_add_div (cp[0]!.val + 19 * cp_carry.val) (2 ^ 51)
       omega
     -- h_key: Field51_as_Nat red + carry * p = c0 + 2^51*c1 + ...
-    have h_key : Field51_as_Nat red + cp.2.1.val * p =
-        sq.1.val + 2^51 * sq.2.1.val + 2^102 * sq.2.2.1.val +
-        2^153 * sq.2.2.2.1.val + 2^204 * sq.2.2.2.2.val := by
+    have h_key : Field51_as_Nat red + cp_carry.val * p =
+        sq0.val + 2^51 * sq1.val + 2^102 * sq2.val +
+        2^153 * sq3.val + 2^204 * sq4.val := by
       rw [hf_r, h_chain]
       simp only [ha'_0, ha'_1, ha'_2, ha'_3, ha'_4, hcarry_val]
       unfold p; omega
     have hsq : Field51_as_Nat red ≡ (Field51_as_Nat a)^2 [MOD p] :=
-      (modeq_of_add_mul_eq _ _ cp.2.1.val p h_key).trans a_pow_two
+      (modeq_of_add_mul_eq _ _ cp_carry.val p h_key).trans a_pow_two
     have hpow := Nat.ModEq.pow (2^k1.val) hsq
     constructor
     · apply Nat.ModEq.trans result_post1 hpow |>.trans
@@ -821,8 +853,11 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   termination_by k.val
   decreasing_by agrind
 
-/-- **Spec theorem for FieldElement51.pow2k**
-Given `k > 0`, `pow2k` computes `self^(2^k)` mod p with reduced limbs. -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k`**
+• The function always succeeds (no panic) when `k > 0` and every input limb is `< 2 ^ 54`
+• `Field51_as_Nat result ≡ (Field51_as_Nat self) ^ (2 ^ k) (mod p)`
+• Every output limb is `< 2 ^ 52`
+-/
 @[step]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
     (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :
@@ -831,6 +866,6 @@ theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
       (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k
   step*
-  exact ⟨‹_›, by agrind⟩
+  refine ⟨‹_›, by grind [Array.getElem!_Nat_eq]⟩
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

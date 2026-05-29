@@ -6,10 +6,12 @@ Authors: Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
-/-!
-# Spec theorem for `AffineNielsPoint::conditional_select`
 
-Specification and proof for `AffineNielsPoint::conditional_select`.
+/-!
+# Spec theorem
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_select`.
 
 This function conditionally selects between two AffineNielsPoint values
 based on a Choice flag. It is implemented by applying
@@ -21,21 +23,18 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
 namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
 namespace SubtleConditionallySelectable
 
-/-- **Spec theorem for
-`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_select`**
-- No panic (always returns successfully)
-- Given inputs:
-  • AffineNielsPoint `a` with coordinates (y_plus_x, y_minus_x, xy2d),
-  • AffineNielsPoint `b` with coordinates (y_plus_x', y_minus_x', xy2d'),
-  • a Choice `choice`,
-  the output AffineNielsPoint has coordinates selected component-wise:
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_select`.
+• The function always succeeds (no panic) for AffineNielsPoints `a` and `b` and a Choice `choice`
+• The result is an AffineNielsPoint whose coordinates are selected component-wise:
   - If choice = 1, each coordinate equals the corresponding one of `b`
   - If choice = 0, each coordinate equals the corresponding one of `a`
-  - The operation is constant-time (does not branch on choice) -/
+• The operation is constant-time (does not branch on choice) -/
 @[step]
 theorem conditional_select_spec
     (a b : backend.serial.curve_models.AffineNielsPoint)
@@ -49,7 +48,7 @@ theorem conditional_select_spec
         if choice.val = 1#u8 then b.xy2d[i]!.val else a.xy2d[i]!.val) ⦄ := by
   unfold conditional_select
   step*
-  grind
+  refine ⟨?_, ?_, ?_⟩ <;> intro i hi <;> split_ifs <;> simp_all
 
 end SubtleConditionallySelectable
 end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts

@@ -3,13 +3,13 @@ import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Math.BitList
 import Curve25519Dalek.Math.Edwards.Basepoint
 import Curve25519Dalek.Math.Edwards.Curve
 import Curve25519Dalek.Math.Edwards.EightTorsion
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Montgomery.Curve
 import Curve25519Dalek.Math.Montgomery.Representation
+import Curve25519Dalek.Math.PrimeCerts
 import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.AssertReceiverIsTotalEq
@@ -30,6 +30,8 @@ import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Sub
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.AsExtended
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Double
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Identity
+import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VariableBase.Mul
+import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VariableBase.MulLoop
 import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VartimeDoubleBase.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Aplus2OverFour
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Ed25519BasepointPoint
@@ -204,6 +206,8 @@ import Curve25519Dalek.Specs.Scalar.Scalar.ToBytes
 import Curve25519Dalek.Specs.Scalar.Scalar.ToRadix2wSizeHint
 import Curve25519Dalek.Specs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Specs.Scalar.Scalar.Zero
+import Curve25519Dalek.Specs.Window.LookupTable.From
+import Curve25519Dalek.Specs.Window.LookupTable.Select
 import Curve25519Dalek.Tactics
 import Curve25519Dalek.Types
 import Curve25519Dalek.TypesAux

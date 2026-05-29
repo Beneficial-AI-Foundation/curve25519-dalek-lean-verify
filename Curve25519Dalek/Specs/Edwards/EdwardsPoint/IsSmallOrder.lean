@@ -1,7 +1,7 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Liao Zhang, Lacramioara Astefanoaei
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Edwards.Representation
@@ -9,51 +9,33 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
 
-/-! # Spec Theorem for `EdwardsPoint::is_small_order`
+/-!
+# Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::is_small_order`
 
-Specification and proof for `EdwardsPoint::is_small_order`.
+Determines whether an `EdwardsPoint` has small order, i.e. lies in the torsion subgroup `E[8]`.
+A point has small order iff multiplying it by the cofactor (= 8) yields the identity element.
 
-This function determines if an Edwards point is of small order (i.e., if it is in E[8]).
-
-**Source**: curve25519-dalek/src/edwards.rs
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
-open Aeneas Aeneas.Std Result Aeneas.Std.WP Edwards
-open curve25519_dalek.backend.serial.u64.field.FieldElement51
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open Edwards curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.edwards.EdwardsPoint
 
-/-
-natural language description:
-
-• Determines whether an EdwardsPoint is in the torsion subgroup E[8]
-
-• A point has small order if multiplying it by the cofactor (= 8) results in the identity element
-
-natural language specs:
-
+/-- **Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::is_small_order`**
 • The function always succeeds (no panic)
-• Returns `true` if and only if the point is in the torsion subgroup E[8]
-• Equivalently, returns `true` iff multiplying by the cofactor yields the identity element
--/
-
-/-- **Spec for `edwards.EdwardsPoint.is_small_order`**:
-- Returns `true` if and only if the point has small order (is in the torsion subgroup E[8])
-- This is determined by checking if multiplying by the cofactor yields the identity element
+• Returns `true` iff multiplying `self` by the cofactor yields the identity, i.e. `self ∈ E[8]`
 -/
 @[step]
 theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :
-    is_small_order self ⦃ result =>
-    (result ↔ h • self.toPoint = 0) ⦄ := by
+    is_small_order self ⦃ (result : Bool) =>
+      (result ↔ h • self.toPoint = 0) ⦄ := by
   unfold is_small_order curve25519_dalek.traits.IsIdentity.Blanket.is_identity
   step with mul_by_cofactor_spec as ⟨ep, hep_valid, hep_point⟩
   step with Insts.Curve25519_dalekTraitsIdentity.identity_spec as
     ⟨t, ht_X, ht_Y, ht_Z, ht_T, ht_valid⟩
   step with Insts.SubtleConstantTimeEq.ct_eq_spec as ⟨c, hc1, hc2⟩
-  -- Grind bridges the Array/List coercion gap (ep.X[i]! vs (↑ep.X)[i]!) and < → ≤.
-  -- Grind-free alternative per goal:
-  --   intro i hi; have := hep_valid.X_bounds i hi
-  --   simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-  --     UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow]; omega
+  -- `grind` bridges the Array/List coercion gap (ep.X[i]! vs (↑ep.X)[i]!) and < → ≤.
   · have := hep_valid.X_bounds; grind
   · have := hep_valid.Y_bounds; grind
   · have := hep_valid.Z_bounds; grind

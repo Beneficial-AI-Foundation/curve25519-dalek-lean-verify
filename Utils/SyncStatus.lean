@@ -26,6 +26,9 @@ open Utils.Lib.StatusCsv
 open Utils.Lib.ListFuns
 open Utils.Lib.Types
 
+-- Empty lines are used as deliberate section dividers
+set_option linter.style.emptyLine false
+
 /-- Run the syncstatus command -/
 def runSyncStatus (p : Parsed) : IO UInt32 := do
   let csvPathStr : String := match p.variableArgsAs? String with
@@ -87,7 +90,8 @@ def runSyncStatus (p : Parsed) : IO UInt32 := do
   let duplicateNames := updatedFile.findDuplicateLeanNames
   if duplicateNames.size > 0 then
     if prune then
-      IO.eprintln s!"Removing {duplicateNames.size} duplicate lean_names (keeping first occurrence):"
+      IO.eprintln s!"Removing {duplicateNames.size} duplicate lean_names \
+        (keeping first occurrence):"
       for name in duplicateNames do
         IO.eprintln s!"  Deduped: {name}"
       updatedFile := updatedFile.deduplicate
@@ -113,7 +117,8 @@ def runSyncStatus (p : Parsed) : IO UInt32 := do
         fun acc n => acc.insert n
       updatedFile := updatedFile.removeByLeanNames staleSet
     else
-      IO.eprintln s!"Warning: {staleNames.size} stale rows in status.csv (not in current functions):"
+      IO.eprintln s!"Warning: {staleNames.size} stale rows in status.csv \
+        (not in current functions):"
       for name in staleNames do
         IO.eprintln s!"  Stale: {name}"
       IO.eprintln "  Use --prune to remove them."

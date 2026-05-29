@@ -90,6 +90,23 @@ theorem Array.set_of_eq (bs : Array U64 5#usize) (a : U64) (i : Nat) (hi : i < b
     = Array.set_val_eq, = UScalar.ofNatCore_val_eq,
     = List.getElem_set]
 
+/-- If two `FieldElement51`s agree pointwise at every limb (as `U64`s), they are equal.
+Used to lift per-limb val/term equality back to the `FieldElement51` level. -/
+theorem fe_eq_of_limbs
+    {a b : curve25519_dalek.backend.serial.u64.field.FieldElement51}
+    (h : ∀ i < 5, a[i]! = b[i]!) :
+    a = b := by
+  simp only [Array.getElem!_Nat_eq] at h
+  apply Subtype.ext
+  apply List.ext_getElem (by simp [a.property, b.property])
+  intro n hn _
+  have hn5 : n < 5 := by
+    simp only [a.property, UScalar.ofNatCore_val_eq] at hn
+    exact hn
+  have := h n hn5
+  simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, hn5] at this
+  exact this
+
 /-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
 must be 0. -/
 theorem high_bit_zero_of_lt_255 (bytes : Array U8 32#usize) (h : U8x32_as_Nat bytes < 2 ^ 255) :
@@ -339,6 +356,30 @@ lemma or_mul_pow_two_eq_add (a b k : Nat) (ha : a < 2 ^ k) :
     · rw [Nat.testBit_zero]
       simp only [h, decide_true, cond_true]
       omega
+
+/-- Casting a `U64` to `U8` truncates to the low 8 bits.
+
+Used by `FieldElement51::to_bytes` and `Scalar52::to_bytes` to relate Aeneas's
+`UScalar.cast` to its natural-number interpretation. -/
+lemma U64_cast_U8 (x : U64) : (UScalar.cast UScalarTy.U8 x).val = x.val % 2 ^ 8 := by
+  bvify 64 at *; bv_decide
+
+/-- OR of disjoint complementary slices at split point `p` (with `p ≤ 64`):
+the low part `a / 2^p` (bits `p..64` of `a`) and the high part
+`b * 2^(64-p) % 2^64` (low `p` bits of `b` shifted up).
+
+Used by `Scalar52::from_bytes` and `Scalar52::from_bytes_wide` to combine
+adjacent U64 words into 52-bit limbs via shift and OR. -/
+lemma or_split_at (a b : U64) (p : Nat) (hp : p ≤ 64) :
+    (a.val / 2 ^ p) ||| ((b.val * 2 ^ (64 - p)) % U64.size)
+      = a.val / 2 ^ p + (b.val % 2 ^ p) * 2 ^ (64 - p) := by
+  have hU : U64.size = 2 ^ 64 := by scalar_tac
+  have hpq : 2 ^ p * 2 ^ (64 - p) = 2 ^ 64 := by rw [← pow_add]; congr 1; omega
+  have h1 : b.val * 2 ^ (64 - p) % 2 ^ 64 = (b.val % 2 ^ p) * 2 ^ (64 - p) := by
+    rw [← hpq, Nat.mul_mod_mul_right]
+  have h0 : a.val / 2 ^ p < 2 ^ (64 - p) := by
+    rw [Nat.div_lt_iff_lt_mul (by positivity), mul_comm, hpq]; exact hU ▸ a.hmax
+  rw [hU, h1, or_mul_pow_two_eq_add _ _ (64 - p) h0]
 
 /-! ## Byte-packing helpers for load8 / from_bytes
 

@@ -1,8 +1,8 @@
 # Aeneas extraction configuration
-# Used by aeneas-cli to run charon and aeneas for Lean code generation
+# Used by `npm run aeneas-{install,extract}` to run charon and aeneas for Lean code generation.
 
 aeneas:
-  commit: "42c0e90d"
+  commit: "1b39931d"
   repo: "https://github.com/AeneasVerif/aeneas.git"
 
 crate:
@@ -16,70 +16,8 @@ charon:
     - "--no-default-features"
     - "--features"
     - "alloc,zeroize"
-  start_from:
-    - "curve25519_dalek::backend::serial::curve_models"
-    - "curve25519_dalek::backend::serial::u64::field"
-    - "curve25519_dalek::backend::serial::u64::scalar"
-    - "curve25519_dalek::edwards"
-    - "curve25519_dalek::field"
-    - "curve25519_dalek::montgomery"
-    - "curve25519_dalek::ristretto"
-    - "curve25519_dalek::scalar"
-  exclude:
-    # Debug impls
-    - "curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}"
-    - "curve25519_dalek::backend::serial::u64::field::{impl core::fmt::Debug for _}"
-    - "curve25519_dalek::backend::serial::u64::scalar::{impl core::fmt::Debug for _}"
-    - "curve25519_dalek::montgomery::{impl core::fmt::Debug for _}"
-    - "curve25519_dalek::scalar::{impl core::fmt::Debug for _}"
-    - "curve25519_dalek::ristretto::{impl core::fmt::Debug for _}"
-    - "curve25519_dalek::edwards::{impl core::fmt::Debug for _}"
-    - "curve25519_dalek::edwards::affine::{impl core::fmt::Debug for _}"
-    # Hash impls
-    - "curve25519_dalek::montgomery::{impl core::hash::Hash for _}"
-    - "curve25519_dalek::scalar::{impl core::hash::Hash for _}"
-    - "curve25519_dalek::ristretto::{impl core::hash::Hash for _}"
-    - "curve25519_dalek::edwards::{impl core::hash::Hash for _}"
-    # Copy/Clone impls
-    - "curve25519_dalek::backend::serial::curve_models::{impl core::marker::Copy for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}"
-    - "curve25519_dalek::backend::serial::curve_models::{impl core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}"
-    # Sum/Product impls (require Iterator/IntoIterator traits)
-    - "curve25519_dalek::scalar::{impl core::iter::traits::accum::Sum<_> for _}"
-    - "curve25519_dalek::scalar::{impl core::iter::traits::accum::Product<_> for _}"
-    - "curve25519_dalek::edwards::{impl core::iter::traits::accum::Sum<_> for _}"
-    - "curve25519_dalek::ristretto::{impl core::iter::traits::accum::Sum<_> for _}"
-    # Zeroize impls
-    - "curve25519_dalek::ristretto::{impl zeroize::Zeroize for _}"
-    - "curve25519_dalek::edwards::{impl zeroize::Zeroize for _}"
-    # MultiscalarMul trait declarations
-    - "curve25519_dalek::traits::MultiscalarMul"
-    - "curve25519_dalek::traits::VartimeMultiscalarMul"
-    - "curve25519_dalek::traits::VartimePrecomputedMultiscalarMul"
-    # MultiscalarMul impls
-    - "curve25519_dalek::edwards::{impl curve25519_dalek::traits::MultiscalarMul for _}"
-    - "curve25519_dalek::ristretto::{impl curve25519_dalek::traits::MultiscalarMul for _}"
-    - "curve25519_dalek::backend::serial::scalar_mul::straus::{impl curve25519_dalek::traits::MultiscalarMul for _}"
-    # Vartime free functions
-    - "curve25519_dalek::backend::vartime_double_base_mul"
-    - "curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul"
-    # VartimeMultiscalarMul / VartimePrecomputedMultiscalarMul impls
-    - "curve25519_dalek::backend::pippenger_optional_multiscalar_mul"
-    - "curve25519_dalek::backend::straus_optional_multiscalar_mul"
-    - "curve25519_dalek::backend::VartimePrecomputedStraus"
-    - "curve25519_dalek::backend::serial::scalar_mul::pippenger::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}"
-    - "curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
-    - "curve25519_dalek::backend::serial::scalar_mul::straus::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}"
-    - "curve25519_dalek::edwards::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}"
-    - "curve25519_dalek::edwards::VartimeEdwardsPrecomputation"
-    - "curve25519_dalek::edwards::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
-    - "curve25519_dalek::ristretto::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}"
-    - "curve25519_dalek::ristretto::VartimeRistrettoPrecomputation"
-    - "curve25519_dalek::ristretto::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
-    - "curve25519_dalek::backend::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
-  opaque: []
 
 aeneas_args:
-  backend: lean
   options:
     - loops-to-rec
     - split-files

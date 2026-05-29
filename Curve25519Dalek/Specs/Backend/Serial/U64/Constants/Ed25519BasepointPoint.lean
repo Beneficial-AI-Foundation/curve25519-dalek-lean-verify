@@ -12,13 +12,10 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
 -- nativeDecide is suppressed because `decide` in the proof elaborates via the native kernel
 set_option linter.style.nativeDecide false
 
-/-!
-# Spec theorem for `constants::ED25519_BASEPOINT_POINT`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`
 
-Specification and proof for the constant `ED25519_BASEPOINT_POINT`.
-
-This constant represents the Ed25519 basepoint, which is the standard generator
-point for the prime order subgroup of the Ed25519 elliptic curve group.
+This constant represents the Ed25519 basepoint, which is the standard generator point for
+the prime order subgroup of the Ed25519 elliptic curve group.
 
 Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 -/
@@ -26,22 +23,15 @@ Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
-/-
-natural language description:
-
-    • ED25519_BASEPOINT_POINT is the standard Ed25519 basepoint,
-      which serves as the generator point for the prime order subgroup of the Ed25519 elliptic curve group.
-    • This constant is used as the base point for scalar multiplication operations in Ed25519.
-
-natural language specs:
-
-    • ED25519_BASEPOINT_POINT is a valid Edwards point (which amongst other things implies that it fulfills the curve equation)
-    • ED25519_BASEPOINT_POINT is of prime order L
+/-- **Spec theorem for
+`curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`**
+• The function always succeeds (no panic)
+• The result is a valid Edwards point (it satisfies the Edwards curve equation)
+• It has prime order `L`, i.e. `L • result.toPoint = 0`
+• It is non-zero, and so is `4 • result.toPoint`
+• `result.Z^2 - result.Y^2` equals the square of a specific witness integer
+• `result.toPoint` equals the canonical Ed25519 Edwards basepoint
 -/
-
-/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`**
-
-`ED25519_BASEPOINT_POINT` is a valid Edwards point (fulfilling the curve equation) of prime order L. -/
 @[step]
 theorem ED25519_BASEPOINT_POINT_spec :
     ED25519_BASEPOINT_POINT ⦃ (result : edwards.EdwardsPoint) =>

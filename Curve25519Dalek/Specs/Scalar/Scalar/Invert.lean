@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander, Hoang Le Truong
 -/
@@ -11,35 +11,22 @@ import Curve25519Dalek.Specs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Invert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
 
-/-! # Spec Theorem for `Scalar::invert`
+/-!
+# Spec theorem for `curve25519_dalek::scalar::Scalar::invert`
 
-Specification and proof for `Scalar::invert`.
+Takes an input Scalar `s` and returns a Scalar `s'` representing the multiplicative inverse
+of `s` in the field ℤ/ℓℤ.
 
-This function computes the multiplicative inverse.
-
-Source: curve25519-dalek/src/scalar.rs
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
-open Aeneas Aeneas.Std Aeneas.Std.WP Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.scalar.Scalar
 
-/-
-natural language description:
-
-    • Takes an input Scalar s and returns another Scalar s' that
-      represents the multiplicative inverse of s within the underlying
-      field \mathbb{Z} / \ell \mathbb{Z}.
-
-natural language specs:
-
-    • \forall Scalars s with scalar_to_nat(s) ≢ 0 (mod \ell):
-      scalar_to_nat(s) * scalar_to_nat(s') is congruent to 1 (mod \ell) -/
-
-/-- **Spec and proof concerning `scalar.Scalar.invert`**:
-- Precondition: The input scalar s must be non-zero modulo L (inverting zero has undefined behavior)
-- No panic (returns successfully for non-zero input)
-- The result s' satisfies the multiplicative inverse property:
-  U8x32_as_Nat(s.bytes) * U8x32_as_Nat(s'.bytes) ≡ 1 (mod L) -/
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::invert`**
+• No panic (succeeds for any non-zero scalar; inverting zero is undefined)
+• The result satisfies `U8x32_as_Nat self.bytes * U8x32_as_Nat result.bytes ≡ 1 [MOD L]`
+-/
 @[step]
 theorem invert_spec (self : Scalar) (h : U8x32_as_Nat self.bytes % L ≠ 0) :
     invert self ⦃ (result : Scalar) =>
@@ -54,6 +41,5 @@ theorem invert_spec (self : Scalar) (h : U8x32_as_Nat self.bytes % L ≠ 0) :
     _ ≡ Scalar52_as_Nat s * Scalar52_as_Nat s1 [MOD L] := by
         exact Nat.ModEq.mul_left _ result_post1
     _ ≡ 1 [MOD L] := s1_post1
-
 
 end curve25519_dalek.scalar.Scalar

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -32,8 +32,6 @@ This function constructs an unpacked scalar from a byte array by:
    `slice_state4_value`.
 -/
 
-set_option linter.style.whitespace false
-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -43,7 +41,7 @@ abbrev word_of_bytes (bytes : Array U8 32#usize) (j : Nat) : Nat :=
 
 /-! ## Part 1: Loop spec — byte packing -/
 
-set_option maxHeartbeats 300000 in -- heavy step
+set_option maxHeartbeats 400000 in -- heavy step
 /-- **Loop spec**: Each iteration packs 8 bytes into one U64 word (little-endian).
 After the loop completes, `words[j] = word_of_bytes bytes j` for all `j < 4`. -/
 theorem from_bytes_loop_helper (bytes : Array U8 32#usize)
@@ -62,32 +60,37 @@ theorem from_bytes_loop_helper (bytes : Array U8 32#usize)
     have hlt : i < 4#usize := by scalar_tac
     simp only [hlt, ↓reduceIte]
     step*
-    -- Goal: ∀ j < i+1, (words.set i i37)[j]! = word_of_bytes bytes j
-    subst a_post
-    intro j hj
-    by_cases heq : j = i.val
-    · -- j = i
-      subst heq
-      simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-      rw [getElem!_pos _ _ (by simp only [List.length_set, List.Vector.length_val,
-        UScalar.ofNatCore_val_eq]; agrind),
-          List.getElem_set_self (by simp only [List.length_set, List.Vector.length_val,
-            UScalar.ofNatCore_val_eq]; agrind)]
-      -- i37 = cascaded OR = byte sum via or_bytes_eq_sum
-      simp (discharger := omega) only [*, UScalar.val_or, UScalar.cast_val_eq,
-        u8_val_mod_u64_numBits, Nat.shiftLeft_eq, u8_mul_pow_mod_u64]
-      rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
-        (bytes.val[i.val * 8]!).hmax (bytes.val[i.val * 8 + 1]!).hmax
-        (bytes.val[i.val * 8 + 2]!).hmax (bytes.val[i.val * 8 + 3]!).hmax
-        (bytes.val[i.val * 8 + 4]!).hmax (bytes.val[i.val * 8 + 5]!).hmax
-        (bytes.val[i.val * 8 + 6]!).hmax (bytes.val[i.val * 8 + 7]!).hmax]
-      simp only [word_of_bytes, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty,
-        zero_add]
-      simp only [Array.getElem!_Nat_eq]; ring_nf
-    · -- j ≠ i: unchanged entry, use h_prev
-      simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-      grind only [= List.getElem!_set_ne, =_ Array.getElem!_Nat_eq]
-
+    · -- Goal: ∀ j < i+1, (words.set i i37)[j]! = word_of_bytes bytes j
+      subst a_post
+      intro j hj
+      by_cases heq : j = i.val
+      · -- j = i
+        subst heq
+        simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
+        rw [getElem!_pos _ _ (by simp only [List.length_set, List.Vector.length_val,
+          UScalar.ofNatCore_val_eq]; agrind),
+            List.getElem_set_self (by simp only [List.length_set, List.Vector.length_val,
+              UScalar.ofNatCore_val_eq]; agrind)]
+        -- i37 = cascaded OR = byte sum via or_bytes_eq_sum
+        simp (discharger := omega) only [*, UScalar.val_or, UScalar.cast_val_eq,
+          u8_val_mod_u64_numBits, Nat.shiftLeft_eq, u8_mul_pow_mod_u64]
+        rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
+          (bytes.val[i.val * 8]!).hmax (bytes.val[i.val * 8 + 1]!).hmax
+          (bytes.val[i.val * 8 + 2]!).hmax (bytes.val[i.val * 8 + 3]!).hmax
+          (bytes.val[i.val * 8 + 4]!).hmax (bytes.val[i.val * 8 + 5]!).hmax
+          (bytes.val[i.val * 8 + 6]!).hmax (bytes.val[i.val * 8 + 7]!).hmax]
+        simp only [word_of_bytes, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty,
+          zero_add]
+        simp only [Array.getElem!_Nat_eq]; ring_nf
+      · -- j ≠ i: unchanged entry, use h_prev
+        have hj' : j < i.val := by omega
+        have hne : Nat.not_eq i.val j := by simp [Nat.not_eq]; omega
+        simp only [Array.getElem!_Nat_eq, Array.set_val_eq, List.getElem!_set_ne _ _ _ _ hne,
+          List.getElem!_eq_getElem?_getD]
+        exact h_prev j hj'
+    · rename_i x
+      have := words'_post1 x ‹_›
+      exact this
 
 /-! ## Part 2: Helper lemma for bit-slicing -/
 
@@ -249,80 +252,188 @@ private theorem slice_state4_value (words1 : Array U64 4#usize) (s : Scalar52)
 
 /-! ## Part 2: Main spec -/
 
-set_option maxHeartbeats 400000 in -- heavy step
-/-- **Spec and proof concerning `scalar.Scalar52.from_bytes`**:
-- No panic (always returns successfully)
-- The result represents the same number as the input byte array
-- All limbs are < 2^52 (from masking with `(1 << 52) - 1` and `(1 << 48) - 1`)
--/
+set_option linter.hashCommand false in
+/- Decompose `from_bytes` into 5 per-limb helpers + a setup prefix. Each helper
+   is small (~7 bindings) so its spec can be proved quickly without burning
+   heartbeats, and `from_bytes_spec` composes them via `from_bytes_eq`. -/
+#decompose from_bytes from_bytes_eq
+  letRange 6 2 => from_bytes_limb0
+  letRange 7 7 => from_bytes_limb1
+  letRange 8 7 => from_bytes_limb2
+  letRange 9 7 => from_bytes_limb3
+  letRange 10 5 => from_bytes_limb4
+
+/-! ### Per-limb stubs
+
+Each `from_bytes_limbN_spec` describes what one chunk of the unpacking loop
+does. The post-conditions below start as `True` — refine them to expose the
+intermediate values the final composition needs (see the commented-out
+reference proof below for the list of `*_post` facts required). -/
+
 @[step]
-theorem from_bytes_spec (b : Array U8 32#usize) :
-    from_bytes b ⦃ u =>
-    Scalar52_as_Nat u = U8x32_as_Nat b ∧
-    ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄
-    := by
-  unfold from_bytes
-  let* ⟨ words1, words1_post ⟩ ← from_bytes_loop_spec
-  let* ⟨ i, i_post1, i_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  let* ⟨ mask, mask_post1, mask_post2 ⟩ ← U64.sub_spec
-  let* ⟨ i1, i1_post1, i1_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  let* ⟨ top_mask, top_mask_post1, top_mask_post2 ⟩ ← U64.sub_spec
+theorem from_bytes_limb0_spec (words1 : Std.Array U64 4#usize) :
+    from_bytes_limb0 words1 ⦃ i2 set_back =>
+      i2 = words1.val[0]! ∧ set_back = Std.Array.set ZERO 0#usize ⦄ := by
+  unfold from_bytes_limb0
+  dsimp only [Insts.CoreOpsIndexIndexMutUsizeU64.index_mut, Array.index_mut_usize,
+              bind_assoc_eq, bind_tc_ok]
   let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
-  -- Eliminate index_mut wrappers: converts opaque __discr.2 callbacks to concrete Array.set
-  simp only [Insts.CoreOpsIndexIndexMutUsizeU64.index_mut, Array.index_mut_usize,
-             bind_assoc_eq, bind_tc_ok]
-  -- All remaining ops are fast (no callbacks): index_usize, shift, AND, OR
   let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  exact i2_post
+
+@[step]
+theorem from_bytes_limb1_spec
+    (words1 : Std.Array U64 4#usize) (mask i2 : U64)
+    (index_mut_back : U64 → Scalar52) :
+    from_bytes_limb1 words1 mask i2 index_mut_back ⦃ i5 i7 set_back =>
+      i5 = words1.val[1]! ∧
+      i7.val = (i2.val >>> 52) ||| ((i5.val <<< 12) % U64.size) ∧
+      set_back = Std.Array.set (index_mut_back (i2 &&& mask)) 1#usize ⦄ := by
+  unfold from_bytes_limb1
+  dsimp only [Insts.CoreOpsIndexIndexMutUsizeU64.index_mut, Array.index_mut_usize,
+              bind_assoc_eq, bind_tc_ok]
   let* ⟨ i3, i3_post1, i3_post2 ⟩ ← UScalar.and_spec
   let* ⟨ i4, i4_post1, i4_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i5, i5_post ⟩ ← Array.index_usize_spec
   let* ⟨ i6, i6_post1, i6_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ i7, i7_post1, i7_post2 ⟩ ← UScalar.or_spec
   let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  refine ⟨i5_post, ?_, ?_⟩
+  · rw [i7_post1, UScalar.val_or, i4_post1, i6_post1]
+  · have h3 : i3 = i2 &&& mask := by
+      apply U64.bv_eq_imp_eq
+      simp [i3_post2]
+    rw [h3]
+
+@[step]
+theorem from_bytes_limb2_spec
+    (words1 : Std.Array U64 4#usize) (mask i5 i7 : U64)
+    (index_mut_back1 : U64 → Scalar52) :
+    from_bytes_limb2 words1 mask i5 i7 index_mut_back1 ⦃ i10 i12 set_back =>
+      i10 = words1.val[2]! ∧
+      i12.val = (i5.val >>> 40) ||| ((i10.val <<< 24) % U64.size) ∧
+      set_back = Std.Array.set (index_mut_back1 (i7 &&& mask)) 2#usize ⦄ := by
+  unfold from_bytes_limb2
+  dsimp only [Insts.CoreOpsIndexIndexMutUsizeU64.index_mut, Array.index_mut_usize,
+              bind_assoc_eq, bind_tc_ok]
   let* ⟨ i8, i8_post1, i8_post2 ⟩ ← UScalar.and_spec
   let* ⟨ i9, i9_post1, i9_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i10, i10_post ⟩ ← Array.index_usize_spec
   let* ⟨ i11, i11_post1, i11_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ i12, i12_post1, i12_post2 ⟩ ← UScalar.or_spec
   let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  refine ⟨i10_post, ?_, ?_⟩
+  · rw [i12_post1, UScalar.val_or, i9_post1, i11_post1]
+  · have h8 : i8 = i7 &&& mask := by
+      apply U64.bv_eq_imp_eq
+      simp [i8_post2]
+    rw [h8]
+
+@[step]
+theorem from_bytes_limb3_spec
+    (words1 : Std.Array U64 4#usize) (mask i10 i12 : U64)
+    (index_mut_back2 : U64 → Scalar52) :
+    from_bytes_limb3 words1 mask i10 i12 index_mut_back2 ⦃ i15 i17 set_back =>
+      i15 = words1.val[3]! ∧
+      i17.val = (i10.val >>> 28) ||| ((i15.val <<< 36) % U64.size) ∧
+      set_back = Std.Array.set (index_mut_back2 (i12 &&& mask)) 3#usize ⦄ := by
+  unfold from_bytes_limb3
+  dsimp only [Insts.CoreOpsIndexIndexMutUsizeU64.index_mut, Array.index_mut_usize,
+              bind_assoc_eq, bind_tc_ok]
   let* ⟨ i13, i13_post1, i13_post2 ⟩ ← UScalar.and_spec
   let* ⟨ i14, i14_post1, i14_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i15, i15_post ⟩ ← Array.index_usize_spec
   let* ⟨ i16, i16_post1, i16_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ i17, i17_post1, i17_post2 ⟩ ← UScalar.or_spec
   let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  refine ⟨i15_post, ?_, ?_⟩
+  · rw [i17_post1, UScalar.val_or, i14_post1, i16_post1]
+  · have h13 : i13 = i12 &&& mask := by
+      apply U64.bv_eq_imp_eq
+      simp [i13_post2]
+    rw [h13]
+
+@[step]
+theorem from_bytes_limb4_spec
+    (mask top_mask i15 i17 : U64)
+    (index_mut_back3 : U64 → Scalar52) :
+    from_bytes_limb4 mask top_mask i15 i17 index_mut_back3 ⦃ set_back i20 =>
+      set_back = Std.Array.set (index_mut_back3 (i17 &&& mask)) 4#usize ∧
+      i20.val = (i15.val >>> 16) &&& top_mask.val ⦄ := by
+  unfold from_bytes_limb4
+  dsimp only [Insts.CoreOpsIndexIndexMutUsizeU64.index_mut, Array.index_mut_usize,
+              bind_assoc_eq, bind_tc_ok]
   let* ⟨ i18, i18_post1, i18_post2 ⟩ ← UScalar.and_spec
   let* ⟨ i19, i19_post1, i19_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
   let* ⟨ i20, i20_post1, i20_post2 ⟩ ← UScalar.and_spec
-  -- Compute mask values
+  refine ⟨?_, ?_⟩
+  · have h18 : i18 = i17 &&& mask := by
+      apply U64.bv_eq_imp_eq
+      simp [i18_post2]
+    rw [h18]
+  · rw [i20_post1, UScalar.val_and, i19_post1]
+
+/-! ### Main spec, composed via `from_bytes_eq` -/
+
+/-- **Spec and proof concerning `scalar.Scalar52.from_bytes`**:
+- No panic (always returns successfully)
+- The result represents the same number as the input byte array
+- All limbs are < 2^52 (from masking with `(1 << 52) - 1` and `(1 << 48) - 1`) -/
+@[step]
+theorem from_bytes_spec (b : Array U8 32#usize) :
+    from_bytes b ⦃ (u : Scalar52) =>
+      Scalar52_as_Nat u = U8x32_as_Nat b ∧ ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by
+  rw [from_bytes_eq]
+  let* ⟨ words1, words1_post ⟩ ← from_bytes_loop_spec
+  let* ⟨ i, i_post1, i_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
+  let* ⟨ mask, mask_post1, mask_post2 ⟩ ← U64.sub_spec
+  let* ⟨ i1, i1_post1, i1_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
+  let* ⟨ top_mask, top_mask_post1, top_mask_post2 ⟩ ← U64.sub_spec
+  let* ⟨ i2, index_mut_back, i2_post, set0_eq ⟩ ← from_bytes_limb0_spec
+  let* ⟨ i5, i7, index_mut_back1, i5_post, i7_post1, set1_eq ⟩ ← from_bytes_limb1_spec
+  let* ⟨ i10, i12, index_mut_back2, i10_post, i12_post1, set2_eq ⟩ ← from_bytes_limb2_spec
+  let* ⟨ i15, i17, index_mut_back3, i15_post, i17_post1, set3_eq ⟩ ← from_bytes_limb3_spec
+  let* ⟨ index_mut_back4, i20, set4_eq, i20_post1 ⟩ ← from_bytes_limb4_spec
+  -- Inline the closures so the result is a 5-deep Std.Array.set chain over ZERO
+  subst set0_eq set1_eq set2_eq set3_eq set4_eq
+  -- Mask values
   have hmask : mask.val = 2 ^ 52 - 1 := by scalar_tac
   have htop : top_mask.val = 2 ^ 48 - 1 := by scalar_tac
-  -- Convert AND → mod for limb postconditions
-  simp only [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod]
-    at i3_post1 i8_post1 i13_post1 i18_post1
-  simp only [UScalar.val_and, htop, land_pow_two_sub_one_eq_mod] at i20_post1
+  -- Derive masked-limb facts in terms of i2, i7, i12, i17 (the "carry" U64s
+  -- exposed by the limb specs).
+  have i3_post1 : (i2 &&& mask).val = i2.val % 2 ^ 52 := by
+    rw [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod]
+  have i8_post1 : (i7 &&& mask).val = i7.val % 2 ^ 52 := by
+    rw [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod]
+  have i13_post1 : (i12 &&& mask).val = i12.val % 2 ^ 52 := by
+    rw [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod]
+  have i18_post1 : (i17 &&& mask).val = i17.val % 2 ^ 52 := by
+    rw [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod]
+  have i20_post1' : i20.val = i15.val >>> 16 % 2 ^ 48 := by
+    rw [i20_post1, htop, land_pow_two_sub_one_eq_mod]
+  -- Substitute the word-array entries so i3_post1/i8_post1/... mention the
+  -- same `(↑words1)[k]!` patterns that appear in the unfolded set-chain goal.
+  subst i2_post i5_post i10_post i15_post
   refine ⟨?_, ?_⟩
   · -- Value: Scalar52_as_Nat = U8x32_as_Nat b
-    refine (slice_state4_value words1 _ ?_).trans
-      words1_post
+    refine (slice_state4_value words1 _ ?_).trans words1_post
     unfold slice_state4
     unfold limb0_nat limb1_nat limb2_nat limb3_nat limb4_nat
     refine ⟨?_, ?_, ?_, ?_, ?_⟩ <;>
       simp only [↓Array.getElem!_Nat_set_ne, ↓Array.getElem!_Nat_set_eq, UScalar.ofNatCore_val_eq,
         ne_eq, Nat.reduceEqDiff, not_false_eq_true, OfNat.ofNat_ne_zero, one_ne_zero,
         Nat.succ_ne_self, Array.length, List.Vector.length_val, Nat.ofNat_pos, and_self,
-        Nat.reduceLT, Nat.lt_add_one, i3_post1, i8_post1, i13_post1, i18_post1, i20_post1,
-        i7_post1, i12_post1, i17_post1, i4_post1, i9_post1, i14_post1, i19_post1, i6_post1,
-        i11_post1, i16_post1, i2_post, i5_post, i10_post, i15_post, UScalar.val_or,
-        Nat.shiftRight_eq_div_pow, Nat.shiftLeft_eq, Array.getElem!_Nat_eq]
+        Nat.reduceLT, Nat.lt_add_one, i3_post1, i8_post1, i13_post1, i18_post1, i20_post1',
+        i7_post1, i12_post1, i17_post1, Nat.shiftRight_eq_div_pow, Nat.shiftLeft_eq,
+        Array.getElem!_Nat_eq]
   · -- Bounds: ∀ i < 5, result[i]! < 2^52
     intro idx hidx
     interval_cases idx <;>
       simp only [↓Array.getElem!_Nat_set_ne, ↓Array.getElem!_Nat_set_eq, UScalar.ofNatCore_val_eq,
         ne_eq, Nat.reduceEqDiff, not_false_eq_true, OfNat.ofNat_ne_zero, one_ne_zero,
         Nat.succ_ne_self, Array.length, List.Vector.length_val, Nat.ofNat_pos, and_self,
-        Nat.reduceLT, Nat.lt_add_one] <;>
+        Nat.reduceLT, Nat.lt_add_one, i3_post1, i8_post1, i13_post1, i18_post1, i20_post1'] <;>
       omega
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

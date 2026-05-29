@@ -47,7 +47,7 @@ def getSpecName (name : Name) : Name := name.appendAfter specSuffix
 def getDirectDeps (env : Environment) (name : Name) : Except String (Array Name) := do
   let some constInfo := env.find? name
     | throw s!"Constant '{name}' not found in environment"
-  let some value := constInfo.value?
+  let some value := constInfo.value? (allowOpaque := true)
     | throw s!"Constant '{name}' has no value (it may be an axiom, opaque, or primitive)"
   return value.getUsedConstants
 
@@ -63,9 +63,9 @@ def hasSpecTheorem (env : Environment) (name : Name) : Bool :=
 def proofContainsSorry (env : Environment) (name : Name) : Bool :=
   match env.find? name with
   | some constInfo =>
-    match constInfo.value? with
+    match constInfo.value? (allowOpaque := true) with
     | some value => value.getUsedConstants.any (· == ``sorryAx)
-    | none => true  -- No value means axiom/opaque, treat as not verified
+    | none => true  -- No value means primitive/axiom, treat as not verified
   | none => true
 
 /-- Check if a function is verified (has spec theorem without direct sorry) -/
@@ -83,7 +83,8 @@ def isExternallyVerified (env : Environment) (name : Name) : Bool :=
   else externallyVerifiedAttr.hasTag env specName
 
 /-- Get the file path where the spec theorem is defined.
-    Returns the path relative to the project root (e.g., "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean"). -/
+    Returns the path relative to the project root
+    (e.g., "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean"). -/
 def getSpecFilePath (env : Environment) (name : Name) : Option String :=
   let specName := getSpecName name
   -- Check if the theorem exists
@@ -139,7 +140,6 @@ def parseSpecSource (relevantLines : Array String) : SpecParts := Id.run do
   let mut statementLines : Array String := #[]
   let mut inDocstring := false
   let mut docstringDone := false
-
   for line in relevantLines do
     if !docstringDone then
       -- Check for docstring start
@@ -171,7 +171,6 @@ def parseSpecSource (relevantLines : Array String) : SpecParts := Id.run do
       statementLines := statementLines.push result.line
       if result.isEnd then
         break
-
   let docstring := if docstringLines.isEmpty then none
     else some (String.intercalate "\n" docstringLines.toList)
   let statement := if statementLines.isEmpty then none
@@ -218,7 +217,8 @@ structure AnalysisResult where
   deriving Repr
 
 /-- Analyze a single function in the given environment -/
-def analyzeFunction (env : Environment) (knownNames : Std.HashSet Name) (name : Name) : AnalysisResult :=
+def analyzeFunction (env : Environment) (knownNames : Std.HashSet Name) (name : Name) :
+    AnalysisResult :=
   match getDirectDeps env name with
   | .ok deps =>
     { name := name
@@ -236,7 +236,8 @@ def analyzeFunction (env : Environment) (knownNames : Std.HashSet Name) (name : 
       error := some msg }
 
 /-- Analyze multiple functions -/
-def analyzeFunctions (env : Environment) (knownNames : Std.HashSet Name) (names : List Name) : List AnalysisResult :=
+def analyzeFunctions (env : Environment) (knownNames : Std.HashSet Name) (names : List Name) :
+    List AnalysisResult :=
   names.map (analyzeFunction env knownNames)
 
 /-- Try to find a constant by exact name -/
@@ -246,8 +247,9 @@ def resolveConstantName (env : Environment) (nameStr : String) : Option Name :=
 
 /-- Compute transitive dependencies within a set of known functions.
     Returns the set of all reachable dependencies and a list of any errors encountered. -/
-partial def getTransitiveDepsWithErrors (env : Environment) (knownNames : Std.HashSet Name) (name : Name)
-    (visited : Std.HashSet Name := {}) (errors : Array String := #[]) : Std.HashSet Name × Array String :=
+partial def getTransitiveDepsWithErrors (env : Environment) (knownNames : Std.HashSet Name)
+    (name : Name) (visited : Std.HashSet Name := {}) (errors : Array String := #[]) :
+    Std.HashSet Name × Array String :=
   if visited.contains name then (visited, errors)
   else
     let visited := visited.insert name

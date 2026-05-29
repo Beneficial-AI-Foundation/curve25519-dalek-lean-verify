@@ -8,10 +8,8 @@ import Lean
 import Utils.Lib.Types
 
 open Lean
-
-namespace Utils.Lib.Docstring
-
 open Utils.Lib.Types
+namespace Utils.Lib.Docstring
 
 /-- Extract the Rust function name from between `[` and `]` in the docstring. -/
 def extractRustName (doc : String) : Option String :=
@@ -72,7 +70,7 @@ def extractVisibility (doc : String) : Option String :=
     else none
   else none
 
-/-- Parse a complete docstring into structured info -/
+/-- Parse a complete docstring into structured info. -/
 def parseDocstring (doc : String) : DocstringInfo :=
   { rustName := extractRustName doc
     source := extractSourceFile doc
@@ -80,11 +78,11 @@ def parseDocstring (doc : String) : DocstringInfo :=
     lineEnd := (extractLineRange doc).map Prod.snd
     visibility := extractVisibility doc }
 
-/-- Get docstring for a constant from the environment -/
+/-- Get docstring for a constant from the environment. -/
 def getDocstring (env : Environment) (name : Name) : IO (Option String) :=
   Lean.findDocString? env name
 
-/-- Get parsed docstring info for a constant -/
+/-- Get parsed docstring info for a constant. -/
 def getDocstringInfo (env : Environment) (name : Name) : IO DocstringInfo := do
   match ← getDocstring env name with
   | some doc => return parseDocstring doc

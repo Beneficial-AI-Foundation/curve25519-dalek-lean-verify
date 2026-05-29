@@ -73,7 +73,7 @@ theorem mul_spec (a b : Scalar52)
     calc Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR
         < L * L := by exact Nat.mul_lt_mul_of_lt_of_lt ab_post3 h_RR_lt
       _ < R * L := by exact Nat.mul_lt_mul_of_pos_right (by unfold R L; omega) (by unfold L; omega)
-  refine ⟨?_, by assumption, by grind⟩
+  refine ⟨?_, by assumption, result_post2⟩
   have h_res_R_ab_RR : Scalar52_as_Nat result * R ≡
     Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR [MOD L] := by
       rw [a2_post1] at result_post1

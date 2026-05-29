@@ -84,7 +84,7 @@ def valid_ladder_state
     Q_affine.toField = Q.U.toField / Q.W.toField ∧
     (∀ i < 5, affine_PmQ[i]!.val < 2 ^ 52) ∧
     affine_PmQ.toField ≠ 0 ∧
-    (∀ (P_affine Q_affine : Point),
+    (∀ (P_affine Q_affine : Montgomery.Point),
     get_u P_affine = P.U.toField / P.W.toField ∧
     get_u Q_affine = Q.U.toField / Q.W.toField →
     get_u (P_affine - Q_affine) = affine_PmQ.toField)
@@ -107,7 +107,7 @@ theorem differential_add_and_double_spec
     differential_add_and_double P Q affine_PmQ ⦃ (result : ProjectivePoint × ProjectivePoint) =>
       result.1.IsValid ∧
       result.2.IsValid ∧
-      (∀ (P_affine Q_affine : Point),
+      (∀ (P_affine Q_affine : Montgomery.Point),
         (get_u P_affine = Field51_as_Nat P.U / Field51_as_Nat P.W ∧
          get_u Q_affine = Field51_as_Nat Q.U / Field51_as_Nat Q.W ∧
          get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ) →
@@ -115,7 +115,7 @@ theorem differential_add_and_double_spec
           get_u (2 • P_affine)) ∧
         (Field51_as_Nat result.2.U / Field51_as_Nat result.2.W =
           get_u (P_affine + Q_affine))) ∧
-      (∃ (P_affine Q_affine : Point),
+      (∃ (P_affine Q_affine : Montgomery.Point),
         (get_u P_affine = Field51_as_Nat P.U / Field51_as_Nat P.W ∧
          get_u Q_affine = Field51_as_Nat Q.U / Field51_as_Nat Q.W ∧
          get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ) )
@@ -126,10 +126,8 @@ theorem differential_add_and_double_spec
   step*
   · exact hP_valid.U_bounds
   · exact hP_valid.W_bounds
-  · have := hQ_valid.U_bounds
-    grind
-  · have := hQ_valid.W_bounds
-    grind
+  · exact hQ_valid.U_bounds
+  · exact hQ_valid.W_bounds
   · rw [lift_mod_eq_iff] at t16_post1
     rw [lift_mod_eq_iff] at t5_post1
     rw [lift_mod_eq_iff] at t4_post1
@@ -271,7 +269,7 @@ theorem differential_add_and_double_spec
           field_simp
           unfold FieldElement51.toField
           grind
-    have DBL_ADD_E : ∀ (P_affine Q_affine : Point),
+    have DBL_ADD_E : ∀ (P_affine Q_affine : Montgomery.Point),
       get_u P_affine = ↑(Field51_as_Nat P.U) / ↑(Field51_as_Nat P.W) ∧
       get_u Q_affine = ↑(Field51_as_Nat Q.U) / ↑(Field51_as_Nat Q.W) ∧
         get_u (P_affine - Q_affine) = (Field51_as_Nat affine_PmQ) →
@@ -415,8 +413,10 @@ theorem differential_add_and_double_spec
     have ADD_neq_0 : P_a + Q_a ≠ 0 := by grind
     constructor
     · constructor
-      · grind only [#f2e6]
-      · grind only [#b561]
+      · simp_lists
+        grind
+      · simp_lists
+        grind
       · simp only [ne_eq]
         unfold FieldElement51.toField
         apply non_t16

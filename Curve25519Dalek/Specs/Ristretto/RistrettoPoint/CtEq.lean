@@ -78,7 +78,7 @@ theorem ct_eq_spec (self other : RistrettoPoint)
     exact ⟨fun _ => h.elim (.inl ∘ c_post.mp ∘ (vo c).mp) (.inr ∘ c1_post.mp ∘ (vo c1).mp),
       fun _ => rfl⟩
   · rename_i h
-    push_neg at h
+    push Not at h
     exact ⟨nofun, fun hm => hm.elim
       (fun hm => absurd ((vo c).mpr (c_post.mpr hm)) h.1)
       (fun hm => absurd ((vo c1).mpr (c1_post.mpr hm)) h.2)⟩

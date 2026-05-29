@@ -817,7 +817,8 @@ private lemma elligator_completed_point_valid
           ring
         rw [step1]
         exact constr_to_squares_r hB
-  exact ⟨fun i hi => by
+  exact ⟨⟨h_cp_Z_ne, h_cp_T_ne, h_cp_curve⟩,
+    fun i hi => by
       dsimp only [Nat.reducePow]
       have := cp_X_post2 i hi
       omega,
@@ -832,8 +833,7 @@ private lemma elligator_completed_point_valid
     fun i hi => by
       dsimp only [Nat.reducePow]
       have := cp_T_post2 i hi
-      omega,
-    h_cp_Z_ne, h_cp_T_ne, h_cp_curve⟩
+      omega⟩
 
 /-- If the extracted `sqrt_ratio_i` flag is square, the pure Elligator squareness predicate
 holds. -/
@@ -1124,7 +1124,6 @@ theorem elligator_ristretto_flavor_spec (r_0 : FieldElement51) (h_r_0_valid : r_
       result.IsValid ∧
       result.toPoint = (elligator_ristretto_flavor_pure r_0.toField).val ⦄ := by
   unfold elligator_ristretto_flavor
-  simp only [step_simps]
   let* ⟨ i, i_post1, i_post2, i_post3 ⟩ ← SQRT_M1_spec
   let* ⟨ d, d_post1, d_post2 ⟩ ← EDWARDS_D_spec
   let* ⟨ one_minus_d_sq, one_minus_d_sq_post1, one_minus_d_sq_post2 ⟩ ←
@@ -1148,7 +1147,12 @@ theorem elligator_ristretto_flavor_spec (r_0 : FieldElement51) (h_r_0_valid : r_
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
   let* ⟨ D, D_post1, D_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
-  let* ⟨ _, _, _, _, _, _, _ ⟩ ← field.FieldElement51.sqrt_ratio_i_spec
+  -- aeneas#963 refactor: uncurried postcondition destructure (Choice × FE51 + 6 conjuncts)
+  let* ⟨ sqrt_flag, sqrt_field, x_post1, x_post2, N_post_x, N_post1_D, N_post2_D, N_post3_D ⟩ ←
+    field.FieldElement51.sqrt_ratio_i_spec
+  -- Reconstruct the pair so downstream structures (ElligatorSqrtRatioPosts, etc.)
+  -- which take `x : subtle.Choice × FieldElement51` continue to typecheck.
+  set x : subtle.Choice × FieldElement51 := (sqrt_flag, sqrt_field) with hx_def
   let* ⟨ s_prime, s_prime_post1, s_prime_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
   let* ⟨ c1, c1_post ⟩ ← field.FieldElement51.is_negative_spec
@@ -1183,19 +1187,22 @@ theorem elligator_ristretto_flavor_spec (r_0 : FieldElement51) (h_r_0_valid : r_
     · simp only [s_prime1_post i hi]; split
       · have := s_prime_neg_post2 i hi; omega
       · have := s_prime_post2 i hi; omega
-    · grind
+    · -- aeneas#963 refactor: discharged using `x_post1` bound on sqrt_field
+      have := x_post1 i hi; omega
   let* ⟨ s_plus_s, s_plus_s_post1, s_plus_s_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
   · intro i hi; simp only [s1_post i hi]; split
     · simp only [s_prime1_post i hi]; split
       · have := s_prime_neg_post2 i hi; omega
       · have := s_prime_post2 i hi; omega
-    · grind
+    · -- aeneas#963 refactor: discharged using `x_post1` bound on sqrt_field
+      have := x_post1 i hi; omega
   · intro i hi; simp only [s1_post i hi]; split
     · simp only [s_prime1_post i hi]; split
       · have := s_prime_neg_post2 i hi; omega
       · have := s_prime_post2 i hi; omega
-    · grind
+    · -- aeneas#963 refactor: discharged using `x_post1` bound on sqrt_field
+      have := x_post1 i hi; omega
   let* ⟨ cp_X, cp_X_post1, cp_X_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
   let* ⟨ fe, fe_post1, fe_post2, fe_post3 ⟩ ← SQRT_AD_MINUS_ONE_spec
@@ -1209,8 +1216,8 @@ theorem elligator_ristretto_flavor_spec (r_0 : FieldElement51) (h_r_0_valid : r_
          ep_post8, ep_post9, ep_post10 ⟩ ←
     backend.serial.curve_models.CompletedPoint.as_extended_spec
   · -- CompletedPoint.IsValid { X := cp_X, Y := cp_Y, Z := cp_Z, T := cp_T }
-    rename_i x _ x_post1 x_post2 N_post_x N_post1_D N_post2_D N_post3_D
-      _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    -- aeneas#963 refactor: names are now bound directly by the let* at sqrt_ratio_i_spec;
+    -- no rename_i needed.
     have h_cp_T_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq := by
       exact field51_as_nat_eq_add cp_T_post1
     have h_rpo_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one := by
@@ -1296,8 +1303,8 @@ theorem elligator_ristretto_flavor_spec (r_0 : FieldElement51) (h_r_0_valid : r_
       h_cp_T_F h_ns_eq_F h_D_eq_F h_Nt_eq_F h_r_F h_i_val
   -- Main Goals: ⊢ IsValid ep ∧ toPoint ep = ↑(elligator_ristretto_flavor_pure r_0.toField)
   -- Step 1: Lift arithmetic postconditions to field equalities
-  rename_i x _ x_post1 x_post2 N_post_x N_post1_D N_post2_D N_post3_D
-      _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  -- aeneas#963 refactor: names are now bound directly by the let* at sqrt_ratio_i_spec;
+  -- no rename_i needed.
   have hX_F : ep.X.toField = cp_X.toField * cp_T.toField := by
     unfold toField; have h := lift_mod_eq _ _ ep_post1; push_cast at h; exact h
   have hY_F : ep.Y.toField = cp_Y.toField * cp_Z.toField := by

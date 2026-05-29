@@ -5,38 +5,25 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 
-/-! # Spec Theorem for `Scalar::conditional_select`
+/-!
+# Spec theorem for `curve25519_dalek::scalar::Scalar::conditional_select`
 
-Specification and proof for the `ConditionallySelectable` trait implementation for `Scalar`.
+Implements the `ConditionallySelectable` trait for `Scalar` via element-wise constant-time
+byte selection, conditionally returning one of two scalars based on a `Choice` value.
 
-This function conditionally selects between two Scalars based on a `Choice` value
-by iterating over the 32 bytes and applying `U8::conditional_select` element-wise.
+• Takes two `Scalar`s `a` and `b` and a `Choice` value
+• Creates a new 32-byte array initialized to zeros
+• For each index `i` in `0..32`, sets `bytes[i]` to
+  `U8::conditional_select(a.bytes[i], b.bytes[i], choice)`
+• Returns a `Scalar` with the resulting bytes array
+• Returns `b` when `choice = Choice.one` (`choice.val = 1`) and `a` when
+  `choice = Choice.zero` (`choice.val = 0`), in constant time
 
-Returns `b` when `choice = 1` and `a` when `choice = 0`, in constant time.
-
-**Source**: curve25519-dalek/src/scalar.rs (lines 390:4-397:5)
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable
-
-/-
-natural language description:
-
-• Takes two Scalars `a` and `b` and a `Choice` value
-• Creates a new 32-byte array initialized to zeros
-• For each index i in 0..32, sets bytes[i] to
-  U8::conditional_select(a.bytes[i], b.bytes[i], choice)
-• Returns a Scalar with the resulting bytes array
-• Implementation: iterates over 32 byte positions, applying constant-time
-  byte selection at each position
-
-natural language specs:
-
-• The function always succeeds (no panic) for any input Scalars and Choice
-• Returns `b` when `choice = Choice.one` (choice.val = 1)
-• Returns `a` when `choice = Choice.zero` (choice.val = 0)
--/
 
 theorem next_spec (range : core.ops.range.Range Usize) :
     ∃ opt range',
@@ -74,10 +61,15 @@ theorem next_spec (range : core.ops.range.Range Usize) :
   · rw [if_neg hlt]
     exact ⟨none, range, rfl, fun _ => ⟨rfl, rfl⟩, fun h => absurd h hlt⟩
 
+/-- **Spec theorem for `Array.update`** (specialised to `Array U8 32`)
+• The update always succeeds (no panic) for in-bounds index `j` (given `j.val < 32`)
+• All elements at indices `k ≠ j.val` are unchanged in the result: `arr'[k]! = arr[k]!`
+• The element at index `j.val` equals the new value `v` in the result: `arr'[j.val]! = v`
+-/
 @[step]
 private lemma Array_U8_32_update_spec (arr : Array U8 32#usize) (j : Usize)
     (v : U8) (hj : j.val < 32) :
-    Array.update arr j v ⦃ arr' =>
+    Array.update arr j v ⦃ (arr' : Array U8 32#usize) =>
       (∀ (k : ℕ), k ≠ j.val → arr'[k]! = arr[k]!) ∧
       arr'[j.val]! = v ⦄ := by
   have hbound : j.val < arr.length := by scalar_tac
@@ -91,6 +83,10 @@ private lemma Array_U8_32_update_spec (arr : Array U8 32#usize) (j : Usize)
   · simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
     exact List.getElem!_set arr.val j.val v (by scalar_tac)
 
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::conditional_select_loop`**
+• The loop always succeeds (no panic) given valid range bounds and loop invariant
+• For all `j < 32`, `result[j]!` = `b.bytes[j]!` if `choice.val = 1`, and `a.bytes[j]!` otherwise
+-/
 @[step]
 theorem conditional_select_loop_spec
     (iter : core.ops.range.Range Usize) (a b : scalar.Scalar)
@@ -99,7 +95,7 @@ theorem conditional_select_loop_spec
     (hstart : iter.start ≤ 32#usize)
     (hinv : ∀ j : Nat, j < iter.start.val →
       bytes[j]! = (if choice.val = 1#u8 then b else a).bytes[j]!) :
-    conditional_select_loop iter a b choice bytes ⦃ result =>
+    conditional_select_loop iter a b choice bytes ⦃ (result : Array U8 32#usize) =>
       ∀ j : Nat, j < 32 →
         result[j]! = (if choice.val = 1#u8 then b else a).bytes[j]! ⦄ := by
   unfold conditional_select_loop
@@ -154,9 +150,8 @@ theorem conditional_select_loop_spec
     rw [hiter1_start]
     grind
 
-/-- **Spec and proof concerning
-`scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select`**:
-• The function always succeeds (no panic)
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::conditional_select`**
+• The function always succeeds (no panic) for any input `Scalar`s and `Choice`
 • Returns `b` when `choice.val = 1` and `a` when `choice.val = 0`
 -/
 @[step]

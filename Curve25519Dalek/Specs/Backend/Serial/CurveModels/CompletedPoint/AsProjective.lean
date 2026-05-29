@@ -7,10 +7,11 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Math.Edwards.Representation
-/-!
-# Spec theorem for `CompletedPoint::as_projective`
 
-Specification and proof for `CompletedPoint::as_projective`.
+/-!
+# Spec theorem
+
+Specification for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective`.
 
 This function implements point conversion from completed coordinates (ℙ¹ × ℙ¹) to projective
 coordinates (ℙ²) on the Curve25519 elliptic curve. Given a point P = (X:Y:Z:T) in
@@ -23,28 +24,17 @@ Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
-
-/-
-natural language description:
-
-• Takes a CompletedPoint with coordinates (X, Y, Z, T) in completed ℙ¹ × ℙ¹ representation
-(i.e., with affine coordinates given via X/Z = x and Y/T = y) and returns a ProjectivePoint
-(X', Y', Z') in projective ℙ² representation (i.e., with X'/Z' = x and Y'/Z' = y).
-Arithmetics are performed in the field 𝔽_p where p = 2^255 - 19.
-
-natural language specs:
-
-• The function always succeeds (no panic)
-• Given an input completed point (X, Y, Z, T), the output ProjectivePoint (X', Y', Z') satisfies:
-- X' ≡ X·T (mod p)
-- Y' ≡ Y·Z (mod p)
-- Z' ≡ Z·T (mod p)
--/
-
 /-- **Auxiliary spec for `as_projective`** proving arithmetic correctness.
-Input bounds: all coordinates < 2^54.
-Output: arithmetic relations modulo p. -/
-@[step]
+
+• The function always succeeds (no panic) for an input completed point (X, Y, Z, T) with all
+coordinates < 2^54
+• The output ProjectivePoint (X', Y', Z') satisfies:
+  • X' ≡ X·T (mod p) where p = 2^255 - 19
+  • Y' ≡ Y·Z (mod p)
+  • Z' ≡ Z·T (mod p)
+
+The point-level `as_projective_spec` (WP form, takes `IsValid` and
+returns `IsValid ∧ toPoint = toPoint`) is the canonical chain target. -/
 theorem as_projective_spec_aux (q : CompletedPoint)
     (h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 54)
     (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 54)
@@ -183,32 +173,30 @@ private lemma as_projective_isValid_and_toPoint
       rw [h_py, hY_F, hZ_F, h_qy]
       field_simp [hq_valid.Z_ne_zero, hq_valid.T_ne_zero]
 
-/--
-Verification of the `as_projective` function.
-The theorem states that converting a valid CompletedPoint to ProjectivePoint:
-1. Always succeeds
-2. Produces a valid ProjectivePoint
-3. Preserves the represented affine point
--/
+/-- **Spec theorem**
+
+For `curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective`.
+• Always succeeds for a valid CompletedPoint
+• Produces a valid ProjectivePoint
+• Preserves the represented affine point (`proj.toPoint = q.toPoint`) -/
+@[step]
 theorem as_projective_spec
     (q : CompletedPoint) (hq_valid : q.IsValid) :
-    ∃ proj, as_projective q = ok proj ∧
-    proj.IsValid ∧ proj.toPoint = q.toPoint := by
+    as_projective q ⦃ (proj : ProjectivePoint) =>
+      proj.IsValid ∧ proj.toPoint = q.toPoint ⦄ := by
   -- Extract bounds from validity
   have h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 54 := hq_valid.X_valid
   have h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 54 := hq_valid.Y_valid
   have h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54 := hq_valid.Z_valid
   have h_qT_bounds : ∀ i < 5, (q.T[i]!).val < 2 ^ 54 := hq_valid.T_valid
-  -- Use auxiliary spec
-  obtain ⟨proj, h_run, hX_arith, hY_arith, hZ_arith, hpX_bounds, hpY_bounds, hpZ_bounds⟩ :=
-    spec_imp_exists (as_projective_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds h_qT_bounds)
-  use proj
-  constructor
-  · exact h_run
-  -- Lift arithmetic to field equalities
+  -- Use auxiliary spec, then strengthen its post to the point-level form.
+  apply WP.spec_mono
+    (as_projective_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds h_qT_bounds)
+  intro proj ⟨hX_arith, hY_arith, hZ_arith, hpX_bounds, hpY_bounds, hpZ_bounds⟩
+  -- Lift arithmetic to field equalities.
   have ⟨hX_F, hY_F, hZ_F⟩ :=
     as_projective_lift_to_field_eqs proj q hX_arith hY_arith hZ_arith
-  -- Prove validity and point equality
+  -- Combine validity and point equality.
   exact as_projective_isValid_and_toPoint proj q hq_valid
     hX_F hY_F hZ_F hpX_bounds hpY_bounds hpZ_bounds
 

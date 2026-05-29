@@ -33,7 +33,8 @@ namespace curve25519_dalek.montgomery.MontgomeryPoint
   where `s = U8x32_as_Nat scalar.bytes`
 -/
 @[step]
-theorem mul_base_spec (scalar : scalar.Scalar) :
+theorem mul_base_spec (scalar : scalar.Scalar)
+    (h_s_canonical : U8x32_as_Nat scalar.bytes < 2 ^ 255) :
     mul_base scalar ⦃ (result : MontgomeryPoint) =>
       let ep := (U8x32_as_Nat scalar.bytes) • _root_.Edwards.basepoint
       if ep.y = 1 then

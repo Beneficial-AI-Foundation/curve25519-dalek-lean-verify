@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong, Oliver Butterley
 -/
@@ -7,19 +7,19 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
-/-! # Spec Theorem for `FieldElement51::mul`
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::mul`
 
-This function computes the product of two field elements.
-
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
+This function computes the product of two `FieldElement51` values modulo `p = 2^255 - 19`.
 
 ## Proof strategy: Fold theorem decomposition
 
 The function is decomposed into 3 helper functions, each with a fold theorem and `@[step]` spec.
 
-- Stage 1 — Product computation (`mul_product_stage`)
-- Stage 2 — Carry propagation (`mul_carry_prop_stage`)
-- Stage 3 — Final reduction (`mul_final_reduce_stage`)
+• Stage 1 — Product computation (`mul_product_stage`)
+• Stage 2 — Carry propagation (`mul_carry_prop_stage`)
+• Stage 3 — Final reduction (`mul_final_reduce_stage`)
+
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 set_option linter.hashCommand false
@@ -28,10 +28,13 @@ set_option linter.hashCommand false
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field
 open MulShared0FieldElement51SharedAFieldElement51FieldElement51 (mul.m mul.LOW_51_BIT_MASK)
-
 namespace curve25519_dalek.Shared0FieldElement51.Insts
 namespace CoreOpsArithMulSharedAFieldElement51FieldElement51
 
+/-- **Spec theorem for `mul.m`**
+• The function always succeeds (no panic)
+• The result equals the 128-bit product `x * y`
+-/
 @[step]
 theorem m_spec (x y : U64) :
     mul.m x y ⦃ (r : U128) =>
@@ -39,9 +42,14 @@ theorem m_spec (x y : U64) :
   unfold mul.m
   step*
 
+/-- **Spec theorem for `mul.LOW_51_BIT_MASK`**
+• The function always succeeds (no panic)
+• The result equals `2 ^ 51 - 1`
+-/
 @[step]
 theorem LOW_51_BIT_MASK_spec :
-    mul.LOW_51_BIT_MASK ⦃ (result : U64) => result.val = 2^51 - 1 ⦄ := by
+    mul.LOW_51_BIT_MASK ⦃ (result : U64) =>
+      result.val = 2^51 - 1 ⦄ := by
   unfold mul.LOW_51_BIT_MASK
   step*
 
@@ -482,6 +490,11 @@ private lemma carry_chain_eq (c0 c1 c2 c3 c4 a0 a1 a2 a3 a4 carry c1' c2' c3' c4
 
 set_option maxHeartbeats 8000000 in
 -- Required for step*
+/-- **Spec theorem for `mul_product_stage`**
+• The function always succeeds (no panic) when every input limb is `< 2 ^ 54`
+• Each `c_i` matches the radix-2⁵¹ product formula for limb `i`
+• Each `c_i < 2 ^ 115`; tighter bounds hold for `c1..c4`
+-/
 @[step]
 theorem mul_product_stage_spec (self _rhs : Array U64 5#usize)
     (hlhs : ∀ i < 5, self[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, _rhs[i]!.val < 2 ^ 54) :
@@ -624,6 +637,11 @@ theorem mul_product_stage_spec (self _rhs : Array U64 5#usize)
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through ~30 monadic carry propagation operations
+/-- **Spec theorem for `mul_carry_prop_stage`**
+• The function always succeeds (no panic) under the carry-chain bounds
+• Each output limb is the radix-2⁵¹ reduced limb of the carry chain
+• The mask equals `2 ^ 51 - 1` and the carry is bounded by `6 * 2 ^ 57`
+-/
 @[step]
 theorem mul_carry_prop_stage_spec (c0 c1 c2 c3 c4 : U128)
     (hc0 : c0.val < 2 ^ 115) (_hc1 : c1.val < 2 ^ 115) (_hc2 : c2.val < 2 ^ 115)
@@ -759,6 +777,11 @@ theorem mul_carry_prop_stage_spec (c0 c1 c2 c3 c4 : U128)
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through final reduction operations
+/-- **Spec theorem for `mul_final_reduce_stage`**
+• The function always succeeds (no panic) under the input bounds
+• Limb 0 becomes `(a'[0] + 19 * carry) % 2 ^ 51`, with the overflow folded into limb 1
+• Limbs 2..4 are unchanged and every output limb is `< 2 ^ 52`
+-/
 @[step]
 theorem mul_final_reduce_stage_spec (a' : Array U64 5#usize) (carry i54 : U64)
     (ha' : ∀ i < 5, a'[i]!.val < 2 ^ 51) (hcarry : carry.val < 6 * 2 ^ 57)
@@ -829,9 +852,10 @@ theorem mul_final_reduce_stage_spec (a' : Array U64 5#usize) (carry i54 : U64)
 
 set_option maxHeartbeats 14000000 in
 -- Required for step*
-/-- Spec theorem for `FieldElement51::mul`.
-
-Field multiplication is correct mod p and produces reduced limbs. -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::mul`**
+• No panic (always returns successfully) when every input limb is `< 2 ^ 54`
+• `Field51_as_Nat r ≡ Field51_as_Nat self * Field51_as_Nat _rhs (mod p)`
+• Every output limb is `< 2 ^ 52` -/
 @[step]
 theorem mul_spec (self _rhs : Array U64 5#usize) (hself : ∀ i < 5, self[i]!.val < 2 ^ 54)
     (hrhs : ∀ i < 5, _rhs[i]!.val < 2 ^ 54) :
@@ -841,12 +865,12 @@ theorem mul_spec (self _rhs : Array U64 5#usize) (hself : ∀ i < 5, self[i]!.va
   unfold mul
   -- Fold all three stages
   simp_rw [fold_mul_product_stage, fold_mul_carry_prop_stage, fold_mul_final_reduce_stage]
-  step as ⟨ prod, prod_post ⟩
-  step as ⟨ cp, cp_post ⟩
+  step as ⟨ c0, c1, c2, c3, c4, prod_post ⟩
+  step as ⟨ cp, carry, mask, cp_post ⟩
   step as ⟨ red, red_post1, red_post2, red_post3, red_post4, red_post5, red_post6 ⟩
   -- Product identity mod p
-  have a_mul : (prod.1.val + 2 ^ 51 * prod.2.1.val + 2 ^ 102 * prod.2.2.1.val +
-      2 ^ 153 * prod.2.2.2.1.val + 2 ^ 204 * prod.2.2.2.2.val) ≡
+  have a_mul : (c0.val + 2 ^ 51 * c1.val + 2 ^ 102 * c2.val +
+      2 ^ 153 * c3.val + 2 ^ 204 * c4.val) ≡
       (Field51_as_Nat self) * (Field51_as_Nat _rhs) [MOD p] := by
     have := decompose self[0]!.val self[1]!.val self[2]!.val
       self[3]!.val self[4]!.val _rhs[0]!.val _rhs[1]!.val
@@ -858,9 +882,9 @@ theorem mul_spec (self _rhs : Array U64 5#usize) (hself : ∀ i < 5, self[i]!.va
       Finset.sum_range_succ, Finset.range_one,
       Finset.sum_singleton, mul_zero, pow_zero, one_mul]
   -- Carry chain conservation
-  set v0 := prod.1.val; set v1 := prod.2.1.val
-  set v2 := prod.2.2.1.val; set v3 := prod.2.2.2.1.val
-  set v4 := prod.2.2.2.2.val
+  set v0 := c0.val; set v1 := c1.val
+  set v2 := c2.val; set v3 := c3.val
+  set v4 := c4.val
   have h_chain := carry_chain_eq v0 v1 v2 v3 v4 _ _ _ _ _ _
     (v1 + v0 / 2 ^ 51) (v2 + (v1 + v0 / 2 ^ 51) / 2 ^ 51)
     (v3 + (v2 + (v1 + v0 / 2 ^ 51) / 2 ^ 51) / 2 ^ 51)
@@ -874,20 +898,20 @@ theorem mul_spec (self _rhs : Array U64 5#usize) (hself : ∀ i < 5, self[i]!.va
   have ha'_4 := cp_post.2.2.2.2.1
   have hcarry_val := cp_post.2.2.2.2.2.1
   -- Field51_as_Nat of the reduced result
-  have hf_r : Field51_as_Nat red = (cp.1[0]!.val + 19 * cp.2.1.val) + 2 ^ 51 * cp.1[1]!.val +
-      2 ^ 102 * cp.1[2]!.val + 2 ^ 153 * cp.1[3]!.val + 2 ^ 204 * cp.1[4]!.val := by
+  have hf_r : Field51_as_Nat red = (cp[0]!.val + 19 * carry.val) + 2 ^ 51 * cp[1]!.val +
+      2 ^ 102 * cp[2]!.val + 2 ^ 153 * cp[3]!.val + 2 ^ 204 * cp[4]!.val := by
     unfold Field51_as_Nat
     simp only [Finset.sum_range_succ, Finset.sum_range_zero]
     rw [red_post1, red_post2, red_post3, red_post4, red_post5]
     have := Nat.mod_add_div
-      (cp.1[0]!.val + 19 * cp.2.1.val) (2 ^ 51)
+      (cp[0]!.val + 19 * carry.val) (2 ^ 51)
     omega
-  have h_key : Field51_as_Nat red + cp.2.1.val * p =
+  have h_key : Field51_as_Nat red + carry.val * p =
       v0 + 2 ^ 51 * v1 + 2 ^ 102 * v2 + 2 ^ 153 * v3 + 2 ^ 204 * v4 := by
     rw [hf_r, h_chain]
     simp only [ha'_0, ha'_1, ha'_2, ha'_3, ha'_4, hcarry_val]
     unfold p; omega
-  exact ⟨(modeq_of_add_mul_eq _ _ cp.2.1.val p h_key).trans a_mul, red_post6⟩
+  exact ⟨(modeq_of_add_mul_eq _ _ carry.val p h_key).trans a_mul, red_post6⟩
 
 end CoreOpsArithMulSharedAFieldElement51FieldElement51
 end curve25519_dalek.Shared0FieldElement51.Insts

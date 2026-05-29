@@ -11,10 +11,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 
-/-!
-# Spec theorem for `CompletedPoint::add`
-
-Specification and proof for `CompletedPoint::add`.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::add`
 
 This function implements the mixed addition of an Edwards point in extended
 coordinates with a point in projective Niels coordinates, returning the result
@@ -49,37 +46,19 @@ open CoreOpsArithAddAssignSharedAFieldElement51
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
-/-
-natural language description:
-
-• Takes an EdwardsPoint (X, Y, Z, T) in extended coordinates and a ProjectiveNielsPoint
-(Y+X, Y−X, Z, 2dXY) and returns a CompletedPoint (X', Y', Z', T') in completed coordinates
-(ℙ¹ × ℙ¹). Arithmetic is performed in the field 𝔽_p where p = 2^255 - 19.
-
-natural language specs:
-
-• The function always succeeds (no panic)
-• Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, Z, 2dXY), the output C = (X', Y', Z', T')
-  satisfies modulo p:
-  - X' ≡ ( (Y+X)·N.Y_plus_X − (Y−X)·N.Y_minus_X ) (mod p)
-  - Y' ≡ ( (Y+X)·N.Y_plus_X + (Y−X)·N.Y_minus_X ) (mod p)
-  - Z' ≡ ( 2·Z·N.Z + T·N.T2d ) (mod p)
-  - T' ≡ ( 2·Z·N.Z − T·N.T2d ) (mod p)
--/
-/-- **Spec and proof concerning `backend.serial.curve_models.CompletedPoint.add`**:
-- No panic (always returns successfully)
-- Given inputs:
+/-- **Helper for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::add`**
+• No panic (always returns successfully)
+• Given inputs:
   • an EdwardsPoint `self` with coordinates (X, Y, Z, T), and
   • a ProjectiveNielsPoint `other` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),
 the output CompletedPoint (X', Y', Z', T') computed by `add self other` satisfies modulo p:
-- X' ≡ ( (Y+X)·Y_plus_X − (Y−X)·Y_minus_X ) (mod p)
-- Y' ≡ ( (Y+X)·Y_plus_X + (Y−X)·Y_minus_X ) (mod p)
-- Z' ≡ ( 2·Z·Z_other + T·T2d ) (mod p)
-- T' ≡ ( 2·Z·Z_other − T·T2d ) (mod p)
+• X' ≡ ( (Y+X)·Y_plus_X − (Y−X)·Y_minus_X ) (mod p)
+• Y' ≡ ( (Y+X)·Y_plus_X + (Y−X)·Y_minus_X ) (mod p)
+• Z' ≡ ( 2·Z·Z_other + T·T2d ) (mod p)
+• T' ≡ ( 2·Z·Z_other − T·T2d ) (mod p)
 where p = 2^255 - 19
 These are the standard mixed-addition formulas via projective Niels coordinates,
-returning the result in completed coordinates.
--/
+returning the result in completed coordinates. -/
 theorem add_assign_spec' (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
@@ -99,11 +78,11 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
   simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow,
     exists_eq_left']
   constructor
-  · grind
+  · grind [Array.getElem!_Nat_eq]
   · intro i hi
     have :(a[i]!).val + (b[i]!).val < 2 ^ 54 + 2 ^ 52:= by
       have := ha i hi; have := hb i hi; omega
-    grind
+    grind [Array.getElem!_Nat_eq]
 
 theorem add_spec' {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
@@ -273,10 +252,10 @@ Input bounds: EdwardsPoint coords < 2^53, ProjectiveNielsPoint coords < 2^53.
 Output: arithmetic relations modulo p with explicit output bounds.
 
 Output bounds (all < 2^54, so output satisfies CompletedPoint.IsValid):
-- X (from sub): < 2^52
-- Y (from add PP+MM): < 2^53
-- Z (from add ZZ2+TT2d): < 2^54 (ZZ2 < 2^53, TT2d < 2^52)
-- T (from sub): < 2^52
+• X (from sub): < 2^52
+• Y (from add PP+MM): < 2^53
+• Z (from add ZZ2+TT2d): < 2^54 (ZZ2 < 2^53, TT2d < 2^52)
+• T (from sub): < 2^52
 -/
 theorem add_spec_aux_54_52_53_52
     (self : edwards.EdwardsPoint)
@@ -286,7 +265,7 @@ theorem add_spec_aux_54_52_53_52
     (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)
     (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)
     (h_otherYpX_bounds : ∀ i, i < 5 → (other.Y_plus_X[i]!).val < 2 ^ 54)
-    (h_otherYmX_bounds : ∀ i, i < 5 → (other.Y_minus_X[i]!).val < 2 ^ 52)
+    (h_otherYmX_bounds : ∀ i, i < 5 → (other.Y_minus_X[i]!).val < 2 ^ 54)
     (h_otherZ_bounds : ∀ i, i < 5 → (other.Z[i]!).val < 2 ^ 53)
     (h_otherT2d_bounds : ∀ i, i < 5 → (other.T2d[i]!).val < 2 ^ 52) :
     add self other ⦃ c =>
@@ -358,7 +337,8 @@ This section provides a cleaner interface using IsValid predicates for inputs.
 The output CompletedPoint satisfies CompletedPoint.IsValid (all coordinates < 2^54).
 -/
 
-namespace curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+namespace curve25519_dalek
+namespace Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
 
 open Edwards
 open curve25519_dalek.backend.serial.curve_models
@@ -407,35 +387,8 @@ These lemmas extract independent proof steps from the main `add_spec` theorem,
 making the algebraic reasoning modular and reusable across both `add_spec` and `add_spec'`.
 -/
 
-/-- Express T2d in terms of affine coordinates from the ProjectiveNiels T2d relation.
-    From `2 * Z * T2d = d * (YpX² - YmX²)` and the definitions of x, y as
-    `(YpX - YmX)/(2Z)` and `(YpX + YmX)/(2Z)`, derives `T2d = 2 * d * Z * x * y`. -/
-private lemma niels_T2d_affine_expr (YpX YmX Z T2d x y : CurveField)
-    (hZ_ne : Z ≠ 0)
-    (hx : x = (YpX - YmX) / (2 * Z))
-    (hy : y = (YpX + YmX) / (2 * Z))
-    (h_rel : 2 * Z * T2d = Ed25519.d * (YpX ^ 2 - YmX ^ 2)) :
-    T2d = 2 * Ed25519.d * Z * x * y := by
-  have h2 : (2 : CurveField) ≠ 0 := by decide
-  have h2Z_ne : 2 * Z ≠ 0 := mul_ne_zero h2 hZ_ne
-  rw [show YpX ^ 2 - YmX ^ 2 = (YpX - YmX) * (YpX + YmX) from by ring] at h_rel
-  have h_factor : (YpX - YmX) * (YpX + YmX) = 4 * Z ^ 2 * x * y := by
-    simp only [hx, hy]; field_simp [h2Z_ne]; ring
-  rw [h_factor] at h_rel
-  have h_cancel : T2d * (2 * Z) = 2 * Ed25519.d * Z * x * y * (2 * Z) := by
-    linear_combination h_rel
-  field_simp [hZ_ne, h2] at h_cancel
-  calc T2d = 2 * Z * Ed25519.d * x * y := h_cancel
-    _ = 2 * Ed25519.d * Z * x * y := by ring
-
-/-- Express T in terms of affine coordinates from the Edwards extended coordinate relation.
-    From `X * Y = T * Z` and `x = X/Z`, `y = Y/Z`, derives `T = x * y * Z`. -/
-private lemma edwards_T_affine_expr (X Y Z T x y : CurveField)
-    (hZ_ne : Z ≠ 0)
-    (hx : x = X / Z) (hy : y = Y / Z)
-    (h_T : X * Y = T * Z) :
-    T = x * y * Z := by
-  simp only [hx, hy]; field_simp [hZ_ne]; linear_combination -h_T
+-- `niels_T2d_affine_expr` and `edwards_T_affine_expr` are now shared
+-- from `Math/Edwards/Representation.lean`
 
 /-- The completed point satisfies the twisted Edwards curve equation when its coordinates
     are the factored forms arising from Edwards point addition. -/
@@ -482,37 +435,28 @@ private lemma completed_on_curve_of_factored_add
           field_simp [hcZ2, hcT2]
 
 /-- From projective Edwards curve equation to affine curve equation.
-    Given a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y² with Z ≠ 0,
-    derives a*(X/Z)² + (Y/Z)² = 1 + d*(X/Z)²*(Y/Z)². -/
+    Delegates to `curve25519_dalek.edwards.affine_on_curve_of_projective`. -/
 private lemma edwards_affine_on_curve_of_projective
     (X Y Z : CurveField) (hZ_ne : Z ≠ 0)
-    (h_curve : Ed25519.a * X ^ 2 * Z ^ 2 + Y ^ 2 * Z ^ 2 = Z ^ 4 + Ed25519.d * X ^ 2 * Y ^ 2) :
-    Ed25519.a * (X / Z)^2 + (Y / Z)^2 = 1 + Ed25519.d * (X / Z) ^ 2 * (Y / Z) ^ 2 := by
-  have hZ2 : Z^2 ≠ 0 := pow_ne_zero 2 hZ_ne
-  have hZ4 : Z^4 ≠ 0 := pow_ne_zero 4 hZ_ne
-  simp only [Ed25519] at h_curve ⊢
-  simp only [div_pow]
-  field_simp [hZ2, hZ4]
-  linear_combination h_curve
+    (h_curve : Ed25519.a * X ^ 2 * Z ^ 2 + Y ^ 2 * Z ^ 2 =
+      Z ^ 4 + Ed25519.d * X ^ 2 * Y ^ 2) :
+    Ed25519.a * (X / Z) ^ 2 + (Y / Z) ^ 2 =
+      1 + Ed25519.d * (X / Z) ^ 2 * (Y / Z) ^ 2 :=
+  curve25519_dalek.edwards.affine_on_curve_of_projective X Y Z hZ_ne h_curve
 
 /-- From Niels projective curve equation to affine curve equation.
-    Given the scaled curve equation in (YpX, YmX, Z) coordinates with Z ≠ 0,
-    derives the affine curve equation for ((YpX-YmX)/(2Z), (YpX+YmX)/(2Z)). -/
+    Delegates to `curve25519_dalek.edwards.affine_on_curve_of_niels`. -/
 private lemma niels_affine_on_curve_of_projective
     (YpX YmX Z : CurveField) (hZ_ne : Z ≠ 0)
-    (h_curve : 4 * Ed25519.a * (YpX - YmX) ^ 2 * Z ^ 2 + 4 * (YpX + YmX) ^ 2 * Z ^ 2 =
-      16 * Z ^ 4 + Ed25519.d * (YpX - YmX) ^ 2 * (YpX + YmX) ^ 2) :
-    Ed25519.a * ((YpX - YmX) / (2 * Z))^2 + ((YpX + YmX) / (2 * Z))^2 =
-      1 + Ed25519.d * ((YpX - YmX) / (2 * Z))^2 * ((YpX + YmX) / (2 * Z))^2 := by
-  have h2 : (2 : CurveField) ≠ 0 := by decide
-  have h2Z_ne : 2 * Z ≠ 0 := mul_ne_zero h2 hZ_ne
-  have h2Z2 : (2 * Z)^2 ≠ 0 := pow_ne_zero 2 h2Z_ne
-  have h2Z4 : (2 * Z)^4 ≠ 0 := pow_ne_zero 4 h2Z_ne
-  simp only [Ed25519] at h_curve ⊢
-  simp only [div_pow]
-  field_simp [h2Z2, h2Z4]
-  ring_nf; ring_nf at h_curve
-  linear_combination h_curve
+    (h_curve : 4 * Ed25519.a * (YpX - YmX) ^ 2 * Z ^ 2 +
+      4 * (YpX + YmX) ^ 2 * Z ^ 2 =
+      16 * Z ^ 4 +
+      Ed25519.d * (YpX - YmX) ^ 2 * (YpX + YmX) ^ 2) :
+    Ed25519.a * ((YpX - YmX) / (2 * Z)) ^ 2 +
+      ((YpX + YmX) / (2 * Z)) ^ 2 =
+      1 + Ed25519.d * ((YpX - YmX) / (2 * Z)) ^ 2 *
+        ((YpX + YmX) / (2 * Z)) ^ 2 :=
+  curve25519_dalek.edwards.affine_on_curve_of_niels YpX YmX Z hZ_ne h_curve
 
 /-- T1 * T2d product identity: from T1 = x1*y1*Z1 and T2d = 2*d*Z2*x2*y2,
     derives T1 * T2d = 2*d*x1*x2*y1*y2*Z1*Z2. -/
@@ -681,10 +625,10 @@ private lemma add_spec_algebraic
   have h_denom_minus : 1 - Ed25519.d * x1 * x2 * y1 * y2 ≠ 0 := by
     have h := h_denoms.2; simp only [P1, P2] at h; convert h using 1
   -- T expressions using helper lemmas
-  have h_T2d_expr := niels_T2d_affine_expr YpX YmX Z2 T2d x2 y2 hZ2_ne hx2_def hy2_def
-    hother_T2d_relation
-  have h_T1_expr := edwards_T_affine_expr X1 Y1 Z1 T1 x1 y1 hZ1_ne hx1_def hy1_def
-    hself.T_relation
+  have h_T2d_expr := niels_T2d_affine_expr YpX YmX Z2 T2d x2 y2 hZ2_ne
+    hother_T2d_relation hx2_def hy2_def
+  have h_T1_expr := edwards_T_affine_expr X1 Y1 Z1 T1 x1 y1 hZ1_ne
+    hself.T_relation hx1_def hy1_def
   -- Key T1*T2d product (using extracted sub-lemma)
   have h_T1_T2d := add_T1_T2d_product T1 T2d x1 y1 x2 y2 Z1 Z2 h_T1_expr h_T2d_expr
   -- Factored coordinate forms (using extracted sub-lemmas)
@@ -734,11 +678,11 @@ private lemma add_spec_algebraic
     hX_factored hY_factored hZ_factored hT_factored h_denom_plus h_denom_minus
 
 
-/-- **Spec theorem for `curve25519_dalek.backend.serial.curve_models.CompletedPoint.add`**
-The theorem states that adding a valid EdwardsPoint with a valid ProjectiveNielsPoint:
-1. Always succeeds
-2. The output CompletedPoint is valid (bounds and algebraic properties)
-3. The output represents the sum of the input points
+/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::CompletedPoint::add`**
+• Always succeeds (no panic) when both inputs are valid
+• The output CompletedPoint is valid (bounds and algebraic properties)
+• The output represents the sum of the input points: `c.toPoint = self.toPoint + other.toPoint`
+
 The mixed addition formulas implement elliptic curve point addition on twisted Edwards curves. -/
 @[step]
 theorem add_spec
@@ -785,4 +729,5 @@ theorem add_spec
     c hX_F hY_F hZ_F hT_F hcX_bounds hcY_bounds hcZ_bounds hcT_bounds
     other.toPoint h_otherx h_othery
 
-end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+end Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+end curve25519_dalek

@@ -13,6 +13,9 @@ set_option linter.style.longLine false
 /- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option -/
 set_option maxHeartbeats 1000000
 
+/- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
+set_option maxRecDepth 2048
+
 namespace curve25519_dalek
 
 /-- Trait declaration: [core::ops::arith::Add]
@@ -191,11 +194,6 @@ structure backend.serial.curve_models.AffineNielsPoint where
   y_plus_x : backend.serial.u64.field.FieldElement51
   y_minus_x : backend.serial.u64.field.FieldElement51
   xy2d : backend.serial.u64.field.FieldElement51
-
-/-- Trait declaration: [curve25519_dalek::traits::ValidityCheck]
-    Source: 'curve25519-dalek/src/traits.rs', lines 426:0-429:1 -/
-structure traits.ValidityCheck (Self : Type) where
-  is_valid : Self → Result Bool
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
     Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34
