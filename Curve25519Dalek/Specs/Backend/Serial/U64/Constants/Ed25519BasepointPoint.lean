@@ -17,9 +17,6 @@ the prime order subgroup of the Ed25519 elliptic curve group.
 Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 -/
 
--- nativeDecide is suppressed because `decide` in the proof elaborates via the native kernel
-set_option linter.style.nativeDecide false
-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 

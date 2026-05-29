@@ -16,10 +16,6 @@ Key results:
 - `L • basepoint = 0`
 -/
 
--- Scalar multiplication over the large-prime field is infeasible for kernel `decide`;
--- `native_decide` is used instead.
-set_option linter.style.nativeDecide false
-
 namespace Edwards
 
 def basepoint : Point Ed25519 where
