@@ -20,7 +20,7 @@ rev = "1b39931d"
 [[require]]
 name = "PrimeCert"
 git = "https://github.com/b-mehta/PrimeCert.git"
-rev = "3bc7e58f74bbb15a9d4259c0accd7decc31bcdec"
+rev = "15fd61770c9a893af0f5cb7893ea98b7d0bf8d52"
 
 [[lean_lib]]
 name = "Curve25519Dalek"
