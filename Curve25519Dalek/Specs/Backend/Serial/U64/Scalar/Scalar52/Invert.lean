@@ -12,14 +12,14 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
+set_option exponentiation.threshold 260
+
 /-! # Spec Theorem for `Scalar52::invert`
 
 This function computes the multiplicative inverse.
 
 Source: curve25519-dalek/src/scalar.rs
 -/
-
-set_option exponentiation.threshold 260
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result curve25519_dalek.backend.serial.u64.scalar
   curve25519_dalek.backend.serial.u64.scalar.Scalar52

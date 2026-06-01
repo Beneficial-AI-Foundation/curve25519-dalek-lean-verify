@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 The Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Liao Zhang
 -/
@@ -9,12 +9,13 @@ import Curve25519Dalek.Aux
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 
+
+set_option exponentiation.threshold 416
+
 /-! # MulInternal
 
 The main statement concerning `mul_internal` is `mul_internal_spec` (below).
 -/
-
-set_option exponentiation.threshold 416
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 

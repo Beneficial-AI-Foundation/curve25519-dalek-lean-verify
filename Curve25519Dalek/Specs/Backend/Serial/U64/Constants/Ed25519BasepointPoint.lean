@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 The Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -8,6 +8,9 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Basepoint
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
+
+-- nativeDecide is suppressed because `decide` in the proof elaborates via the native kernel
+set_option linter.style.nativeDecide false
 
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`
 

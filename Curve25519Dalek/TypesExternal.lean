@@ -1,9 +1,10 @@
 /-
-Copyright (c) 2025 The Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
 import Aeneas
+open Aeneas.Std Result
 
 /-!
 # External type definitions for `curve25519_dalek`
@@ -12,8 +13,6 @@ Manual Lean definitions for types from external crates (`core`, `subtle`)
 whose definitions cannot be extracted by Aeneas but are referenced by the
 extracted `curve25519-dalek` code.
 -/
-
-open Aeneas.Std Result
 
 namespace curve25519_dalek
 
