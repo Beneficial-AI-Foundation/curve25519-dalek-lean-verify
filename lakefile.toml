@@ -1,7 +1,7 @@
 name = "Curve25519Dalek"
 version = "0.1.0"
 keywords = ["formal verification"]
-defaultTargets = ["Curve25519Dalek"]
+defaultTargets = ["Curve25519Dalek", "LinterTest"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -24,6 +24,13 @@ rev = "3bc7e58f74bbb15a9d4259c0accd7decc31bcdec"
 
 [[lean_lib]]
 name = "Curve25519Dalek"
+
+# Standalone library holding the project-linter `#guard_msgs` tests.  Kept separate from
+# `Curve25519Dalek` so the dummy `@[step]` test theorems never become public declarations
+# of the production library (nor leak into Aeneas's global `@[step]` database via it).
+# It is a default target so `lake build` still compiles and checks the tests.
+[[lean_lib]]
+name = "LinterTest"
 
 [[lean_lib]]
 name = "Utils"

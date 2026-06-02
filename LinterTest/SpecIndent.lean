@@ -13,6 +13,11 @@ Tests for the four indentation checks.  The first three checks fire only on `@[s
 theorems; the proof-body (Check 4) rule fires on every theorem.  Each `#guard_msgs` block
 targets exactly one violation so the expected-output annotation stays minimal.
 
+These tests live in the standalone `LinterTest` Lake library rather than in the
+`Curve25519Dalek` library, so the dummy theorems below (and their `@[step]` registrations)
+never leak into the production library or its public namespace.  They are additionally
+wrapped in the `Curve25519Dalek.Lint.Test` namespace as a second line of defence.
+
 This module docstring includes a `Source:` line so that `linter.curve25519.specSourceDoc`
 does **not** fire here.
 
@@ -20,6 +25,8 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
+
+namespace Curve25519Dalek.Lint.Test
 
 -- Two minimal dummy functions for the test cases below.
 private def dummyI (n : Nat) : Result Nat := .ok n
@@ -236,3 +243,5 @@ theorem dummyP_canonical2_spec
       2 = 2 ⦄ := by
   simp
   simp [dummyP]
+
+end Curve25519Dalek.Lint.Test
