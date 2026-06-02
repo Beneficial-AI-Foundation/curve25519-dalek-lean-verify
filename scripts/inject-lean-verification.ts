@@ -377,26 +377,23 @@ function renderPanel(
   parts.push(`    <span class="lean-badge lean-badge-${badge.cls}">${badge.text}</span>`)
   parts.push(`  </div>`)
 
-  // --- Lean spec statement (collapsible) ---
+  // --- Lean spec statement (always visible) ---
   if (fn.spec_statement || fn.spec_file) {
-    parts.push(`  <details class="lean-details">`)
-    parts.push(`    <summary>Show Lean spec</summary>`)
-    parts.push(`    <div class="lean-details-body">`)
+    parts.push(`  <div class="lean-spec-body">`)
     // Link to the spec theorem location (with line number if we found it),
     // otherwise fall back to the spec file root.
     if (specLoc) {
       const url = buildGitHubLineUrl(cfg, specLoc.path, specLoc.line)
-      parts.push(`      <a class="lean-link" href="${htmlEscape(url)}" target="_blank" rel="noopener">View in <code>${htmlEscape(specLoc.path)}</code> (line ${specLoc.line}) ↗</a>`)
+      parts.push(`    <a class="lean-link" href="${htmlEscape(url)}" target="_blank" rel="noopener">View in <code>${htmlEscape(specLoc.path)}</code> (line ${specLoc.line}) ↗</a>`)
     } else if (fn.spec_file) {
       const url = buildGitHubLineUrl(cfg, fn.spec_file)
-      parts.push(`      <a class="lean-link" href="${htmlEscape(url)}" target="_blank" rel="noopener">View in <code>${htmlEscape(fn.spec_file)}</code> ↗</a>`)
+      parts.push(`    <a class="lean-link" href="${htmlEscape(url)}" target="_blank" rel="noopener">View in <code>${htmlEscape(fn.spec_file)}</code> ↗</a>`)
     }
     if (fn.spec_statement) {
       const trimmed = trimSpecTail(fn.spec_statement)
-      parts.push(`      <pre class="lean-code"><code>${highlightLean(trimmed)}</code></pre>`)
+      parts.push(`    <pre class="lean-code"><code>${highlightLean(trimmed)}</code></pre>`)
     }
-    parts.push(`    </div>`)
-    parts.push(`  </details>`)
+    parts.push(`  </div>`)
   }
 
   parts.push(`</div>`)
@@ -454,23 +451,8 @@ const PANEL_CSS = `
   margin: 0.4rem 0;
   color: var(--main-color, #333);
 }
-.lean-details {
-  margin-top: 0.4rem;
-}
-.lean-details > summary {
-  cursor: pointer;
-  font-weight: 500;
-  padding: 0.25rem 0;
-  user-select: none;
-}
-.lean-details > summary:hover { color: var(--link-color, #3873ad); }
-.lean-details-body {
-  margin: 0.5rem 0 0.5rem 1rem;
-}
-.lean-meta {
-  margin-bottom: 0.4rem;
-  font-size: 0.85em;
-  color: var(--src-line-numbers-color, #666);
+.lean-spec-body {
+  margin: 0.4rem 0 0;
 }
 /* Lean syntax-highlighting tokens (github-light theme) */
 .lean-code .hl-keyword { color: #D73A49; }
