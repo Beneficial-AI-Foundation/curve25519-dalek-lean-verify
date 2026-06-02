@@ -198,7 +198,8 @@ function sourceToModulePath(source: string): string | null {
 }
 
 /**
- * Extract the receiver type from a brace-form rust_name. Handles two shapes:
+ * Extract the receiver type and its defining module from a brace-form
+ * `rust_name`. Handles two shapes:
  *
  *   curve25519_dalek::edwards::{Trait for &0 (Receiver)}::method  — trait impl
  *   curve25519_dalek::scalar::{Receiver}::method                  — inherent
@@ -206,10 +207,22 @@ function sourceToModulePath(source: string): string | null {
  *
  * The inherent shape appears when a struct has multiple separate `impl T { … }`
  * blocks; the compiler tags methods with the impl block's receiver path even
- * though there's no trait involved. Returns the last `::` segment of the
- * receiver path (which is the type name the rustdoc page is built for).
+ * though there's no trait involved.
+ *
+ * Crucially the receiver's FULLY-QUALIFIED path is embedded in the brace —
+ * we use it to derive the rustdoc module directory, because rustdoc places
+ * the struct's docs under the receiver's *definition* module, not under the
+ * `source` (impl-block) module. Using the impl module's path produces a
+ * non-existent HTML file for every trait impl whose receiver lives in a
+ * different module — a frequent shape in this crate.
+ *
+ * Returns `{ type, modulePath }` where:
+ *   - `type` is the last `::` segment of the receiver path (the struct name);
+ *   - `modulePath` is a slash-joined module path like `curve25519_dalek/edwards`
+ *     for the file lookup. Falls back to `null` if the brace is unrecognised
+ *     or has no `::` segments at all.
  */
-function receiverFromBraceForm(rustName: string): string | null {
+function receiverFromBraceForm(rustName: string): { type: string; modulePath: string } | null {
   const braceMatch = rustName.match(/\{[^{}]*\}/)
   if (!braceMatch) return null
   let inner = braceMatch[0].slice(1, -1).trim()  // strip leading '{' and trailing '}'
@@ -223,9 +236,11 @@ function receiverFromBraceForm(rustName: string): string | null {
   // Strip trailing generic param suffix `<...>` — receiver is the bare type
   // path (rustdoc page is named after the type without generics).
   inner = inner.replace(/<[^<>]*>\s*$/, '')
-  const parts = inner.split('::')
-  const last = parts[parts.length - 1].trim()
-  return last || null
+  const parts = inner.split('::').map(s => s.trim()).filter(s => s.length > 0)
+  if (parts.length === 0) return null
+  const type = parts[parts.length - 1]
+  const modulePath = parts.length > 1 ? parts.slice(0, -1).join('/') : 'curve25519_dalek'
+  return { type, modulePath }
 }
 
 /**
@@ -244,12 +259,14 @@ function rustNameToRustdoc(rustName: string, source: string): RustdocTarget | nu
   if (!modulePath) return null
 
   // Brace form: trait impl `{T for R}::method` OR inherent impl `{R}::method`.
+  // Use the receiver's OWN module path (not the impl block's `source` path)
+  // since rustdoc files the struct docs under the receiver's definition.
   if (rustName.includes('{')) {
     const receiver = receiverFromBraceForm(rustName)
     const method = lastSegment(rustName)
     if (!receiver) return null
     return {
-      file: `${modulePath}/struct.${receiver}.html`,
+      file: `${receiver.modulePath}/struct.${receiver.type}.html`,
       anchor: `method.${method}`,
     }
   }
