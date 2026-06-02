@@ -303,12 +303,17 @@ function htmlEscape(s: string): string {
     .replace(/"/g, '&quot;')
 }
 
-function statusBadge(fn: FunctionRecord): { text: string; cls: string } {
-  if (fn.fully_verified) return { text: '✓ Verified in Lean', cls: 'verified' }
-  if (fn.externally_verified) return { text: '✓ Externally verified', cls: 'verified' }
-  if (fn.verified) return { text: '✓ Verified', cls: 'verified' }
-  if (fn.specified) return { text: '◑ Specified (proof pending)', cls: 'specified' }
-  return { text: '○ Not yet specified', cls: 'unspecified' }
+/**
+ * Status indicator shown inline at the top of the spec block. The verbose
+ * label is exposed via the `title` attribute (hover tooltip); the symbol
+ * itself is the visible UI to save horizontal space.
+ */
+function statusSymbol(fn: FunctionRecord): { symbol: string; title: string; cls: string } {
+  if (fn.fully_verified)      return { symbol: '✓✓', title: 'Verified in Lean',          cls: 'verified' }
+  if (fn.externally_verified) return { symbol: '✓',  title: 'Externally verified',       cls: 'verified' }
+  if (fn.verified)            return { symbol: '✓',  title: 'Verified',                  cls: 'verified' }
+  if (fn.specified)           return { symbol: '◑',  title: 'Specified (proof pending)', cls: 'specified' }
+  return                              { symbol: '○',  title: 'Not yet specified',         cls: 'unspecified' }
 }
 
 function buildGitHubLineUrl(cfg: Config, filePath: string, startLine?: number, endLine?: number): string {
@@ -370,16 +375,14 @@ function renderPanel(
   cfg: Config,
   specLoc: LeanLocation | null,
 ): string {
-  const badge = statusBadge(fn)
+  const status = statusSymbol(fn)
   const parts: string[] = []
-  parts.push(`<div class="lean-verification lean-${badge.cls}">`)
-  parts.push(`  <div class="lean-header">`)
-  parts.push(`    <span class="lean-badge lean-badge-${badge.cls}">${badge.text}</span>`)
-  parts.push(`  </div>`)
+  parts.push(`<div class="lean-verification">`)
 
   // --- Lean spec statement (always visible) ---
   if (fn.spec_statement || fn.spec_file) {
     parts.push(`  <div class="lean-spec-body">`)
+    parts.push(`    <span class="lean-status lean-status-${status.cls}" title="${htmlEscape(status.title)}">${status.symbol}</span>`)
     // Link to the spec theorem location (with line number if we found it),
     // otherwise fall back to the spec file root.
     if (specLoc) {
@@ -412,48 +415,25 @@ const PANEL_CSS = `
   background: var(--code-block-background-color, #f5f5f5);
   font-size: 0.95em;
 }
-.lean-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.5rem;
+.lean-spec-body {
+  margin: 0;
 }
-.lean-badge {
+.lean-status {
   display: inline-block;
-  padding: 0.15rem 0.6rem;
-  border-radius: 4px;
-  font-weight: 600;
-  font-size: 0.85em;
-  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: 0.95em;
+  margin-right: 0.5rem;
+  cursor: help;
+  vertical-align: baseline;
 }
-.lean-badge-verified {
-  background: #d4edda;
-  color: #155724;
-  border-color: #c3e6cb;
-}
-.lean-badge-specified {
-  background: #fff3cd;
-  color: #856404;
-  border-color: #ffeeba;
-}
-.lean-badge-unspecified {
-  background: #f8d7da;
-  color: #721c24;
-  border-color: #f5c6cb;
-}
+.lean-status-verified   { color: #1a7f37; }
+.lean-status-specified  { color: #9a6700; }
+.lean-status-unspecified{ color: #6e7781; }
 .lean-link {
   text-decoration: none;
   font-size: 0.9em;
 }
 .lean-link:hover { text-decoration: underline; }
-.lean-description {
-  margin: 0.4rem 0;
-  color: var(--main-color, #333);
-}
-.lean-spec-body {
-  margin: 0.4rem 0 0;
-}
 /* Lean syntax-highlighting tokens (github-light theme) */
 .lean-code .hl-keyword { color: #D73A49; }
 .lean-code .hl-const   { color: #6F42C1; }
@@ -494,16 +474,16 @@ html[data-theme="ayu"]  .lean-code .hl-comment { color: #8b949e; }
 
 /* Dark theme adjustments (rustdoc default vars) */
 @media (prefers-color-scheme: dark) {
-  .lean-badge-verified   { background: #1f3a25; color: #a3e1b5; border-color: #2c4d34; }
-  .lean-badge-specified  { background: #3a3416; color: #e7d490; border-color: #4d4a22; }
-  .lean-badge-unspecified{ background: #3a1f23; color: #e8a8af; border-color: #4d2c32; }
+  .lean-status-verified   { color: #5fb874; }
+  .lean-status-specified  { color: #d4a72c; }
+  .lean-status-unspecified{ color: #8b949e; }
 }
-html[data-theme="dark"] .lean-badge-verified,
-html[data-theme="ayu"] .lean-badge-verified   { background: #1f3a25; color: #a3e1b5; border-color: #2c4d34; }
-html[data-theme="dark"] .lean-badge-specified,
-html[data-theme="ayu"] .lean-badge-specified  { background: #3a3416; color: #e7d490; border-color: #4d4a22; }
-html[data-theme="dark"] .lean-badge-unspecified,
-html[data-theme="ayu"] .lean-badge-unspecified{ background: #3a1f23; color: #e8a8af; border-color: #4d2c32; }
+html[data-theme="dark"] .lean-status-verified,
+html[data-theme="ayu"]  .lean-status-verified   { color: #5fb874; }
+html[data-theme="dark"] .lean-status-specified,
+html[data-theme="ayu"]  .lean-status-specified  { color: #d4a72c; }
+html[data-theme="dark"] .lean-status-unspecified,
+html[data-theme="ayu"]  .lean-status-unspecified{ color: #8b949e; }
 `
 
 // ---------- HTML injection ----------
