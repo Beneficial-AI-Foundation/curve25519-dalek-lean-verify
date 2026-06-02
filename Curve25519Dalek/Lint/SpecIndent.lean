@@ -174,14 +174,20 @@ private def runStepChecks
             on a new line should be indented 4 spaces \
             per the spec theorem style guide."
   -- ── Check 3a: First postcondition body at column 6 ──────────────────────
-  for node in collectMisindentedWpBodies typeTerm fm 6 do
+  let misindentedBodies := collectMisindentedWpBodies typeTerm fm 6
+  for node in misindentedBodies do
     let col := (colOf node fm).getD 0
     logLint linter.curve25519.specIndent node
       m!"Postcondition body is at column {col}, expected 6. \
         The postcondition body after `=>` should be indented 6 spaces \
         per the spec theorem style guide."
   -- ── Check 3b: ∧ postcondition RHS at column 6 ────────────────────────────
+  -- Suppress 3b on any WP body that 3a already flagged: when the whole conjunctive
+  -- body is misindented, 3a's body warning already covers the mistake, so re-reporting
+  -- each conjunct would emit several messages for one block-level indentation slip.
+  let flaggedBodyPos := misindentedBodies.filterMap (·.getPos?)
   for body in collectWpBodies typeTerm do
+    if (body.getPos?.map flaggedBodyPos.contains).getD false then continue
     for (node, msg) in collectMisindentedAndRhs body fm 6 do
       logLint linter.curve25519.specIndent node m!"{msg}"
 

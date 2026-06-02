@@ -132,6 +132,24 @@ theorem dummyP_postcond_ok_spec (n : Nat) :
       r.1 = n ∧ r.2 = n ⦄ := by
   simp [dummyP]
 
+/-! ### Check 3a/3b interaction — no double warning on a misindented conjunctive body -/
+
+/--
+warning: Postcondition body is at column 8, expected 6. The postcondition body after `=>` should be indented 6 spaces per the spec theorem style guide.
+
+Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
+-/
+#guard_msgs in
+-- The WP body is itself a conjunction that, as a whole, starts on a new line at column 8.
+-- Check 3a flags the body; Check 3b must be suppressed on this body so the single
+-- block-level indentation mistake yields exactly one message (not one per conjunct).
+@[step]
+theorem dummyP_conj_body_misindent_spec (n : Nat) :
+    dummyP n ⦃ (r : Nat × Nat) =>
+        r.1 = n ∧
+        r.2 = n ⦄ := by
+  simp [dummyP]
+
 /-! ## Check 4 — proof body after `by` at wrong column -/
 
 /--
