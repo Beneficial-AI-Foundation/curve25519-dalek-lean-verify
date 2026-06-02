@@ -368,7 +368,6 @@ function trimSpecTail(spec: string): string {
 function renderPanel(
   fn: FunctionRecord,
   cfg: Config,
-  aeneasLoc: LeanLocation | null,
   specLoc: LeanLocation | null,
 ): string {
   const badge = statusBadge(fn)
@@ -377,23 +376,6 @@ function renderPanel(
   parts.push(`  <div class="lean-header">`)
   parts.push(`    <span class="lean-badge lean-badge-${badge.cls}">${badge.text}</span>`)
   parts.push(`  </div>`)
-
-  // --- Aeneas-extracted definition (collapsible) ---
-  if (fn.lean_name) {
-    const filePath = aeneasLoc?.path ?? null
-    const line = aeneasLoc?.line ?? null
-    parts.push(`  <details class="lean-details">`)
-    parts.push(`    <summary>Show Aeneas-extracted definition</summary>`)
-    parts.push(`    <div class="lean-details-body">`)
-    parts.push(`      <div class="lean-meta"><code>${htmlEscape(fn.lean_name)}</code></div>`)
-    if (filePath) {
-      const url = buildGitHubLineUrl(cfg, filePath, line ?? undefined)
-      const lineSuffix = line ? ` (line ${line})` : ''
-      parts.push(`      <a class="lean-link" href="${htmlEscape(url)}" target="_blank" rel="noopener">View in <code>${htmlEscape(filePath)}</code>${lineSuffix} ↗</a>`)
-    }
-    parts.push(`    </div>`)
-    parts.push(`  </details>`)
-  }
 
   // --- Lean spec statement (collapsible) ---
   if (fn.spec_statement || fn.spec_file) {
@@ -761,20 +743,18 @@ function main() {
     }
   }
 
-  // Build byFile from the deduped best-records and look up Lean locations.
+  // Build byFile from the deduped best-records and look up Lean spec locations.
   const byFile = new Map<string, {
     fn: FunctionRecord
     target: RustdocTarget
-    aeneas: LeanLocation | null
     spec: LeanLocation | null
   }[]>()
   for (const { fn, target } of bestByAnchor.values()) {
-    const aeneas = fn.lean_name ? leanByName.get(fn.lean_name) ?? null : null
     // Convention: the spec theorem for an Aeneas-extracted function `X` is
     // named `X_spec` in the same namespace.
     const spec = fn.lean_name ? leanByName.get(fn.lean_name + '_spec') ?? null : null
     const arr = byFile.get(target.file) ?? []
-    arr.push({ fn, target, aeneas, spec })
+    arr.push({ fn, target, spec })
     byFile.set(target.file, arr)
   }
 
@@ -802,7 +782,7 @@ function main() {
     const sortedAnchored = entries.filter(e => e.target.anchor !== '')
 
     for (const e of sortedTop) {
-      const panel = renderPanel(e.fn, cfg, e.aeneas, e.spec)
+      const panel = renderPanel(e.fn, cfg, e.spec)
       const next = injectPanel(html, e.target.anchor, panel)
       if (next) {
         html = next
@@ -812,7 +792,7 @@ function main() {
       }
     }
     for (const e of sortedAnchored) {
-      const panel = renderPanel(e.fn, cfg, e.aeneas, e.spec)
+      const panel = renderPanel(e.fn, cfg, e.spec)
       const next = injectPanel(html, e.target.anchor, panel)
       if (next) {
         html = next
