@@ -2,14 +2,10 @@
 /*
  * Post-processes rustdoc HTML (in target/doc/curve25519_dalek/) to inject a
  * "Lean verification" panel under each function/method that has a matching
- * record in functions.json.
+ * record in functions.json. Each panel renders a small status symbol
+ * (✓✓ / ✓ / ◑ / ○) followed by the Lean spec statement.
  *
- * Sources:
- *   - functions.json    — per-Rust-function record (with lean_name + spec metadata)
- *   - Curve25519Dalek/  — Lean source tree; scanned at startup to build a
- *                         `lean_name → {file, line}` index for accurate links.
- *                         (Replaces the probe-lean output we used previously —
- *                         that data was stale and led to wrong line links.)
+ * Source: functions.json — per-Rust-function record with spec metadata.
  *
  * Output: modified HTML files in-place. A single CSS file is written once
  *         at target/doc/lean-verification.css and linked from each modified
@@ -18,10 +14,7 @@
  * Usage:
  *   tsx scripts/inject-lean-verification.ts \
  *     --rustdoc-root target/doc \
- *     --functions   functions.json \
- *     --source-root .                          # repo root (contains Curve25519Dalek/)
- *     [--repo-url   https://github.com/...]    \
- *     [--branch     master]
+ *     --functions   functions.json
  */
 
 import fs from 'node:fs'
@@ -47,19 +40,9 @@ interface FunctionRecord {
   is_extraction_artifact: boolean
 }
 
-interface LeanLocation {
-  /** Path of the .lean file relative to repo root. */
-  path: string
-  /** 1-indexed line number where the declaration starts. */
-  line: number
-}
-
 interface Config {
   rustdocRoot: string   // e.g. target/doc
   functionsJson: string
-  sourceRoot: string    // e.g. . (repo root containing Curve25519Dalek/)
-  repoUrl: string       // e.g. https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify
-  branch: string        // e.g. master
 }
 
 // ---------- CLI ----------
@@ -73,105 +56,9 @@ function parseArgs(): Config {
     args.set(k, v)
   }
   return {
-    rustdocRoot:   args.get('rustdoc-root')  ?? 'target/doc',
-    functionsJson: args.get('functions')     ?? 'functions.json',
-    sourceRoot:    args.get('source-root')   ?? '.',
-    repoUrl:       args.get('repo-url')      ?? 'https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify',
-    branch:        args.get('branch')        ?? 'master',
+    rustdocRoot:   args.get('rustdoc-root') ?? 'target/doc',
+    functionsJson: args.get('functions')    ?? 'functions.json',
   }
-}
-
-// ---------- Lean source indexer ----------
-
-/**
- * Scan a single .lean file for declaration positions, tracking the enclosing
- * `namespace ...` blocks. Returns a list of (fully-qualified-name, line)
- * pairs.
- */
-function scanLeanFile(absPath: string): Array<{ name: string; line: number }> {
-  const text = fs.readFileSync(absPath, 'utf-8')
-  const lines = text.split('\n')
-  const nsStack: string[] = []
-  const out: Array<{ name: string; line: number }> = []
-
-  // Lean declaration prefix on the same line:
-  //   def NAME ...
-  //   @[reducible] def NAME ...
-  //   theorem NAME ...
-  // Capture group 1 = the (possibly empty) trailing name.
-  const declRe = /^(?:@\[[^\]]*\]\s*)*(?:public\s+|protected\s+|private\s+)?(?:noncomputable\s+)?(def|theorem|lemma|abbrev|instance|axiom)\s+([A-Za-z_][\w.]*)?/
-  // Just a binder keyword on its own line (Aeneas emits "def\n  LongName" for
-  // names longer than the 100-col limit).
-  const declWithoutNameRe = /^(?:@\[[^\]]*\]\s*)*(?:public\s+|protected\s+|private\s+)?(?:noncomputable\s+)?(def|theorem|lemma|abbrev|instance|axiom)\s*$/
-
-  for (let i = 0; i < lines.length; i++) {
-    const trimmed = lines[i].replace(/^\s+/, '')
-    if (trimmed.length === 0 || trimmed.startsWith('--')) continue
-
-    // namespace / end tracking.
-    const nsOpen = trimmed.match(/^namespace\s+([A-Za-z_][\w.]*)/)
-    if (nsOpen) { nsStack.push(nsOpen[1]); continue }
-    const nsClose = trimmed.match(/^end\s+([A-Za-z_][\w.]*)/)
-    if (nsClose && nsStack.length > 0 && nsStack[nsStack.length - 1] === nsClose[1]) {
-      nsStack.pop()
-      continue
-    }
-
-    // Inline form: `def NAME ...` or `@[attr] def NAME ...`.
-    const decl = trimmed.match(declRe)
-    if (decl && decl[2]) {
-      const fullName = nsStack.length > 0
-        ? nsStack.join('.') + '.' + decl[2]
-        : decl[2]
-      out.push({ name: fullName, line: i + 1 })
-      continue
-    }
-
-    // Wrapped form: binder alone on line, name on next non-blank line.
-    if (declWithoutNameRe.test(trimmed)) {
-      for (let j = i + 1; j < lines.length && j < i + 5; j++) {
-        const next = lines[j].replace(/^\s+/, '')
-        if (next.length === 0) continue
-        const nameMatch = next.match(/^([A-Za-z_][\w.]*)/)
-        if (!nameMatch) break
-        const fullName = nsStack.length > 0
-          ? nsStack.join('.') + '.' + nameMatch[1]
-          : nameMatch[1]
-        out.push({ name: fullName, line: i + 1 })
-        break
-      }
-    }
-  }
-  return out
-}
-
-/**
- * Walk Curve25519Dalek/ and produce a single `lean_name → location` index.
- */
-function buildLeanIndex(sourceRoot: string): Map<string, LeanLocation> {
-  const idx = new Map<string, LeanLocation>()
-  const root = path.join(sourceRoot, 'Curve25519Dalek')
-  if (!fs.existsSync(root)) {
-    console.warn(`[inject-lean-verification] Curve25519Dalek/ not found at ${root}`)
-    console.warn('  Aeneas-extracted-definition and Lean-spec links will lack line numbers.')
-    return idx
-  }
-  function walk(dir: string) {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name)
-      if (entry.isDirectory()) walk(full)
-      else if (entry.name.endsWith('.lean')) {
-        const rel = path.relative(sourceRoot, full)
-        for (const d of scanLeanFile(full)) {
-          // First write wins so we don't blow away earlier hits if a name
-          // appears twice (rare; would indicate the same decl in two files).
-          if (!idx.has(d.name)) idx.set(d.name, { path: rel, line: d.line })
-        }
-      }
-    }
-  }
-  walk(root)
-  return idx
 }
 
 // ---------- rust_name → rustdoc URL ----------
@@ -304,29 +191,6 @@ function htmlEscape(s: string): string {
 }
 
 /**
- * Status indicator shown inline at the top of the spec block. The verbose
- * label is exposed via the `title` attribute (hover tooltip); the symbol
- * itself is the visible UI to save horizontal space.
- */
-function statusSymbol(fn: FunctionRecord): { symbol: string; title: string; cls: string } {
-  if (fn.fully_verified)      return { symbol: '✓✓', title: 'Verified in Lean',          cls: 'verified' }
-  if (fn.externally_verified) return { symbol: '✓',  title: 'Externally verified',       cls: 'verified' }
-  if (fn.verified)            return { symbol: '✓',  title: 'Verified',                  cls: 'verified' }
-  if (fn.specified)           return { symbol: '◑',  title: 'Specified (proof pending)', cls: 'specified' }
-  return                              { symbol: '○',  title: 'Not yet specified',         cls: 'unspecified' }
-}
-
-function buildGitHubLineUrl(cfg: Config, filePath: string, startLine?: number, endLine?: number): string {
-  let url = `${cfg.repoUrl}/blob/${cfg.branch}/${filePath}`
-  if (startLine && endLine && startLine > 0) {
-    url += `#L${startLine}-L${endLine}`
-  } else if (startLine && startLine > 0) {
-    url += `#L${startLine}`
-  }
-  return url
-}
-
-/**
  * Lightweight server-side syntax highlighter for Lean code.
  *
  * Wraps keywords / literals / strings / comments in `<span class="hl-*">`.
@@ -370,33 +234,14 @@ function trimSpecTail(spec: string): string {
              .replace(/\s*:=\s*\.{2,}\s*$/, '')
 }
 
-function renderPanel(
-  fn: FunctionRecord,
-  cfg: Config,
-  specLoc: LeanLocation | null,
-): string {
-  const status = statusSymbol(fn)
+function renderPanel(fn: FunctionRecord): string {
   const parts: string[] = []
   parts.push(`<div class="lean-verification">`)
 
-  // --- Lean spec statement (always visible) ---
-  if (fn.spec_statement || fn.spec_file) {
-    parts.push(`  <div class="lean-spec-body">`)
-    parts.push(`    <span class="lean-status lean-status-${status.cls}" title="${htmlEscape(status.title)}">${status.symbol}</span>`)
-    // Link to the spec theorem location (with line number if we found it),
-    // otherwise fall back to the spec file root.
-    if (specLoc) {
-      const url = buildGitHubLineUrl(cfg, specLoc.path, specLoc.line)
-      parts.push(`    <a class="lean-link" href="${htmlEscape(url)}" target="_blank" rel="noopener">View in <code>${htmlEscape(specLoc.path)}</code> (line ${specLoc.line}) ↗</a>`)
-    } else if (fn.spec_file) {
-      const url = buildGitHubLineUrl(cfg, fn.spec_file)
-      parts.push(`    <a class="lean-link" href="${htmlEscape(url)}" target="_blank" rel="noopener">View in <code>${htmlEscape(fn.spec_file)}</code> ↗</a>`)
-    }
-    if (fn.spec_statement) {
-      const trimmed = trimSpecTail(fn.spec_statement)
-      parts.push(`    <pre class="lean-code"><code>${highlightLean(trimmed)}</code></pre>`)
-    }
-    parts.push(`  </div>`)
+  if (fn.spec_statement) {
+    parts.push(`  <div class="lean-header"><span class="lean-tick">✓✓</span> Lean specification</div>`)
+    const trimmed = trimSpecTail(fn.spec_statement)
+    parts.push(`  <pre class="lean-code"><code>${highlightLean(trimmed)}</code></pre>`)
   }
 
   parts.push(`</div>`)
@@ -415,25 +260,22 @@ const PANEL_CSS = `
   background: var(--code-block-background-color, #f5f5f5);
   font-size: 0.95em;
 }
-.lean-spec-body {
-  margin: 0;
-}
-.lean-status {
-  display: inline-block;
-  font-weight: 700;
+.lean-header {
+  font-weight: 500;
   font-size: 0.95em;
-  margin-right: 0.5rem;
-  cursor: help;
-  vertical-align: baseline;
+  margin-bottom: 0.5rem;
+  color: var(--main-color, #333);
 }
-.lean-status-verified   { color: #1a7f37; }
-.lean-status-specified  { color: #9a6700; }
-.lean-status-unspecified{ color: #6e7781; }
-.lean-link {
-  text-decoration: none;
-  font-size: 0.9em;
+.lean-tick {
+  color: #1a7f37;
+  font-weight: 700;
+  margin-right: 0.15rem;
 }
-.lean-link:hover { text-decoration: underline; }
+@media (prefers-color-scheme: dark) {
+  .lean-tick { color: #5fb874; }
+}
+html[data-theme="dark"] .lean-tick,
+html[data-theme="ayu"]  .lean-tick { color: #5fb874; }
 /* Lean syntax-highlighting tokens (github-light theme) */
 .lean-code .hl-keyword { color: #D73A49; }
 .lean-code .hl-const   { color: #6F42C1; }
@@ -472,18 +314,6 @@ html[data-theme="ayu"]  .lean-code .hl-comment { color: #8b949e; }
   white-space: pre;
 }
 
-/* Dark theme adjustments (rustdoc default vars) */
-@media (prefers-color-scheme: dark) {
-  .lean-status-verified   { color: #5fb874; }
-  .lean-status-specified  { color: #d4a72c; }
-  .lean-status-unspecified{ color: #8b949e; }
-}
-html[data-theme="dark"] .lean-status-verified,
-html[data-theme="ayu"]  .lean-status-verified   { color: #5fb874; }
-html[data-theme="dark"] .lean-status-specified,
-html[data-theme="ayu"]  .lean-status-specified  { color: #d4a72c; }
-html[data-theme="dark"] .lean-status-unspecified,
-html[data-theme="ayu"]  .lean-status-unspecified{ color: #8b949e; }
 `
 
 // ---------- HTML injection ----------
@@ -667,11 +497,6 @@ function main() {
     functions: FunctionRecord[]
   }
 
-  // Build the Lean source index by scanning Curve25519Dalek/**/*.lean for
-  // declarations. The index maps a fully-qualified Lean name to (file, line).
-  const leanByName = buildLeanIndex(cfg.sourceRoot)
-  console.log(`[inject-lean-verification] indexed ${leanByName.size} Lean declarations from ${cfg.sourceRoot}/Curve25519Dalek/`)
-
   // Group function records by target HTML file. Each (file, anchor) tuple
   // keeps only ONE record — the one with the highest status rank. This
   // prevents multiple panels from stacking when several functions.json
@@ -705,18 +530,14 @@ function main() {
     }
   }
 
-  // Build byFile from the deduped best-records and look up Lean spec locations.
+  // Build byFile from the deduped best-records.
   const byFile = new Map<string, {
     fn: FunctionRecord
     target: RustdocTarget
-    spec: LeanLocation | null
   }[]>()
   for (const { fn, target } of bestByAnchor.values()) {
-    // Convention: the spec theorem for an Aeneas-extracted function `X` is
-    // named `X_spec` in the same namespace.
-    const spec = fn.lean_name ? leanByName.get(fn.lean_name + '_spec') ?? null : null
     const arr = byFile.get(target.file) ?? []
-    arr.push({ fn, target, spec })
+    arr.push({ fn, target })
     byFile.set(target.file, arr)
   }
 
@@ -744,7 +565,7 @@ function main() {
     const sortedAnchored = entries.filter(e => e.target.anchor !== '')
 
     for (const e of sortedTop) {
-      const panel = renderPanel(e.fn, cfg, e.spec)
+      const panel = renderPanel(e.fn)
       const next = injectPanel(html, e.target.anchor, panel)
       if (next) {
         html = next
@@ -754,7 +575,7 @@ function main() {
       }
     }
     for (const e of sortedAnchored) {
-      const panel = renderPanel(e.fn, cfg, e.spec)
+      const panel = renderPanel(e.fn)
       const next = injectPanel(html, e.target.anchor, panel)
       if (next) {
         html = next

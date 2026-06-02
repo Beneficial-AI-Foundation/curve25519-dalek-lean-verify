@@ -26,14 +26,12 @@ cargo +nightly-2025-07-20 rustdoc \
   -p curve25519-dalek
 
 # Inject Lean verification panels into the generated rustdoc HTML (in-place
-# under target/doc/). Uses functions.json as the per-function record and
-# scans Curve25519Dalek/**/*.lean for accurate file:line links.
+# under target/doc/). Uses functions.json as the per-function record.
 # See scripts/inject-lean-verification.ts for details.
 echo "Injecting Lean verification panels into rustdoc HTML..."
 npx tsx "$ROOT/scripts/inject-lean-verification.ts" \
   --rustdoc-root "$ROOT/target/doc" \
-  --functions   "$ROOT/functions.json" \
-  --source-root "$ROOT"
+  --functions   "$ROOT/functions.json"
 
 # Copy generated docs (with panels) to the site public directory
 mkdir -p $ROOT/site/public/doc
