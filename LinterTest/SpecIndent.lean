@@ -17,11 +17,6 @@ These tests live in the standalone `LinterTest` Lake library rather than in the
 `Curve25519Dalek` library, so the dummy theorems below (and their `@[step]` registrations)
 never leak into the production library or its public namespace.  They are additionally
 wrapped in the `Curve25519Dalek.Lint.Test` namespace as a second line of defence.
-
-This module docstring includes a `Source:` line so that `linter.curve25519.specSourceDoc`
-does **not** fire here.
-
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -130,6 +125,25 @@ theorem dummyP_postcond_wrong_spec (n : Nat) :
 theorem dummyP_postcond_ok_spec (n : Nat) :
     dummyP n ⦃ (r : Nat × Nat) =>
       r.1 = n ∧ r.2 = n ⦄ := by
+  simp [dummyP]
+
+/-! ### Check 3b — `∧` operator placed at the start of a new line -/
+
+/--
+warning: ∧ operator should be appended to the end of the preceding line, not placed at the start of a new line, per the spec theorem style guide.
+
+Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
+-/
+#guard_msgs in
+-- Triggers `specIndent` check 3b's operator-placement branch: the `∧` starts a new line
+-- instead of being appended to the previous one.  The body is at column 6 (so check 3a
+-- does not fire) and the RHS shares the `∧` line (so the conjunct-indentation branch does
+-- not fire), isolating the operator-placement warning.
+@[step]
+theorem dummyP_and_on_new_line_spec (n : Nat) :
+    dummyP n ⦃ (r : Nat × Nat) =>
+      r.1 = n
+      ∧ r.2 = n ⦄ := by
   simp [dummyP]
 
 /-! ### Check 3a/3b interaction — no double warning on a misindented conjunctive body -/
