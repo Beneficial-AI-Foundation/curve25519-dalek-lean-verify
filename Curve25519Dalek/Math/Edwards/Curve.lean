@@ -95,8 +95,8 @@ Proof is adapted from https://eprint.iacr.org/2007/286 Theorem 3.3 and
 https://eprint.iacr.org/2008/013 Section 6. We write it here for completeness
 
 Recall the twisted curve equation: ax² + y² = 1 + dx²y².
-We will show that if λ := dx₁y₁x₂y₂ ∈ {-1, 1}, we get a
-contradiction
+We will show that if a is square, d is nonsquare, and λ := dx₁y₁x₂y₂ ∈ {-1, 1},
+we get a contradiction
 
 Lemma 1: dx₁²y₁²(ax₂² + y₂²) = ax₁² + y₁²
 
