@@ -35,13 +35,8 @@ with the following additional clause:
 
 ## License
 
-The verification code, i.e., the Lean project contained within the repo, is licensed under Apache License, Version 2.0, [LICENSE-APACHE](LICENSE-APACHE).
+The verification code (the Lean project in this repo) is licensed under the Apache License, Version 2.0 ([`LICENSE`](LICENSE)).
 
-The code from [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek) (contained here within the folder `curve25519-dalek` with some minimal modifications) is licensed under either of
-
-  * Apache License, Version 2.0, [LICENSE-APACHE](LICENSE-APACHE),
-  * MIT license ([LICENSE-MIT](LICENSE-MIT)).
-
-See individual files for full information.
+The code under [`curve25519-dalek/`](curve25519-dalek/) is vendored (with minimal modifications) from the upstream [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek) project and is licensed under the BSD-3-Clause license; see [`curve25519-dalek/LICENSE`](curve25519-dalek/LICENSE).
 
 
