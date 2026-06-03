@@ -5,23 +5,25 @@ Authors: Oliver Butterley, Theodore Ehrenborg, Liao Zhang
 -/
 import Curve25519Dalek.Funs
 
-/-! # M
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::m`
 
-The main statement concerning `m` is `m_spec` (below).
+This helper widens two `u64` operands to `u128` and multiplies them, providing a non-truncating
+multiplication primitive used throughout the Scalar52 routines.
+
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek
 open backend.serial.u64.scalar
+namespace curve25519_dalek.backend.serial.u64.scalar
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
-/-! ## Spec for `m` -/
-
-namespace curve25519_dalek.backend.serial.u64.scalar
-
-/-- **Spec for `backend.serial.u64.scalar.m`**:
-- The result equals the product of the two input values -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::m`**
+• The function always succeeds (no panic)
+• `result.val = x.val * y.val`, i.e. the exact `u128` product of `x` and `y`
+-/
 @[step]
 theorem m_spec (x y : U64) :
     m x y ⦃ (result : U128) => result.val = x.val * y.val ⦄ := by

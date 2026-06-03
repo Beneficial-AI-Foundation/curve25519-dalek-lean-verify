@@ -11,7 +11,10 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
-/-! # Spec Theorem for `Scalar52::from_bytes_wide`
+/-! # Spec theorem
+
+Specification for
+`curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes_wide`.
 
 Converts a 64-byte (512-bit) little-endian integer to a
 canonical `Scalar52` reduced modulo L.
@@ -30,10 +33,10 @@ canonical `Scalar52` reduced modulo L.
 4. `from_bytes_wide_spec` (`@[step]`): Combines all pieces.
 -/
 
-set_option exponentiation.threshold 260
-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
+
+set_option exponentiation.threshold 260
 
 /-- LE value of 8 consecutive bytes at position `8*j`
 in a 64-byte array. -/
@@ -795,10 +798,13 @@ theorem from_bytes_wide_eq (b : Array U8 64#usize) :
   rfl
 
 set_option maxHeartbeats 4000000 in -- heavy staged proof
-/-- **Spec for `Scalar52::from_bytes_wide`**:
-- No panic
-- Result = input mod L (canonical form)
-- All limbs < 2^52 -/
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes_wide`.
+• No panic
+• Result = input mod L (canonical form)
+• All limbs < 2^52 -/
 @[step]
 theorem from_bytes_wide_spec
     (b : Array U8 64#usize) :

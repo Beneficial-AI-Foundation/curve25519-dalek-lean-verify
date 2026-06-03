@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Oliver Butterley. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
@@ -10,19 +10,11 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ConditionalAddL
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 
-set_option exponentiation.threshold 260
-
-/-! # Sub
-
-Specification and proof for `Scalar52::sub`.
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub`
 
 This function computes the difference of two Scalar52 values modulo L (the group order).
 The function performs subtraction with borrow handling and conditional addition of L
 to ensure the result is non-negative.
-
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs:L175-L198
-
-## Algorithm Summary
 
 The subtraction uses base-2^52 arithmetic with borrow propagation:
 
@@ -44,13 +36,14 @@ The subtraction uses base-2^52 arithmetic with borrow propagation:
 **Key insight**: The final borrow `c_5` is just a sign indicator, not a quantity to subtract.
 When `A < B`, the difference array stores `2^260 + (A - B)` (the representation in Z/(2^260)Z).
 Adding L causes wrap-around: `(2^260 + (A - B) + L) mod 2^260 = A - B + L ∈ (0, L)`.
+
+Source: curve25519-dalek/src/backend/serial/u64/scalar.rs:L175-L198
 -/
 
-open Aeneas Aeneas.Std Result
-open Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
-
+set_option exponentiation.threshold 260
 attribute [-simp] Int.reducePow Nat.reducePow
 
 /-! ## Spec for `sub` -/
@@ -60,17 +53,19 @@ def Scalar52_partial_as_Nat (limbs : Array U64 5#usize) (n : Nat) : Nat :=
   ∑ j ∈ Finset.range n, 2 ^ (52 * j) * (limbs[j]!).val
 
 set_option maxHeartbeats 1200000 in -- proof could be better
-/-- **Spec for `backend.serial.u64.scalar.Scalar52.sub_loop`**:
+/-- **Spec theorem**
 
-The loop computes the subtraction a - b with borrow propagation.
-After processing indices 0..i, the loop invariant holds:
-  partial_a(i) + (borrow / 2^63) * 2^(52*i) = partial_b(i) + partial_diff(i)
+Specification for
+`curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub_loop`.
 
-When the loop completes (i = 5), this gives:
-  A + (borrow / 2^63) * 2^260 = B + D
-
-Where (borrow / 2^63) = 1 means A < B (underflow occurred), and the difference D
-represents (A - B) mod 2^260.
+The loop computes the subtraction `a - b` with borrow propagation. After processing
+indices `0..i`, the loop invariant
+  `partial_a(i) + (borrow / 2^63) * 2^(52*i) = partial_b(i) + partial_diff(i)`
+holds; on completion (`i = 5`) this becomes
+  `Scalar52_as_Nat a + (borrow / 2^63) * 2^260 = Scalar52_as_Nat b + Scalar52_as_Nat result.1`,
+where `borrow / 2^63 = 1` flags an underflow (`a < b`).
+• Every output limb of `result.1` is `< 2 ^ 52`
+• The closing value invariant above holds
 -/
 @[step]
 theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize)
@@ -83,10 +78,10 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
     (hborrow : borrow.val / 2 ^ 63 ≤ 1)
     (hinv : Scalar52_partial_as_Nat a i.val + borrow.val / 2 ^ 63 * 2 ^ (52 * i.val) =
             Scalar52_partial_as_Nat b i.val + Scalar52_partial_as_Nat difference i.val) :
-    sub_loop a b difference mask borrow i ⦃ result =>
-    (∀ j < 5, result.1[j]!.val < 2 ^ 52) ∧
-    (Scalar52_as_Nat a + result.2.val / 2 ^ 63 * 2 ^ 260 =
-     Scalar52_as_Nat b + Scalar52_as_Nat result.1) ⦄ := by
+    sub_loop a b difference mask borrow i ⦃ (result : Scalar52 × U64) =>
+      (∀ j < 5, result.1[j]!.val < 2 ^ 52) ∧
+      (Scalar52_as_Nat a + result.2.val / 2 ^ 63 * 2 ^ 260 =
+        Scalar52_as_Nat b + Scalar52_as_Nat result.1) ⦄ := by
   unfold sub_loop
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
@@ -260,21 +255,22 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
-/-- **Spec for `backend.serial.u64.scalar.Scalar52.sub`**:
-- Requires bounded limbs for both inputs
-- Requires both inputs to be bounded from above
-- The result represents (a - b) mod L
-- The result has bounded limbs and is canonical -/
+/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub`**
+• The function always succeeds (no panic) when both inputs have limbs `< 2 ^ 52` and the
+  value preconditions hold (`a < b + L` and `b ≤ L`)
+• `Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a (mod L)`
+• `Scalar52_as_Nat result < L`, the canonical reduced representative
+• Every output limb is `< 2 ^ 52` -/
 @[step]
 theorem sub_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < Scalar52_as_Nat b + L)
     (hb' : Scalar52_as_Nat b ≤ L) :
-    sub a b ⦃ result =>
-    Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a [MOD L] ∧
-    Scalar52_as_Nat result < L ∧
-    (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
+    sub a b ⦃ (result : Scalar52) =>
+      Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a [MOD L] ∧
+      Scalar52_as_Nat result < L ∧
+      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold sub
   unfold subtle.Choice.Insts.CoreConvertFromU8.from
   -- First, step through mask computation (two steps: shift then subtract)
