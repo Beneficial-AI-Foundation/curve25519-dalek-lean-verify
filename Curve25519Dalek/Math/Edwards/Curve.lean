@@ -84,9 +84,9 @@ variable {F : Type} [Field F]
 section Completeness
 variable [NeZero (2 : F)]
 
+set_option linter.style.whitespace false in
 /-- Helper to completeness of Twisted Edwards addition:
 If λ² = 1 where λ = d·x₁·x₂·y₁·y₂, then d is a square — contradiction. -/
-set_option linter.style.whitespace false in
 /-
 Proof is adapted from https://eprint.iacr.org/2007/286 Theorem 3.3 and
 https://eprint.iacr.org/2008/013 Section 6. We write it here for completeness
