@@ -11,6 +11,7 @@ import Curve25519Dalek.Math.Montgomery.Curve
 import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Math.PrimeCerts
 import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Plausible
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.AssertReceiverIsTotalEq
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.ConditionalAssign
@@ -52,6 +53,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SqrtAdMinusOne
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SqrtM1
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add_plausible
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AsBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
@@ -209,6 +211,7 @@ import Curve25519Dalek.Specs.Scalar.Scalar.Zero
 import Curve25519Dalek.Specs.Window.LookupTable.From
 import Curve25519Dalek.Specs.Window.LookupTable.Select
 import Curve25519Dalek.Tactics
+import Curve25519Dalek.Test.PlausibleSignedInt
 import Curve25519Dalek.Types
 import Curve25519Dalek.TypesAux
 import Curve25519Dalek.TypesExternal
