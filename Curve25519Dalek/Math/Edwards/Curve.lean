@@ -141,13 +141,12 @@ private theorem lam_sq_eq_one_impossible
     (C : EdwardsCurve F) (ha : IsSquare C.a) (hd : ¬IsSquare C.d) (p1 p2 : Point C)
     (hLamSq : (C.d * p1.x * p2.x * p1.y * p2.y) ^ 2 = 1) : False := by
   set lamVal := C.d * p1.x * p2.x * p1.y * p2.y with hlam
-  have lemLam : lamVal ^ 2 = 1 := hLamSq
   /- Lemma 1: dx₁²y₁²(ax₂² + y₂²) = ax₁² + y₁² -/
   have lem1 :
       C.d * p1.x ^ 2 * p1.y ^ 2 * (C.a * p2.x ^ 2 + p2.y ^ 2) =
         C.a * p1.x ^ 2 + p1.y ^ 2 := by
     linear_combination
-      C.d * p1.x ^ 2 * p1.y ^ 2 * p2.on_curve + lemLam - p1.on_curve
+      C.d * p1.x ^ 2 * p1.y ^ 2 * p2.on_curve + hLamSq - p1.on_curve
   obtain ⟨a', ha'⟩ := ha
   /- Lemma 2: (a'x₁ + λy₁)² = dx₁²y₁²(a'x₂ + y₂)² -/
   have lem2 :
@@ -155,7 +154,7 @@ private theorem lam_sq_eq_one_impossible
         C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x + p2.y) ^ 2 := by
     linear_combination
       (C.d * p1.x ^ 2 * p1.y ^ 2 * p2.x ^ 2 - p1.x ^ 2) * ha' +
-      p1.y ^ 2 * lemLam - lem1
+      p1.y ^ 2 * hLamSq - lem1
   /- From lem2, if any denominator is nonzero, d is a square — contradiction. -/
   have hp2x : p2.x ≠ 0 := by grind
   by_cases hcasePos : a' * p2.x + p2.y = 0
