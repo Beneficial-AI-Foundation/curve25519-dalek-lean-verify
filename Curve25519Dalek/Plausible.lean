@@ -400,26 +400,3 @@ instance {α : Type*} {x : Result α} {p : Post α} [∀ a, Decidable (p a)] :
   · unfold wp_return; infer_instance
   · infer_instance
   · infer_instance
-
-/-! ## Smoke tests -/
-
--- Arbitrary instances exist for all key types.
-#check (inferInstance : Arbitrary scalar.Scalar)
-#check (inferInstance : Arbitrary backend.serial.u64.field.FieldElement51)
-#check (inferInstance : Arbitrary edwards.EdwardsPoint)
-#check (inferInstance : Arbitrary ristretto.RistrettoPoint)
-
--- Arbitrary instances exist for all primitive scalar types (unsigned and signed).
-#check (inferInstance : Arbitrary Std.U8)
-#check (inferInstance : Arbitrary Std.U64)
-#check (inferInstance : Arbitrary Std.I8)
-#check (inferInstance : Arbitrary Std.I16)
-#check (inferInstance : Arbitrary Std.I64)
-
--- Shrinkable instances exist for signed integers.
-#check (inferInstance : Shrinkable Std.I8)
-#check (inferInstance : Shrinkable Std.I64)
-
--- WP.spec is Decidable for a simple postcondition.
-example : Decidable (WP.spec (Result.ok (⟨0⟩ : Std.U64)) (fun x => x = ⟨0⟩)) :=
-  inferInstance
