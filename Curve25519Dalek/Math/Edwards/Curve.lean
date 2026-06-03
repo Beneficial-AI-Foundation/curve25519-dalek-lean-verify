@@ -84,13 +84,10 @@ variable {F : Type} [Field F]
 section Completeness
 variable [NeZero (2 : F)]
 
-/- **Completeness of Twisted Edwards Addition**
-
-For a twisted Edwards curve E_{a,d} over a field k with char(k) ≠ 2,
-if a is a square and d is not a square in k, then
-for all points (x₁, y₁), (x₂, y₂) on E_{a,d}: 1 + d·x₁x₂y₁y₂ ≠ 0 and 1 - d·x₁x₂y₁y₂ ≠ 0.
-This makes the addition law "complete" (no exceptional cases).
-
+/-- Helper to completeness of Twisted Edwards addition:
+If λ² = 1 where λ = d·x₁·x₂·y₁·y₂, then d is a square — contradiction. -/
+set_option linter.style.whitespace false in
+/-
 Proof is adapted from https://eprint.iacr.org/2007/286 Theorem 3.3 and
 https://eprint.iacr.org/2008/013 Section 6. We write it here for completeness
 
@@ -102,22 +99,22 @@ Lemma 1: dx₁²y₁²(ax₂² + y₂²) = ax₁² + y₁²
 
   Proof:
     dx₁²y₁²(ax₂² + y₂²)
-    = dx₁²y₁² + d²x₁²y₁²x₂²y₂² curve eq
-    = dx₁²y₁² + λ²             λ def
-    = dx₁²y₁² + 1              simp
-    = ax₁² + y₁²               by curve eq
+    = dx₁²y₁² + d²x₁²y₁²x₂²y₂²  curve eq
+    = dx₁²y₁² + λ²              λ def
+    = dx₁²y₁² + 1               simp
+    = ax₁² + y₁²                by curve eq
 
 Lemma 2: Let a' = sqrt(a) then
     (a'x₁ + λy₁)² = dx₁²y₁²(a'x₂ + y₂)²
 
   Proof:
     (a'x₁ + λy₁)²
-    = ax₁² + λ²y₁² + 2a'λx₁y₁        expan
-    = ax₁² + y₁² + 2a'λx₁y₁          simp
-    = dx₁²y₁²(ax₂² + y₂²) + 2a'λx₁y₁ lemma 1
+    = ax₁² + λ²y₁² + 2a'λx₁y₁         expan
+    = ax₁² + y₁² + 2a'λx₁y₁           simp
+    = dx₁²y₁²(ax₂² + y₂²) + 2a'λx₁y₁  lemma 1
     = dx₁²y₁²(ax₂² + y₂²)
-      + 2a'dx₁y₁x₂y₂x₁y₁             λ def
-    = dx₁²y₁²(a'x₂ + y₂)²            simp
+      + 2a'dx₁y₁x₂y₂x₁y₁              λ def
+    = dx₁²y₁²(a'x₂ + y₂)²             simp
 
 Lemma 3: Let a' = sqrt(a) then
     (a'x₁ - λy₁)² = dx₁²y₁²(a'x₂ - y₂)²
@@ -136,7 +133,6 @@ To finish up, consider three cases:
   3. Suppose a'x₂ + y₂ = a'x₂ - y₂ = 0. Since a' ≠ 0, we get
      that x₂ = 0. Contradiction.
 -/
-/-- Helper: if λ² = 1 where λ = d·x₁·x₂·y₁·y₂, then d is a square — contradiction. -/
 private theorem lam_sq_eq_one_impossible
     (C : EdwardsCurve F) (ha : IsSquare C.a) (hd : ¬IsSquare C.d) (p1 p2 : Point C)
     (hLamSq : (C.d * p1.x * p2.x * p1.y * p2.y) ^ 2 = 1) : False := by
@@ -174,6 +170,13 @@ private theorem lam_sq_eq_one_impossible
       rw [← sq, div_pow, eq_div_iff (pow_ne_zero _ (by grind))]
       linear_combination -lem2⟩
 
+/-- **Completeness of Twisted Edwards Addition**
+
+For a twisted Edwards curve E_{a,d} over a field k with char(k) ≠ 2,
+if a is a square and d is not a square in k, then
+for all points (x₁, y₁), (x₂, y₂) on E_{a,d}: 1 + d·x₁x₂y₁y₂ ≠ 0 and 1 - d·x₁x₂y₁y₂ ≠ 0.
+This makes the addition law "complete" (no exceptional cases).
+-/
 theorem complete_addition_denominators_ne_zero
     (C : EdwardsCurve F) (ha : IsSquare C.a) (hd : ¬IsSquare C.d) (p1 p2 : Point C) :
     let lamVal := C.d * p1.x * p2.x * p1.y * p2.y
