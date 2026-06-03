@@ -86,6 +86,9 @@ variable [NeZero (2 : F)]
 
 /-- Helper to completeness of Twisted Edwards addition:
 If λ² = 1 where λ = d·x₁·x₂·y₁·y₂, then d is a square — contradiction. -/
+private theorem lam_sq_eq_one_impossible
+    (C : EdwardsCurve F) (ha : IsSquare C.a) (hd : ¬IsSquare C.d) (p1 p2 : Point C)
+    (hLamSq : (C.d * p1.x * p2.x * p1.y * p2.y) ^ 2 = 1) : False := by
 /-
 Proof is adapted from https://eprint.iacr.org/2007/286 Theorem 3.3 and
 https://eprint.iacr.org/2008/013 Section 6. We write it here for completeness
@@ -132,9 +135,6 @@ To finish up, consider three cases:
   3. Suppose a'x₂ + y₂ = a'x₂ - y₂ = 0. Since a' ≠ 0, we get
      that x₂ = 0. Contradiction.
 -/
-private theorem lam_sq_eq_one_impossible
-    (C : EdwardsCurve F) (ha : IsSquare C.a) (hd : ¬IsSquare C.d) (p1 p2 : Point C)
-    (hLamSq : (C.d * p1.x * p2.x * p1.y * p2.y) ^ 2 = 1) : False := by
   set lamVal := C.d * p1.x * p2.x * p1.y * p2.y with hlam
   have lem1 :
       C.d * p1.x ^ 2 * p1.y ^ 2 * (C.a * p2.x ^ 2 + p2.y ^ 2) =
