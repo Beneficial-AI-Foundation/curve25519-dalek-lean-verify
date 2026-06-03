@@ -142,130 +142,38 @@ private theorem lam_sq_eq_one_impossible
     (hLamSq : (C.d * p1.x * p2.x * p1.y * p2.y) ^ 2 = 1) : False := by
   set lamVal := C.d * p1.x * p2.x * p1.y * p2.y with hlam
   have lemLam : lamVal ^ 2 = 1 := hLamSq
+  /- Lemma 1: dx₁²y₁²(ax₂² + y₂²) = ax₁² + y₁² -/
   have lem1 :
       C.d * p1.x ^ 2 * p1.y ^ 2 * (C.a * p2.x ^ 2 + p2.y ^ 2) =
         C.a * p1.x ^ 2 + p1.y ^ 2 := by
-    rw [p2.on_curve, mul_add]
-    simp
-    suffices h :
-        C.d * p1.x ^ 2 * p1.y ^ 2 +
-          C.d ^ 2 * p1.x ^ 2 * p1.y ^ 2 * p2.x ^ 2 * p2.y ^ 2 =
-          C.a * p1.x ^ 2 + p1.y ^ 2 by
-      grind
-    suffices lem3 :
-        C.d * p1.x ^ 2 * p1.y ^ 2 +
-          (C.d * p1.x * p2.x * p1.y * p2.y) ^ 2 =
-          C.a * p1.x ^ 2 + p1.y ^ 2 by
-      grind
-    rw [← hlam, lemLam]
-    rw [add_comm, p1.on_curve]
+    linear_combination
+      C.d * p1.x ^ 2 * p1.y ^ 2 * p2.on_curve + lemLam - p1.on_curve
   obtain ⟨a', ha'⟩ := ha
+  /- Lemma 2: (a'x₁ + λy₁)² = dx₁²y₁²(a'x₂ + y₂)² -/
   have lem2 :
       (a' * p1.x + lamVal * p1.y) ^ 2 =
         C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x + p2.y) ^ 2 := by
-    suffices h :
-        a' * a' * p1.x ^ 2 + lamVal ^ 2 * p1.y ^ 2 +
-          2 * a' * p1.x * lamVal * p1.y =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x + p2.y) ^ 2 by
-      linear_combination h
-    suffices h :
-        C.a * p1.x ^ 2 + p1.y ^ 2 +
-          2 * a' * p1.x * lamVal * p1.y =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x + p2.y) ^ 2 by
-      rw [lemLam, ← ha']; simp [h]
-    suffices h :
-        C.d * p1.x ^ 2 * p1.y ^ 2 * (C.a * p2.x ^ 2 + p2.y ^ 2) +
-          2 * a' * p1.x * lamVal * p1.y =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x + p2.y) ^ 2 by
-      rw [← lem1, h]
-    suffices h :
-        C.d * p1.x ^ 2 * p1.y ^ 2 * (C.a * p2.x ^ 2 + p2.y ^ 2) +
-          2 * a' * p1.x * C.d * p1.x * p2.x * p1.y * p2.y * p1.y =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x + p2.y) ^ 2 by
-      rw [hlam]; linear_combination h
-    suffices h :
-        C.d * p1.x ^ 2 * p1.y ^ 2 *
-            (a' * a' * p2.x ^ 2 + p2.y ^ 2) +
-          2 * a' * p1.x * C.d * p1.x * p2.x * p1.y * p2.y * p1.y =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x + p2.y) ^ 2 by
-      rw [ha', h]
-    suffices h :
-        C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x + p2.y) ^ 2 =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x + p2.y) ^ 2 by
-      linear_combination h
-    eq_refl
-  have _lem3 :
-      (a' * p1.x - lamVal * p1.y) ^ 2 =
-        C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x - p2.y) ^ 2 := by
-    suffices h :
-        a' * a' * p1.x ^ 2 + lamVal ^ 2 * p1.y ^ 2 -
-          2 * a' * p1.x * lamVal * p1.y =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x - p2.y) ^ 2 by
-      linear_combination h
-    suffices h :
-        C.a * p1.x ^ 2 + p1.y ^ 2 -
-          2 * a' * p1.x * lamVal * p1.y =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x - p2.y) ^ 2 by
-      rw [lemLam, ← ha']; simp [h]
-    suffices h :
-        C.d * p1.x ^ 2 * p1.y ^ 2 * (C.a * p2.x ^ 2 + p2.y ^ 2) -
-          2 * a' * p1.x * lamVal * p1.y =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x - p2.y) ^ 2 by
-      rw [← lem1, h]
-    suffices h :
-        C.d * p1.x ^ 2 * p1.y ^ 2 * (C.a * p2.x ^ 2 + p2.y ^ 2) -
-          2 * a' * p1.x * C.d * p1.x * p2.x * p1.y * p2.y * p1.y =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x - p2.y) ^ 2 by
-      rw [hlam]; linear_combination h
-    suffices h :
-        C.d * p1.x ^ 2 * p1.y ^ 2 *
-            (a' * a' * p2.x ^ 2 + p2.y ^ 2) -
-          2 * a' * p1.x * C.d * p1.x * p2.x * p1.y * p2.y * p1.y =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x - p2.y) ^ 2 by
-      rw [ha', h]
-    suffices h :
-        C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x - p2.y) ^ 2 =
-          C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x - p2.y) ^ 2 by
-      linear_combination h
-    eq_refl
-  have hp1x : p1.x ≠ 0 := by grind
-  have hp1y : p1.y ≠ 0 := by grind
+    linear_combination
+      (C.d * p1.x ^ 2 * p1.y ^ 2 * p2.x ^ 2 - p1.x ^ 2) * ha' +
+      p1.y ^ 2 * lemLam - lem1
+  /- From lem2, if any denominator is nonzero, d is a square — contradiction. -/
   have hp2x : p2.x ≠ 0 := by grind
-  have _hp2y : p2.y ≠ 0 := by grind
   by_cases hcasePos : a' * p2.x + p2.y = 0
   · by_cases hcaseNeg : a' * p2.x - p2.y = 0
-    · /- Both a'x₂ + y₂ = 0 and a'x₂ - y₂ = 0 ⟹ x₂ = 0. Contradiction. -/
-      have hx0 : 2 * a' * p2.x = 0 := by
-        linear_combination (hcasePos + hcaseNeg)
-      have han0 : a' ≠ 0 := by grind
-      exact hp2x <|
-        (mul_eq_zero.mp hx0).resolve_left (mul_ne_zero two_ne_zero han0)
-    · /- a'x₂ + y₂ = 0 but a'x₂ - y₂ ≠ 0 ⟹ use minus denominator -/
-      have hdenom : (p1.x * p1.y * (a' * p2.x - p2.y)) ^ 2 ≠ 0 :=
-        pow_ne_zero _ (by grind)
-      have hfrac :
-          C.d = (a' * p1.x - lamVal * p1.y) ^ 2 /
-            (p1.x * p1.y * (a' * p2.x - p2.y)) ^ 2 := by
-        rw [eq_div_iff hdenom]
-        linear_combination -lem2
-      have hfrac2 :
-          C.d = ((a' * p1.x - lamVal * p1.y) /
-            (p1.x * p1.y * (a' * p2.x - p2.y))) ^ 2 := by
-        rw [div_pow]; exact hfrac
-      exact hd ⟨_, by rw [← sq]; exact hfrac2⟩
-  · /- a'x₂ + y₂ ≠ 0 ⟹ use plus denominator -/
-    have hdenom : (p1.x * p1.y * (a' * p2.x + p2.y)) ^ 2 ≠ 0 :=
-      pow_ne_zero _ (by grind)
-    have hfrac :
-        C.d = (a' * p1.x + lamVal * p1.y) ^ 2 /
-          (p1.x * p1.y * (a' * p2.x + p2.y)) ^ 2 := by
-      rw [eq_div_iff hdenom]
-      linear_combination -lem2
-    have hfrac2 :
-        C.d = ((a' * p1.x + lamVal * p1.y) /
-          (p1.x * p1.y * (a' * p2.x + p2.y))) ^ 2 := by
-      rw [div_pow]; exact hfrac
-    exact hd ⟨_, by rw [← sq]; exact hfrac2⟩
+    · /- Both zero ⟹ 2a'x₂ = 0 ⟹ x₂ = 0 (since a' ≠ 0). Contradiction. -/
+      exact hp2x <| (mul_eq_zero.mp (show 2 * a' * p2.x = 0 by
+        linear_combination (hcasePos + hcaseNeg))).resolve_left
+        (mul_ne_zero two_ne_zero (by grind))
+    · /- a'x₂ - y₂ ≠ 0 ⟹ d = ((a'x₁ - λy₁) / (x₁y₁(a'x₂ - y₂)))² -/
+      exact hd ⟨(a' * p1.x - lamVal * p1.y) /
+        (p1.x * p1.y * (a' * p2.x - p2.y)), by
+        rw [← sq, div_pow, eq_div_iff (pow_ne_zero _ (by grind))]
+        linear_combination -lem2⟩
+  · /- a'x₂ + y₂ ≠ 0 ⟹ d = ((a'x₁ + λy₁) / (x₁y₁(a'x₂ + y₂)))² -/
+    exact hd ⟨(a' * p1.x + lamVal * p1.y) /
+      (p1.x * p1.y * (a' * p2.x + p2.y)), by
+      rw [← sq, div_pow, eq_div_iff (pow_ne_zero _ (by grind))]
+      linear_combination -lem2⟩
 
 theorem complete_addition_denominators_ne_zero
     (C : EdwardsCurve F) (ha : IsSquare C.a) (hd : ¬IsSquare C.d) (p1 p2 : Point C) :
