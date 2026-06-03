@@ -75,7 +75,8 @@ example : ∀ (x : I32), x.val ≥ -2147483648 ∧ x.val ≤ 2147483647 := by
 example : ∀ (x : Isize), x.val ≥ -9223372036854775808 := by
   plausible (config := { numInst := 100 })
 
-/-! ## `FieldElement51::add`
+
+/-! ## `curve25519_dalek::backend::serial::u64::field::FieldElement51::FieldElement51::add`
 
 `FieldElement51::add` performs element-wise addition of field-element limbs.
 
@@ -97,14 +98,28 @@ open CoreOpsArithAddAssignSharedAFieldElement51
 namespace curve25519_dalek.Shared0FieldElement51.Insts
 namespace CoreOpsArithAddSharedAFieldElement51FieldElement51
 
--- ✓ Correct spec — Plausible finds no counter-example (bounded subtype sampling active).
+/-! ### Catching a wrong spec
+
+This is a deliberately **incorrect** spec: it claims every output limb is `< 2^50`, but
+since each input limb can be up to `2^53 - 1`, a sum reaches `≈ 2^54`, so the bound is far
+too tight. `plausible` finds a counter-example, which `Testable.check` reports by throwing
+an error — normally that fails the build.
+
+To keep the build green while still demonstrating the bug is caught, we run `plausible`
+with `quiet := true` (so the thrown message is the deterministic string
+`"Found a counter-example!"`, with no random values) and capture that expected error with
+`#guard_msgs`. The command therefore succeeds **iff** Plausible discovered the spec error;
+if the spec were accidentally correct, no error would be thrown and `#guard_msgs` would
+fail instead. -/
+
+/-- error: Found a counter-example! -/
+#guard_msgs in
 example :
     ∀ (a : { a : Array U64 5#usize // ∀ i < 5, a[i]!.val < 2^53 })
       (b : { b : Array U64 5#usize // ∀ i < 5, b[i]!.val < 2^53 }),
-    WP.spec (add a.val b.val) (fun (result : Array U64 5#usize) =>
-      (∀ i < 5, (result[i]!.val : ℕ) = a.val[i]!.val + b.val[i]!.val) ∧
-      (∀ i < 5, result[i]!.val < 2^54)) := by
-  plausible (config := { numInst := 1000 })
+    add a.val b.val ⦃ (result : Array U64 5#usize) =>
+      ∀ i < 5, result[i]!.val < 2^50 ⦄ := by
+  plausible (config := { numInst := 1000, quiet := true })
 
 end CoreOpsArithAddSharedAFieldElement51FieldElement51
 end curve25519_dalek.Shared0FieldElement51.Insts
