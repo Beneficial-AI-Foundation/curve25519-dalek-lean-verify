@@ -84,7 +84,6 @@ variable {F : Type} [Field F]
 section Completeness
 variable [NeZero (2 : F)]
 
-set_option linter.style.whitespace false in
 /-- Helper to completeness of Twisted Edwards addition:
 If λ² = 1 where λ = d·x₁·x₂·y₁·y₂, then d is a square — contradiction. -/
 /-
@@ -99,22 +98,22 @@ Lemma 1: dx₁²y₁²(ax₂² + y₂²) = ax₁² + y₁²
 
   Proof:
     dx₁²y₁²(ax₂² + y₂²)
-    = dx₁²y₁² + d²x₁²y₁²x₂²y₂²  curve eq
-    = dx₁²y₁² + λ²              λ def
-    = dx₁²y₁² + 1               simp
-    = ax₁² + y₁²                by curve eq
+    = dx₁²y₁² + d²x₁²y₁²x₂²y₂² (curve eq)
+    = dx₁²y₁² + λ² (λ def)
+    = dx₁²y₁² + 1 (simp)
+    = ax₁² + y₁² (by curve eq)
 
 Lemma 2: Let a' = sqrt(a) then
     (a'x₁ + λy₁)² = dx₁²y₁²(a'x₂ + y₂)²
 
   Proof:
     (a'x₁ + λy₁)²
-    = ax₁² + λ²y₁² + 2a'λx₁y₁         expan
-    = ax₁² + y₁² + 2a'λx₁y₁           simp
-    = dx₁²y₁²(ax₂² + y₂²) + 2a'λx₁y₁  lemma 1
-    = dx₁²y₁²(ax₂² + y₂²)
-      + 2a'dx₁y₁x₂y₂x₁y₁              λ def
-    = dx₁²y₁²(a'x₂ + y₂)²             simp
+    = ax₁² + λ²y₁² + 2a'λx₁y₁ (expan)
+    = ax₁² + y₁² + 2a'λx₁y₁ (simp)
+    = dx₁²y₁²(ax₂² + y₂²) + 2a'λx₁y₁ (lemma 1)
+    = dx₁²y₁²(ax₂² + y₂²) (λ def)
+      + 2a'dx₁y₁x₂y₂x₁y₁
+    = dx₁²y₁²(a'x₂ + y₂)² (simp)
 
 Lemma 3: Let a' = sqrt(a) then
     (a'x₁ - λy₁)² = dx₁²y₁²(a'x₂ - y₂)²
@@ -137,14 +136,12 @@ private theorem lam_sq_eq_one_impossible
     (C : EdwardsCurve F) (ha : IsSquare C.a) (hd : ¬IsSquare C.d) (p1 p2 : Point C)
     (hLamSq : (C.d * p1.x * p2.x * p1.y * p2.y) ^ 2 = 1) : False := by
   set lamVal := C.d * p1.x * p2.x * p1.y * p2.y with hlam
-  /- Lemma 1: dx₁²y₁²(ax₂² + y₂²) = ax₁² + y₁² -/
   have lem1 :
       C.d * p1.x ^ 2 * p1.y ^ 2 * (C.a * p2.x ^ 2 + p2.y ^ 2) =
         C.a * p1.x ^ 2 + p1.y ^ 2 := by
     linear_combination
       C.d * p1.x ^ 2 * p1.y ^ 2 * p2.on_curve + hLamSq - p1.on_curve
   obtain ⟨a', ha'⟩ := ha
-  /- Lemma 2: (a'x₁ + λy₁)² = dx₁²y₁²(a'x₂ + y₂)² -/
   have lem2 :
       (a' * p1.x + lamVal * p1.y) ^ 2 =
         C.d * p1.x ^ 2 * p1.y ^ 2 * (a' * p2.x + p2.y) ^ 2 := by
