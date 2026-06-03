@@ -1,5 +1,15 @@
--- Quick test to verify signed integer instances work in Plausible tests
+/-
+Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
 import Curve25519Dalek.Plausible
+
+/-! # Plausible tests for signed-integer instances
+
+Sanity checks that the `Arbitrary`/`Shrinkable` instances for signed scalar types
+(`I8`/`I16`/`I32`/`I64`/`Isize`) generate in-range values and that arrays of them
+work. Part of the `Tests` library, which is not in `defaultTargets`, so these
+randomized `#eval`s do not run on a normal `lake build` — use `lake build Tests`. -/
 
 open Plausible
 open Aeneas.Std

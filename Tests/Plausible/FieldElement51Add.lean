@@ -6,19 +6,24 @@ Authors: Oliver Butterley
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 import Curve25519Dalek.Plausible
 
-/-! # Add
+/-! # Plausible test for `FieldElement51::add`
 
-Specification and proof for `FieldElement51::add`.
+Property-based test exercising the `Arbitrary`/`Shrinkable` infrastructure from
+`Curve25519Dalek.Plausible`. This file lives in the `Tests` library, which is **not**
+part of `defaultTargets`, so the randomized `#eval` below does not run on a normal
+`lake build`. Run it explicitly with `lake build Tests`.
 
-This function performs element-wise addition of field element limbs. It simply wraps `add_assign`.
+`FieldElement51::add` performs element-wise addition of field-element limbs.
 
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-open curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51
+open curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
+open CoreOpsArithAddAssignSharedAFieldElement51
 
-namespace curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
+namespace curve25519_dalek.Shared0FieldElement51.Insts
+namespace CoreOpsArithAddSharedAFieldElement51FieldElement51
 
 /-! ## Plausible test for `add`
 
@@ -48,4 +53,5 @@ bounded arrays by construction, and `.val` extracts the underlying array for `ad
 --      ∀ i < 5, result[i]!.val < 2^50))
 --   (cfg := { numInst := 1000 })
 
-end curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
+end CoreOpsArithAddSharedAFieldElement51FieldElement51
+end curve25519_dalek.Shared0FieldElement51.Insts

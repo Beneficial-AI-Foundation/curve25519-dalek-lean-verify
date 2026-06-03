@@ -28,6 +28,14 @@ name = "Curve25519Dalek"
 [[lean_lib]]
 name = "Utils"
 
+# Property-based (Plausible) tests. Deliberately NOT in `defaultTargets`, so the
+# randomized `#eval Testable.check` calls do not run on a normal `lake build`.
+# Run them explicitly with `lake build Tests`. `globs` builds every `Tests.*`
+# submodule directly (no aggregator root module needed).
+[[lean_lib]]
+name = "Tests"
+globs = ["Tests.+"]
+
 [[lean_exe]]
 name = "listfuns"
 root = "Utils.ListFuns"

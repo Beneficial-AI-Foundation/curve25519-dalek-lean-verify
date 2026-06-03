@@ -346,7 +346,7 @@ instance {n : Nat} {P : Nat → Prop} [DecidablePred P] :
   decidable_of_iff (∀ i : Fin n, P i.val)
     ⟨fun h i hi => h ⟨i, hi⟩, fun h i => h i.val i.isLt⟩
 
-/-! ### Coverage, gaps, and how to extend (see `docs/Plausible-Limitations.md`)
+/-! ### Coverage, gaps, and how to extend
 
 The three instances above fire only for this exact shape: a **universal**
 quantifier over **`Nat`** whose **leading** guard is a strict `i < n` (`n` any
