@@ -1,1 +1,2 @@
-import Tests.PlausibleTests.ProbeTest
+import Tests.LinterTest.SpecIndent
+import Tests.PlausibleTests.PlausibleTests
