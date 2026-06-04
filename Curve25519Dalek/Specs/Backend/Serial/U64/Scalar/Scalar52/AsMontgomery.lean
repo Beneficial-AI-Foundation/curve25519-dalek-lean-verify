@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Oliver Butterley, Theo Ehrenborg
 -/
@@ -8,45 +8,39 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
-set_option exponentiation.threshold 260
+/-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_montgomery`
 
-/-! # Spec Theorem for `Scalar52::as_montgomery`
+This function converts a `Scalar52` `u` to Montgomery form by computing `(u * R) mod L`,
+where `R = 2^260` is the Montgomery constant for Scalar52 and `L` is the group order of
+Curve25519.
 
-Specification and proof for `Scalar52::as_montgomery`.
-
-This function converts to Montgomery form.
-
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
-open Aeneas Aeneas.Std Aeneas.Std.WP Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
-/-
-natural language description:
-
-    • Takes an input unpacked scalar u and returns an unpacked scalar m representing
-      the value (u * R) mod L, where R = 2^260 is the Montgomery constant and L is the group order.
-
-natural language specs:
-
-    • scalar_to_nat(m) = (scalar_to_nat(u) * R) mod L
--/
+set_option exponentiation.threshold 260
 
 theorem RR_lt : ∀ i < 5, constants.RR[i]!.val < 2 ^ 62 := by
   unfold constants.RR
   decide
 
-/-- **Spec and proof concerning `scalar.Scalar52.as_montgomery`**:
-- No panic (always returns successfully)
-- The result represents the input scalar multiplied by the Montgomery constant R = 2^260, modulo L
+/-- **Spec theorem**
+
+Specification for
+`curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_montgomery`.
+• The function always succeeds (no panic) when every input limb is `< 2 ^ 52`
+• `Scalar52_as_Nat result ≡ Scalar52_as_Nat u * R (mod L)`, i.e. multiplication by `R  = 2^260`
+• Every output limb is `< 2 ^ 52`
+• `Scalar52_as_Nat result < L`, the canonical reduced representative
 -/
 @[step]
 theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 52) :
-    as_montgomery u ⦃ m =>
-    Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧
-    (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
-    Scalar52_as_Nat m < L ⦄ := by
+    as_montgomery u ⦃ (m : Scalar52) =>
+      Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧
+      (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
+      Scalar52_as_Nat m < L ⦄ := by
   unfold as_montgomery
   let* ⟨ m, m_post1, m_post2, m_post3 ⟩ ← montgomery_mul_spec
   · exact RR_lt

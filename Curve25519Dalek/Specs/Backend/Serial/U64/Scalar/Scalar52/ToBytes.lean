@@ -7,8 +7,9 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
+/-! # Spec theorem
 
-/-! # Spec Theorem for `Scalar52::to_bytes`
+Specification for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::to_bytes`.
 
 Pack a `Scalar52` (5 little-endian 52-bit limbs) into 32 bytes.
 
@@ -31,7 +32,6 @@ low nibble of the next via `(prev >> 48) | (next << 4)`. The top limb uses only 
    the radix-2^52 limb sum.
 4. `to_bytes_spec`: drive the body with `step*`, prove the layout predicate, conclude.
 -/
-
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
@@ -162,9 +162,11 @@ private theorem byte_packing_eq (a : Scalar52) (s : Std.Array U8 32#usize)
 
 /-! ## Main spec -/
 
-/-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:
-- The result byte array represents the same number as the input unpacked scalar
-- The result is in canonical form (less than L) -/
+/-- **Spec theorem**
+
+Specification for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::to_bytes`.
+• The result byte array represents the same number as the input unpacked scalar
+• The result is in canonical form (less than L) -/
 @[step]
 theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     (h' : Scalar52_as_Nat self < L) :
