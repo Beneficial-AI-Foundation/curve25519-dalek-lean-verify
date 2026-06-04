@@ -25,6 +25,13 @@ rev = "15fd61770c9a893af0f5cb7893ea98b7d0bf8d52"
 [[lean_lib]]
 name = "Curve25519Dalek"
 
+# Standalone library holding the project-linter `#guard_msgs` tests.  Kept separate from
+# `Curve25519Dalek` so the dummy `@[step]` test theorems never become public declarations
+# of the production library (nor leak into Aeneas's global `@[step]` database via it).
+# It is a default target so `lake build` still compiles and checks the tests.
+[[lean_lib]]
+name = "LinterTest"
+
 [[lean_lib]]
 name = "Utils"
 

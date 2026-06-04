@@ -1,0 +1,607 @@
+#!/usr/bin/env tsx
+/*
+ * Post-processes rustdoc HTML (in target/doc/curve25519_dalek/) to inject a
+ * "Lean verification" panel under each function/method that has a matching
+ * record in functions.json. Each panel renders a small status symbol
+ * (✓✓ / ✓ / ◑ / ○) followed by the Lean spec statement.
+ *
+ * Source: functions.json — per-Rust-function record with spec metadata.
+ *
+ * Output: modified HTML files in-place. A single CSS file is written once
+ *         at target/doc/lean-verification.css and linked from each modified
+ *         page's <head>.
+ *
+ * Usage:
+ *   tsx scripts/inject-lean-verification.ts \
+ *     --rustdoc-root target/doc \
+ *     --functions   functions.json
+ */
+
+import fs from 'node:fs'
+import path from 'node:path'
+
+// ---------- Types ----------
+
+interface FunctionRecord {
+  rust_name: string | null
+  lean_name: string | null
+  source: string | null
+  lines: string | null
+  spec_file: string | null
+  spec_docstring: string | null
+  spec_statement: string | null
+  verified: boolean
+  specified: boolean
+  fully_verified: boolean
+  externally_verified: boolean
+  is_relevant: boolean
+  is_hidden: boolean
+  is_ignored: boolean
+  is_extraction_artifact: boolean
+}
+
+interface Config {
+  rustdocRoot: string   // e.g. target/doc
+  functionsJson: string
+}
+
+// ---------- CLI ----------
+
+function parseArgs(): Config {
+  const args = new Map<string, string>()
+  for (let i = 2; i < process.argv.length; i += 2) {
+    const k = process.argv[i].replace(/^--/, '')
+    const v = process.argv[i + 1]
+    if (!v) throw new Error(`Missing value for --${k}`)
+    args.set(k, v)
+  }
+  return {
+    rustdocRoot:   args.get('rustdoc-root') ?? 'target/doc',
+    functionsJson: args.get('functions')    ?? 'functions.json',
+  }
+}
+
+// ---------- rust_name → rustdoc URL ----------
+
+interface RustdocTarget {
+  file: string    // path under rustdoc-root, e.g. curve25519_dalek/edwards/struct.EdwardsPoint.html
+  anchor: string  // e.g. "method.identity", or "" if injecting at top of page
+}
+
+/**
+ * Convert a `source` path like 'curve25519-dalek/src/backend/serial/curve_models/mod.rs'
+ * into a module URL component like 'curve25519_dalek/backend/serial/curve_models'.
+ */
+function sourceToModulePath(source: string): string | null {
+  // curve25519-dalek/src/... → curve25519_dalek/...
+  const m = source.match(/^curve25519-dalek\/src\/(.*)$/)
+  if (!m) return null
+  let inner = m[1]
+  // strip extension + /mod.rs
+  inner = inner.replace(/\/mod\.rs$/, '').replace(/\.rs$/, '')
+  // lib.rs at crate root has no inner module path
+  if (inner === 'lib') return 'curve25519_dalek'
+  return 'curve25519_dalek/' + inner
+}
+
+/**
+ * Extract the receiver type and its defining module from a brace-form
+ * `rust_name`. Handles two shapes:
+ *
+ *   curve25519_dalek::edwards::{Trait for &0 (Receiver)}::method  — trait impl
+ *   curve25519_dalek::scalar::{Receiver}::method                  — inherent
+ *                                                                   impl-in-block
+ *
+ * The inherent shape appears when a struct has multiple separate `impl T { … }`
+ * blocks; the compiler tags methods with the impl block's receiver path even
+ * though there's no trait involved.
+ *
+ * Crucially the receiver's FULLY-QUALIFIED path is embedded in the brace —
+ * we use it to derive the rustdoc module directory, because rustdoc places
+ * the struct's docs under the receiver's *definition* module, not under the
+ * `source` (impl-block) module. Using the impl module's path produces a
+ * non-existent HTML file for every trait impl whose receiver lives in a
+ * different module — a frequent shape in this crate.
+ *
+ * Returns `{ type, modulePath }` where:
+ *   - `type` is the last `::` segment of the receiver path (the struct name);
+ *   - `modulePath` is a slash-joined module path like `curve25519_dalek/edwards`
+ *     for the file lookup. Falls back to `null` if the brace is unrecognised
+ *     or has no `::` segments at all.
+ */
+function receiverFromBraceForm(rustName: string): { type: string; modulePath: string } | null {
+  const braceMatch = rustName.match(/\{[^{}]*\}/)
+  if (!braceMatch) return null
+  let inner = braceMatch[0].slice(1, -1).trim()  // strip leading '{' and trailing '}'
+  // Trait impl: keep only the RHS of the last ` for `.
+  const forIdx = inner.lastIndexOf(' for ')
+  if (forIdx >= 0) {
+    inner = inner.slice(forIdx + 5).trim()
+  }
+  // Drop leading '&N (' refcount wrapper and matching trailing ')'.
+  inner = inner.replace(/^&\d+\s*\(/, '').replace(/\)\s*$/, '').trim()
+  // Strip trailing generic param suffix `<...>` — receiver is the bare type
+  // path (rustdoc page is named after the type without generics).
+  inner = inner.replace(/<[^<>]*>\s*$/, '')
+  const parts = inner.split('::').map(s => s.trim()).filter(s => s.length > 0)
+  if (parts.length === 0) return null
+  const type = parts[parts.length - 1]
+  const modulePath = parts.length > 1 ? parts.slice(0, -1).join('/') : 'curve25519_dalek'
+  return { type, modulePath }
+}
+
+/**
+ * Last `::` segment of a Rust path.
+ */
+function lastSegment(rustName: string): string {
+  const segs = rustName.split('::')
+  return segs[segs.length - 1]
+}
+
+/**
+ * Decide where in rustdoc the item lives.
+ */
+function rustNameToRustdoc(rustName: string, source: string): RustdocTarget | null {
+  const modulePath = sourceToModulePath(source)
+  if (!modulePath) return null
+
+  // Brace form: trait impl `{T for R}::method` OR inherent impl `{R}::method`.
+  // Use the receiver's OWN module path (not the impl block's `source` path)
+  // since rustdoc files the struct docs under the receiver's definition.
+  if (rustName.includes('{')) {
+    const receiver = receiverFromBraceForm(rustName)
+    const method = lastSegment(rustName)
+    if (!receiver) return null
+    return {
+      file: `${receiver.modulePath}/struct.${receiver.type}.html`,
+      anchor: `method.${method}`,
+    }
+  }
+
+  // Non-trait: module::[Type::]method
+  const segs = rustName.split('::')
+  const name = segs[segs.length - 1]
+  const parent = segs[segs.length - 2] ?? ''
+
+  // SCREAMING_SNAKE → module-level constant
+  if (/^[A-Z][A-Z0-9_]*$/.test(name) && !/[a-z]/.test(name)) {
+    return { file: `${modulePath}/constant.${name}.html`, anchor: '' }
+  }
+
+  // Capitalized parent segment → method on a type (struct or enum)
+  if (parent && /^[A-Z]/.test(parent)) {
+    return {
+      file: `${modulePath}/struct.${parent}.html`,
+      anchor: `method.${name}`,
+    }
+  }
+
+  // Otherwise: free function
+  return { file: `${modulePath}/fn.${name}.html`, anchor: '' }
+}
+
+// ---------- Panel rendering ----------
+
+function htmlEscape(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+/**
+ * Lightweight server-side syntax highlighter for Lean code.
+ *
+ * Wraps keywords / literals / strings / comments in `<span class="hl-*">`.
+ * The CSS classes are styled in PANEL_CSS using the github-light Lean theme
+ * (same palette as the verso-blueprint PQXDH setup).
+ *
+ * NOTE: regex-based — keywords appearing inside string literals will get
+ * wrongly highlighted. That doesn't happen in the spec_statement values we
+ * care about (mathematical theorem statements).
+ */
+function highlightLean(code: string): string {
+  // Escape HTML first; subsequent passes operate on the escaped text.
+  let h = htmlEscape(code)
+
+  // 1. Block comments `/- ... -/`
+  h = h.replace(/\/-[\s\S]*?-\//g, m => `<span class="hl-comment">${m}</span>`)
+  // 2. Line comments `-- ...`
+  h = h.replace(/--[^\n]*/g, m => `<span class="hl-comment">${m}</span>`)
+  // 3. Strings (very basic — Lean strings can have escapes, this is best-effort)
+  h = h.replace(/&quot;(?:[^&]|&(?!quot;))*?&quot;/g, m => `<span class="hl-string">${m}</span>`)
+  // 4. Statement-level keywords
+  h = h.replace(/\b(theorem|lemma|def|abbrev|axiom|instance|structure|inductive|class|mutual|end|namespace|section|open|variable|universe|noncomputable|protected|public|private)\b/g,
+    '<span class="hl-keyword">$1</span>')
+  // 5. Term / tactic keywords
+  h = h.replace(/\b(by|fun|let|do|if|then|else|match|with|return|pure|try|catch|simp|rw|rewrite|exact|intro|intros|have|show|suffices|induction|cases|constructor|refine|calc|ring|omega|norm_num|linarith|aesop|trivial|contradiction|exfalso|congr|ext|funext|sorry|decide|native_decide|apply|subst|change|where)\b/g,
+    '<span class="hl-keyword">$1</span>')
+  // 6. Built-in constants / types
+  h = h.replace(/\b(true|false|none|some|True|False|None|Some|Nat|Int|Bool|String|Type|Prop|Sort)\b/g,
+    '<span class="hl-const">$1</span>')
+  // 7. Numeric literals
+  h = h.replace(/\b(\d+)\b/g, '<span class="hl-lit">$1</span>')
+  return h
+}
+
+/**
+ * Strip an Aeneas-style ":= by ..." or ":= ..." truncation suffix from a
+ * spec_statement so the displayed code ends at the colon-equals.
+ */
+function trimSpecTail(spec: string): string {
+  return spec.replace(/\s*:=\s*by\s*\.{2,}\s*$/, '')
+             .replace(/\s*:=\s*\.{2,}\s*$/, '')
+}
+
+function renderPanel(fn: FunctionRecord): string {
+  const parts: string[] = []
+  parts.push(`<div class="lean-verification">`)
+
+  if (fn.spec_statement) {
+    parts.push(`  <div class="lean-header"><span class="lean-tick">✓✓</span> Lean specification</div>`)
+    const trimmed = trimSpecTail(fn.spec_statement)
+    parts.push(`  <pre class="lean-code"><code>${highlightLean(trimmed)}</code></pre>`)
+  }
+
+  parts.push(`</div>`)
+  return parts.join('\n')
+}
+
+// ---------- CSS ----------
+
+const PANEL_CSS = `
+/* Lean verification panel — injected by scripts/inject-lean-verification.ts */
+.lean-verification {
+  margin: 0.75rem 0 1rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color, #d2d2d2);
+  border-radius: 6px;
+  background: var(--code-block-background-color, #f5f5f5);
+  font-size: 0.95em;
+}
+.lean-header {
+  font-weight: 500;
+  font-size: 0.95em;
+  margin-bottom: 0.5rem;
+  color: var(--main-color, #333);
+}
+.lean-tick {
+  color: #1a7f37;
+  font-weight: 700;
+  margin-right: 0.15rem;
+}
+@media (prefers-color-scheme: dark) {
+  .lean-tick { color: #5fb874; }
+}
+html[data-theme="dark"] .lean-tick,
+html[data-theme="ayu"]  .lean-tick { color: #5fb874; }
+/* Lean syntax-highlighting tokens (github-light theme) */
+.lean-code .hl-keyword { color: #D73A49; }
+.lean-code .hl-const   { color: #6F42C1; }
+.lean-code .hl-lit     { color: #005CC5; }
+.lean-code .hl-string  { color: #032F62; }
+.lean-code .hl-comment { color: #6A737D; font-style: italic; }
+
+@media (prefers-color-scheme: dark) {
+  .lean-code .hl-keyword { color: #ff7b72; }
+  .lean-code .hl-const   { color: #d2a8ff; }
+  .lean-code .hl-lit     { color: #79c0ff; }
+  .lean-code .hl-string  { color: #a5d6ff; }
+  .lean-code .hl-comment { color: #8b949e; }
+}
+html[data-theme="dark"] .lean-code .hl-keyword,
+html[data-theme="ayu"]  .lean-code .hl-keyword { color: #ff7b72; }
+html[data-theme="dark"] .lean-code .hl-const,
+html[data-theme="ayu"]  .lean-code .hl-const   { color: #d2a8ff; }
+html[data-theme="dark"] .lean-code .hl-lit,
+html[data-theme="ayu"]  .lean-code .hl-lit     { color: #79c0ff; }
+html[data-theme="dark"] .lean-code .hl-string,
+html[data-theme="ayu"]  .lean-code .hl-string  { color: #a5d6ff; }
+html[data-theme="dark"] .lean-code .hl-comment,
+html[data-theme="ayu"]  .lean-code .hl-comment { color: #8b949e; }
+
+.lean-code {
+  margin: 0.4rem 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--code-block-background-color, #fafafa);
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 0.88em;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+`
+
+// ---------- HTML injection ----------
+
+/**
+ * Walk forward from `from` to find the end of a `<div class="docblock">`
+ * block, accounting for nested <div>s. Returns the index just past the
+ * closing `</div>`, or null if no docblock starts within `lookahead` chars
+ * of `from`.
+ */
+function findDocblockEnd(html: string, from: number, lookahead = 600): number | null {
+  // Rustdoc uses both <div class="docblock"> (inherent methods) and
+  // <div class='docblock'> (trait-impl methods). Match either.
+  const docOpenRe = /<div class=['"]docblock['"][^>]*>/g
+  docOpenRe.lastIndex = from
+  const m = docOpenRe.exec(html)
+  if (!m || m.index - from > lookahead) return null
+  // Position right after the opening tag's '>'.
+  let pos = m.index + m[0].length
+  let depth = 1
+  // Use a simple state machine — only look at <div ... > and </div>.
+  // Self-closing <div /> doesn't occur in rustdoc HTML.
+  while (pos < html.length && depth > 0) {
+    const nextOpen = html.indexOf('<div', pos)
+    const nextClose = html.indexOf('</div>', pos)
+    if (nextClose === -1) return null
+    if (nextOpen !== -1 && nextOpen < nextClose) {
+      depth++
+      const openEnd = html.indexOf('>', nextOpen)
+      if (openEnd === -1) return null
+      pos = openEnd + 1
+    } else {
+      depth--
+      pos = nextClose + '</div>'.length
+    }
+  }
+  return depth === 0 ? pos : null
+}
+
+/**
+ * Inject `panelHtml` into a rustdoc page.
+ *
+ *  - When `anchor` is "" (free fn / constant page), insert just after the
+ *    first </h1> in the body.
+ *  - When `anchor` is "method.X", find <section id="method.X" class="method">
+ *    and insert AFTER the function's docblock (so the rustdoc-native
+ *    description "Performs the + operation. Read more" appears between the
+ *    signature and our panel). Falls back to "after </section>" if no
+ *    docblock follows.
+ *
+ * Returns the modified HTML, or null if the anchor wasn't found.
+ */
+function injectPanel(html: string, anchor: string, panelHtml: string): string | null {
+  if (anchor === '') {
+    // Insert after the first </h1> in the body
+    const h1Re = /(<h1[^>]*>[\s\S]*?<\/h1>)/
+    const m = h1Re.exec(html)
+    if (!m) return null
+    const idx = m.index + m[0].length
+    return html.slice(0, idx) + '\n' + panelHtml + '\n' + html.slice(idx)
+  }
+
+  // Find the full <section id="ANCHOR" ...> ... </section>
+  const escAnchor = anchor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const sectionRe = new RegExp(
+    `<section\\s+id="${escAnchor}"[^>]*>[\\s\\S]*?<\\/section>`,
+    'm',
+  )
+  const m = sectionRe.exec(html)
+  if (!m) return null
+  const sectionEnd = m.index + m[0].length
+
+  // Prefer to inject AFTER the docblock that follows (so the rustdoc
+  // description appears between the signature and our panel).
+  const docEnd = findDocblockEnd(html, sectionEnd)
+  const insertAt = docEnd ?? sectionEnd
+  return html.slice(0, insertAt) + '\n' + panelHtml + '\n' + html.slice(insertAt)
+}
+
+/** Inject a <link> for the panel stylesheet into <head> if not already present. */
+function injectStylesheetLink(html: string, relCssPath: string): string {
+  if (html.includes(`href="${relCssPath}"`)) return html
+  return html.replace(
+    /(<\/head>)/,
+    `  <link rel="stylesheet" href="${relCssPath}">\n$1`,
+  )
+}
+
+/**
+ * Strip every <div class="lean-verification ...">...</div> previously
+ * injected into the page (matched by balanced <div> counting). Makes the
+ * post-processor idempotent: re-running it on an already-augmented HTML
+ * file replaces the panels instead of stacking new ones.
+ *
+ * `cargo rustdoc` is incremental and will skip rewriting HTML for files
+ * whose source didn't change, so stale panels persist across runs without
+ * this pass.
+ */
+function stripExistingPanels(html: string): string {
+  let out = html
+  const openRe = /<div\s+class="lean-verification[^"]*"[^>]*>/g
+  while (true) {
+    openRe.lastIndex = 0
+    const m = openRe.exec(out)
+    if (!m) break
+    const start = m.index
+    let pos = m.index + m[0].length
+    let depth = 1
+    while (pos < out.length && depth > 0) {
+      const nextOpen = out.indexOf('<div', pos)
+      const nextClose = out.indexOf('</div>', pos)
+      if (nextClose === -1) break
+      if (nextOpen !== -1 && nextOpen < nextClose) {
+        depth++
+        const openEnd = out.indexOf('>', nextOpen)
+        if (openEnd === -1) break
+        pos = openEnd + 1
+      } else {
+        depth--
+        pos = nextClose + '</div>'.length
+      }
+    }
+    if (depth !== 0) break  // malformed; bail out to avoid an infinite loop
+    // Also swallow the preceding/following lone newlines we inserted.
+    let cleanStart = start
+    let cleanEnd = pos
+    if (out[cleanStart - 1] === '\n') cleanStart--
+    if (out[cleanEnd] === '\n') cleanEnd++
+    out = out.slice(0, cleanStart) + out.slice(cleanEnd)
+  }
+  return out
+}
+
+/** How many `..` segments are needed to step from `htmlFile` up to rustdoc-root. */
+function relCssPathFor(htmlFile: string): string {
+  // htmlFile is something like 'curve25519_dalek/edwards/struct.X.html'.
+  const depth = htmlFile.split('/').length - 1
+  return depth > 0 ? '../'.repeat(depth) + 'lean-verification.css' : 'lean-verification.css'
+}
+
+// ---------- Main ----------
+
+interface Stats {
+  panelsInjected: number
+  filesModified: number
+  htmlNotFound: number
+  anchorNotFound: number
+  skippedHidden: number
+  noRustName: number
+  noSource: number
+  duplicatesMerged: number
+}
+
+/**
+ * Precedence for picking the "best" record when multiple functions.json
+ * entries map to the same rustdoc anchor. Higher = preferred.
+ */
+function statusRank(fn: FunctionRecord): number {
+  if (fn.fully_verified) return 5
+  if (fn.externally_verified) return 4
+  if (fn.verified) return 3
+  if (fn.specified) return 2
+  return 1
+}
+
+function main() {
+  const cfg = parseArgs()
+  const stats: Stats = {
+    panelsInjected: 0,
+    filesModified: 0,
+    htmlNotFound: 0,
+    anchorNotFound: 0,
+    skippedHidden: 0,
+    noRustName: 0,
+    noSource: 0,
+    duplicatesMerged: 0,
+  }
+
+  // Load functions.json
+  const fnsData = JSON.parse(fs.readFileSync(cfg.functionsJson, 'utf-8')) as {
+    functions: FunctionRecord[]
+  }
+
+  // Group function records by target HTML file. Each (file, anchor) tuple
+  // keeps only ONE record — the one with the highest status rank. This
+  // prevents multiple panels from stacking when several functions.json
+  // entries (e.g. Add<&T1> and Add<&T2>) map to the same rustdoc method
+  // anchor.
+  const bestByAnchor = new Map<string, { fn: FunctionRecord; target: RustdocTarget }>()
+
+  for (const fn of fnsData.functions) {
+    // We still want to show panels for `is_extraction_artifact`-flagged
+    // functions: those are real Rust functions Aeneas couldn't extract
+    // cleanly, and surfacing them as yellow/red is exactly the point.
+    if (!fn.is_relevant || fn.is_hidden || fn.is_ignored) {
+      stats.skippedHidden++
+      continue
+    }
+    if (!fn.rust_name) { stats.noRustName++; continue }
+    if (!fn.source)    { stats.noSource++;    continue }
+
+    const target = rustNameToRustdoc(fn.rust_name, fn.source)
+    if (!target) continue
+
+    const key = `${target.file}#${target.anchor}`
+    const prev = bestByAnchor.get(key)
+    if (!prev) {
+      bestByAnchor.set(key, { fn, target })
+    } else {
+      stats.duplicatesMerged++
+      if (statusRank(fn) > statusRank(prev.fn)) {
+        bestByAnchor.set(key, { fn, target })
+      }
+    }
+  }
+
+  // Build byFile from the deduped best-records.
+  const byFile = new Map<string, {
+    fn: FunctionRecord
+    target: RustdocTarget
+  }[]>()
+  for (const { fn, target } of bestByAnchor.values()) {
+    const arr = byFile.get(target.file) ?? []
+    arr.push({ fn, target })
+    byFile.set(target.file, arr)
+  }
+
+  // Write the CSS file once into rustdoc root.
+  const cssAbs = path.join(cfg.rustdocRoot, 'lean-verification.css')
+  fs.writeFileSync(cssAbs, PANEL_CSS, 'utf-8')
+
+  // Walk each file, inject all panels for it.
+  for (const [file, entries] of byFile) {
+    const abs = path.join(cfg.rustdocRoot, file)
+    if (!fs.existsSync(abs)) {
+      stats.htmlNotFound += entries.length
+      continue
+    }
+    const originalHtml = fs.readFileSync(abs, 'utf-8')
+    // Strip any panels already injected by a previous run, so this run is
+    // idempotent (cargo rustdoc is incremental and may not have rewritten
+    // this page even though we did).
+    let html = stripExistingPanels(originalHtml)
+    const before = html
+
+    // Sort entries: "top of page" (anchor === '') first so subsequent
+    // anchored injections aren't disturbed.
+    const sortedTop = entries.filter(e => e.target.anchor === '')
+    const sortedAnchored = entries.filter(e => e.target.anchor !== '')
+
+    for (const e of sortedTop) {
+      const panel = renderPanel(e.fn)
+      const next = injectPanel(html, e.target.anchor, panel)
+      if (next) {
+        html = next
+        stats.panelsInjected++
+      } else {
+        stats.anchorNotFound++
+      }
+    }
+    for (const e of sortedAnchored) {
+      const panel = renderPanel(e.fn)
+      const next = injectPanel(html, e.target.anchor, panel)
+      if (next) {
+        html = next
+        stats.panelsInjected++
+      } else {
+        stats.anchorNotFound++
+      }
+    }
+
+    // Write if either (a) we stripped old panels, or (b) we injected new ones.
+    if (html !== originalHtml) {
+      html = injectStylesheetLink(html, relCssPathFor(file))
+      fs.writeFileSync(abs, html, 'utf-8')
+      stats.filesModified++
+    }
+  }
+
+  console.log('[inject-lean-verification] done')
+  console.log(`  Panels injected:               ${stats.panelsInjected}`)
+  console.log(`  Files modified:                ${stats.filesModified}`)
+  console.log(`  Duplicates merged per anchor:  ${stats.duplicatesMerged}`)
+  console.log(`  Skipped (hidden/ignored):      ${stats.skippedHidden}`)
+  console.log(`  Anchor not found in HTML:      ${stats.anchorNotFound}`)
+  console.log(`  HTML file not found:           ${stats.htmlNotFound}`)
+  console.log(`  No rust_name:                  ${stats.noRustName}`)
+  console.log(`  No source path:                ${stats.noSource}`)
+}
+
+main()
