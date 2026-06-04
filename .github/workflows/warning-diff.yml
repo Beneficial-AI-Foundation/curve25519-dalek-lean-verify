@@ -9,8 +9,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
-  issues: write
 
 jobs:
   warning-diff:
@@ -36,8 +34,17 @@ jobs:
         id: diff
         run: node scripts/warning-diff.js ${{ github.event.pull_request.base.sha }} ${{ github.sha }}
 
-      - name: Post PR comment
+      - name: Save PR number
         if: steps.diff.outputs.has_diff == 'true'
-        uses: marocchino/sticky-pull-request-comment@v2
+        run: echo "${{ github.event.pull_request.number }}" > pr-number.txt
+
+      - name: Upload warning diff artifact
+        if: steps.diff.outputs.has_diff == 'true'
+        uses: actions/upload-artifact@v4
         with:
-          path: .warning-diff-comment.md
+          name: warning-diff-comment
+          path: |
+            .warning-diff-comment.md
+            pr-number.txt
+          if-no-files-found: ignore
+          retention-days: 1
