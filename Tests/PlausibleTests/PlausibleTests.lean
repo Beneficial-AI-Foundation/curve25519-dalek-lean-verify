@@ -1,5 +1,5 @@
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
-import Curve25519Dalek.Plausible
+import Curve25519Dalek.Funs
+import Curve25519Dalek.PlausibleDomain
 
 /-! # Plausible tests
 
@@ -27,14 +27,27 @@ The `Arbitrary`/`Shrinkable`/`SampleableExt` instances exist for every key type.
 
 -- Arbitrary instances exist for all primitive scalar types (unsigned and signed).
 #check (inferInstance : Arbitrary Std.U8)
+#check (inferInstance : Arbitrary Std.U16)
+#check (inferInstance : Arbitrary Std.U32)
 #check (inferInstance : Arbitrary Std.U64)
+#check (inferInstance : Arbitrary Std.Usize)
 #check (inferInstance : Arbitrary Std.I8)
 #check (inferInstance : Arbitrary Std.I16)
+#check (inferInstance : Arbitrary Std.I32)
 #check (inferInstance : Arbitrary Std.I64)
+#check (inferInstance : Arbitrary Std.Isize)
 
--- Shrinkable instances exist for signed integers.
+-- Shrinkable instances exist for every primitive scalar type.
+#check (inferInstance : Shrinkable Std.U8)
+#check (inferInstance : Shrinkable Std.U16)
+#check (inferInstance : Shrinkable Std.U32)
+#check (inferInstance : Shrinkable Std.U64)
+#check (inferInstance : Shrinkable Std.Usize)
 #check (inferInstance : Shrinkable Std.I8)
+#check (inferInstance : Shrinkable Std.I16)
+#check (inferInstance : Shrinkable Std.I32)
 #check (inferInstance : Shrinkable Std.I64)
+#check (inferInstance : Shrinkable Std.Isize)
 
 #check (inferInstance : SampleableExt edwards.affine.AffinePoint)
 #check (inferInstance : SampleableExt montgomery.ProjectivePoint)

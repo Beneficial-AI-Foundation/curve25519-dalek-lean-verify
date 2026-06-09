@@ -33,11 +33,10 @@ name = "Utils"
 # `defaultTargets`, so neither the dummy `@[step]` linter theorems nor the randomized
 # Plausible checks run on a normal `lake build` — keeping the test `@[step]` theorems out
 # of the production library and Aeneas's global `@[step]` database.  Run them explicitly
-# with `lake build Tests`. `globs` builds every `Tests.*` submodule directly (no
-# aggregator root module needed).
+# with `lake build Tests`.  The `Tests.lean` root module imports both submodules, so Lake
+# discovers the whole suite from it.
 [[lean_lib]]
 name = "Tests"
-globs = ["Tests.+"]
 
 [[lean_exe]]
 name = "listfuns"

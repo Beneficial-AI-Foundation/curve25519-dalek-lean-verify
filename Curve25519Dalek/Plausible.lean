@@ -1,18 +1,29 @@
--- Plausible property-based testing support for curve25519-dalek types.
---
--- Key findings from Aeneas source (used to guide instances below):
---   Std.U64  = UScalar .U64 = { bv : BitVec 64 }
---   Std.Array T n = { l : List T // l.length = n.val }
---   Construction: ⟨BitVec.ofNat 64 m⟩ for scalar types;
---                 Array.make / Array.repeat for array types.
---   WP.spec x p = theta x p, where theta dispatches on ok / fail / div.
-
 import Plausible
-import Curve25519Dalek.Funs
+import Aeneas
+-- Registers the `linter.mathlibStandardSet` set enabled in `lakefile.toml`; `import Aeneas`
+-- alone does not pull it in transitively.
+import Mathlib.Tactic.Linter
+
+/-! # Plausible property-based testing support for generic Aeneas types
+
+This file provides the *generic*, project-independent `Plausible` infrastructure for
+Aeneas-extracted code: `Arbitrary`/`Shrinkable`/`Repr` instances for the primitive
+scalar types (`Std.U8/…/Usize` and `Std.I8/…/Isize`), the fixed-length
+`Aeneas.Std.Array T n`, decidability of bounded universal quantifiers, and a
+`Decidable` instance for `WP.spec`. None of it depends on curve25519-dalek, so it can be
+reviewed in isolation and eventually upstreamed to Aeneas. Project-specific domain
+instances live in `Curve25519Dalek.PlausibleDomain`, which imports this file.
+
+Key findings from Aeneas source (used to guide the instances below):
+  `Std.U64`  = `UScalar .U64` = `{ bv : BitVec 64 }`
+  `Std.Array T n` = `{ l : List T // l.length = n.val }`
+  Scalar bounds are provided as `irreducible_def`s: `UScalar.max`, `IScalar.min`,
+  `IScalar.max` (`Aeneas/Std/Scalar/Core.lean`); using them keeps the generators in
+  step with Aeneas should those definitions ever change.
+  `WP.spec x p = theta x p`, where `theta` dispatches on `ok` / `fail` / `div`. -/
 
 open Plausible Arbitrary
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-open curve25519_dalek
 
 /-! ## Primitive scalar types
 
@@ -24,18 +35,17 @@ call site — values from `Gen.choose` are already in range.
 private def mkUScalar {ty : UScalarTy} (m : Nat) : UScalar ty :=
   { bv := BitVec.ofNat _ m }
 
--- Generate a UScalar with edge-case bias toward 0 and the max value.
-private def genUScalarN (ty : UScalarTy) : Gen (UScalar ty) := do
-  let max := 2 ^ ty.numBits - 1
-  let rand := do let ⟨v, _⟩ ← Gen.choose Nat 0 max (Nat.zero_le _); pure v
-  let m ← Gen.frequency rand [(90, rand), (5, pure 0), (5, pure max)]
+-- Uniformly sample a `UScalar` from `[0, UScalar.max ty]` (`UScalar.max` is the same
+-- bound Aeneas uses to define the type, so this tracks any future change there).
+private def genUScalar (ty : UScalarTy) : Gen (UScalar ty) := do
+  let ⟨m, _⟩ ← Gen.choose Nat 0 (UScalar.max ty) (Nat.zero_le _)
   return mkUScalar m
 
-instance : Arbitrary Std.U8    where arbitrary := genUScalarN .U8
-instance : Arbitrary Std.U16   where arbitrary := genUScalarN .U16
-instance : Arbitrary Std.U32   where arbitrary := genUScalarN .U32
-instance : Arbitrary Std.U64   where arbitrary := genUScalarN .U64
-instance : Arbitrary Std.Usize where arbitrary := genUScalarN .Usize
+instance : Arbitrary Std.U8    where arbitrary := genUScalar .U8
+instance : Arbitrary Std.U16   where arbitrary := genUScalar .U16
+instance : Arbitrary Std.U32   where arbitrary := genUScalar .U32
+instance : Arbitrary Std.U64   where arbitrary := genUScalar .U64
+instance : Arbitrary Std.Usize where arbitrary := genUScalar .Usize
 
 -- Shrink by halving the underlying Nat toward 0, then re-wrapping.
 instance : Shrinkable Std.U8    where shrink u := Nat.shrink u.val |>.map mkUScalar
@@ -47,70 +57,56 @@ instance : Shrinkable Std.Usize where shrink u := Nat.shrink u.val |>.map mkUSca
 /-! ## Signed scalar types
 
 `Std.I8/I16/I32/I64/Isize` are all `IScalar ty = { bv : BitVec ty.numBits }`.
-Signed integers use two's complement representation with range [-2^(N-1), 2^(N-1)-1].
-`BitVec.ofInt` handles the conversion. Shrinking moves toward 0 from both
-positive and negative values by halving the absolute value and preserving sign. -/
+Signed integers use two's complement representation with range `[-2^(N-1), 2^(N-1)-1]`.
+`BitVec.ofInt` handles the conversion. A single parametric generator covers all five
+types, drawing the bounds from `IScalar.min`/`IScalar.max` (the very definitions Aeneas
+uses, so `Isize` automatically gets the platform-correct 64-bit range). -/
 
 private def mkIScalar {ty : IScalarTy} (m : Int) : IScalar ty :=
   { bv := BitVec.ofInt _ m }
 
--- Shrink an Int toward 0 by halving the absolute value and preserving sign.
+-- Shrink an Int toward 0. Each step offers both the next value one closer to 0
+-- (`n - 1` / `n + 1`) — so Plausible can walk to the exact boundary of a violated
+-- bound — and the halved value, for fast convergence from large magnitudes.
 private def shrinkInt (n : Int) : List Int :=
   if n = 0 then []
   else if n > 0 then
-    (Nat.shrink n.natAbs).map Int.ofNat
+    (n - 1) :: (Nat.shrink n.natAbs).map Int.ofNat
   else
-    (Nat.shrink n.natAbs).map fun m => -(Int.ofNat m)
+    (n + 1) :: (Nat.shrink n.natAbs).map fun m => -(Int.ofNat m)
 
--- Generate an IScalar with edge-case bias toward 0, min, and max values.
--- We use concrete bounds for each type to avoid proof obligations.
-private def genI8 : Gen Std.I8 := do
-  let min : Int := -128
-  let max : Int := 127
-  let rand := do let ⟨v, _⟩ ← Gen.choose Int min max (by decide); pure v
-  let m ← Gen.frequency rand [(85, rand), (5, pure 0), (5, pure min), (5, pure max)]
+-- Uniformly sample an `IScalar` from `[IScalar.min ty, IScalar.max ty]`.
+private def genIScalar (ty : IScalarTy) : Gen (IScalar ty) := do
+  -- `IScalar.min ty = -2^(numBits-1)` and `IScalar.max ty = 2^(numBits-1) - 1`, so the
+  -- range is always nonempty (`min ≤ 0 ≤ max`); `Isize` gets the platform-correct bounds.
+  let h : IScalar.min ty ≤ IScalar.max ty := by
+    simp only [IScalar.min, IScalar.max]
+    have : (0 : Int) < 2 ^ (ty.numBits - 1) := by positivity
+    omega
+  let ⟨m, _⟩ ← Gen.choose Int (IScalar.min ty) (IScalar.max ty) h
   return mkIScalar m
 
-private def genI16 : Gen Std.I16 := do
-  let min : Int := -32768
-  let max : Int := 32767
-  let rand := do let ⟨v, _⟩ ← Gen.choose Int min max (by decide); pure v
-  let m ← Gen.frequency rand [(85, rand), (5, pure 0), (5, pure min), (5, pure max)]
-  return mkIScalar m
+instance : Arbitrary Std.I8    where arbitrary := genIScalar .I8
+instance : Arbitrary Std.I16   where arbitrary := genIScalar .I16
+instance : Arbitrary Std.I32   where arbitrary := genIScalar .I32
+instance : Arbitrary Std.I64   where arbitrary := genIScalar .I64
+instance : Arbitrary Std.Isize where arbitrary := genIScalar .Isize
 
-private def genI32 : Gen Std.I32 := do
-  let min : Int := -2147483648
-  let max : Int := 2147483647
-  let rand := do let ⟨v, _⟩ ← Gen.choose Int min max (by decide); pure v
-  let m ← Gen.frequency rand [(85, rand), (5, pure 0), (5, pure min), (5, pure max)]
-  return mkIScalar m
-
-private def genI64 : Gen Std.I64 := do
-  let min : Int := -9223372036854775808
-  let max : Int := 9223372036854775807
-  let rand := do let ⟨v, _⟩ ← Gen.choose Int min max (by decide); pure v
-  let m ← Gen.frequency rand [(85, rand), (5, pure 0), (5, pure min), (5, pure max)]
-  return mkIScalar m
-
-private def genIsize : Gen Std.Isize := do
-  let min : Int := -9223372036854775808
-  let max : Int := 9223372036854775807
-  let rand := do let ⟨v, _⟩ ← Gen.choose Int min max (by decide); pure v
-  let m ← Gen.frequency rand [(85, rand), (5, pure 0), (5, pure min), (5, pure max)]
-  return mkIScalar m
-
-instance : Arbitrary Std.I8    where arbitrary := genI8
-instance : Arbitrary Std.I16   where arbitrary := genI16
-instance : Arbitrary Std.I32   where arbitrary := genI32
-instance : Arbitrary Std.I64   where arbitrary := genI64
-instance : Arbitrary Std.Isize where arbitrary := genIsize
-
--- Shrink by halving toward 0, working with the signed interpretation.
+-- Shrink by stepping toward 0, working with the signed interpretation.
 instance : Shrinkable Std.I8    where shrink i := shrinkInt i.val |>.map mkIScalar
 instance : Shrinkable Std.I16   where shrink i := shrinkInt i.val |>.map mkIScalar
 instance : Shrinkable Std.I32   where shrink i := shrinkInt i.val |>.map mkIScalar
 instance : Shrinkable Std.I64   where shrink i := shrinkInt i.val |>.map mkIScalar
 instance : Shrinkable Std.Isize where shrink i := shrinkInt i.val |>.map mkIScalar
+
+-- Aeneas derives `Repr (IScalar ty)` from the structure, which prints the raw bitvector
+-- (`{ bv := 0x01ff#16 }`). Override with the human-readable signed value so reported
+-- counter-examples show `511` rather than the two's-complement encoding.
+instance : Repr Std.I8    where reprPrec i prec := reprPrec i.val prec
+instance : Repr Std.I16   where reprPrec i prec := reprPrec i.val prec
+instance : Repr Std.I32   where reprPrec i prec := reprPrec i.val prec
+instance : Repr Std.I64   where reprPrec i prec := reprPrec i.val prec
+instance : Repr Std.Isize where reprPrec i prec := reprPrec i.val prec
 
 /-! ## Generic `Aeneas.Std.Array T n` instance
 
@@ -153,172 +149,6 @@ instance {T : Type} {n : Usize} [Repr T] :
 -- Lean's generic subtype instance doesn't fire. Bridge explicitly.
 instance {T : Type} {n : Usize} [DecidableEq T] : DecidableEq (Aeneas.Std.Array T n) :=
   fun a b => decidable_of_iff (a.val = b.val) Subtype.ext_iff.symm
-
-/-! ## Bounded `Array U64 5` sampling for subtype preconditions
-
-Plausible's `subtypeVarTestable` instance (priority 2000) handles propositions of
-the shape `∀ (a : α), p a → Q a` by sampling `a` from `{ a : α // p a }` directly,
-rather than generating `a` freely and then filtering.  This eliminates the
-vacuous-success problem for hypotheses like `ha : ∀ i < 5, a[i]!.val < 2^53`,
-which are satisfied by only ≈ 1/2^110 of unconstrained arrays.
-
-The required `Repr` and `Shrinkable` pieces come for free:
-• `Repr` — Lean 4's built-in `Repr (Subtype p)` delegates to `Repr (Array U64 5)`.
-• `Shrinkable` — Plausible's `Subtype.shrinkable` shrinks the inner array and
-  filters candidates via the decidable predicate.
-• `SampleableExt` — `SampleableExt.selfContained` assembles the above three.
-
-The only piece we must supply is `Arbitrary`. -/
-
--- Like `genListN` but driven by an explicit element generator.
-private def genListNWith {T : Type} (g : Gen T) :
-    (n : Nat) → Gen {l : List T // l.length = n}
-  | 0     => pure ⟨[], rfl⟩
-  | n + 1 => do
-    let x      ← g
-    let ⟨xs, h⟩ ← genListNWith g n
-    return ⟨x :: xs, by simp [h]⟩
-
--- Single U64 limb uniformly sampled from [0, bound − 1]; falls back to 0 for bound = 0.
-private def genBoundedLimb (bound : Nat) : Gen U64 := do
-  let max := if 0 < bound then bound - 1 else 0
-  let rand := do let ⟨v, _⟩ ← Gen.choose Nat 0 max (Nat.zero_le _); pure v
-  let m ← Gen.frequency rand [(90, rand), (5, pure 0), (5, pure max)]
-  return mkUScalar m
-
--- `Array U64 5` with every limb < bound.
-private def genBoundedFEArr (bound : Nat) : Gen (Array U64 5#usize) := do
-  let ⟨elems, h⟩ ← genListNWith (genBoundedLimb bound) 5
-  return Array.make 5#usize elems h
-
-/-- `Arbitrary` for `{ a : Array U64 5 // ∀ i < 5, a[i]!.val < bound }`.
-
-`genBoundedFEArr` keeps every limb in `[0, bound − 1]`, so the runtime decidability
-check always succeeds for `bound > 0`.  For `bound = 0` the subtype is empty and
-`throw` causes Plausible to report "gave up", which is the correct outcome. -/
-instance (bound : Nat) :
-    Arbitrary { a : Array U64 5#usize // ∀ i < 5, a[i]!.val < bound } where
-  arbitrary := do
-    let arr ← genBoundedFEArr bound
-    if h : ∀ i < 5, arr[i]!.val < bound then
-      pure ⟨arr, h⟩
-    else
-      throw (.genError s!"bounded-limb generator produced a limb ≥ {bound}")
-
-/-! ## Domain types
-
-`@[reducible]` def aliases (`FieldElement51`, `Scalar52`, `CompressedEdwardsY`,
-`MontgomeryPoint`, `CompressedRistretto`, `RistrettoPoint`) inherit all instances from
-the array/EdwardsPoint instances above via typeclass unfolding — no explicit delegation needed.
-
-Explicit instances are required for each concrete `structure`. -/
-
--- scalar.Scalar { bytes : Array U8 32 }
-instance : Arbitrary scalar.Scalar where
-  arbitrary := do return { bytes := ← arbitrary }
-
-instance : Shrinkable scalar.Scalar where
-  shrink s := (Shrinkable.shrink s.bytes).map fun b => { bytes := b }
-
-instance : Repr scalar.Scalar where
-  reprPrec s prec := reprPrec s.bytes prec
-
--- edwards.EdwardsPoint { X Y Z T : FieldElement51 }
-instance : Arbitrary edwards.EdwardsPoint where
-  arbitrary := do
-    return { X := ← arbitrary, Y := ← arbitrary, Z := ← arbitrary, T := ← arbitrary }
-
-instance : Shrinkable edwards.EdwardsPoint where
-  shrink p :=
-    (Shrinkable.shrink p.X).map (fun x => { p with X := x }) ++
-    (Shrinkable.shrink p.Y).map (fun y => { p with Y := y }) ++
-    (Shrinkable.shrink p.Z).map (fun z => { p with Z := z }) ++
-    (Shrinkable.shrink p.T).map (fun t => { p with T := t })
-
-instance : Repr edwards.EdwardsPoint where
-  reprPrec p prec := reprPrec (p.X, p.Y, p.Z, p.T) prec
-
--- edwards.affine.AffinePoint { x y : FieldElement51 }
-instance : Arbitrary edwards.affine.AffinePoint where
-  arbitrary := do return { x := ← arbitrary, y := ← arbitrary }
-
-instance : Shrinkable edwards.affine.AffinePoint where
-  shrink p :=
-    (Shrinkable.shrink p.x).map (fun x => { p with x := x }) ++
-    (Shrinkable.shrink p.y).map (fun y => { p with y := y })
-
-instance : Repr edwards.affine.AffinePoint where
-  reprPrec p prec := reprPrec (p.x, p.y) prec
-
--- montgomery.ProjectivePoint { U W : FieldElement51 }
-instance : Arbitrary montgomery.ProjectivePoint where
-  arbitrary := do return { U := ← arbitrary, W := ← arbitrary }
-
-instance : Shrinkable montgomery.ProjectivePoint where
-  shrink p :=
-    (Shrinkable.shrink p.U).map (fun u => { p with U := u }) ++
-    (Shrinkable.shrink p.W).map (fun w => { p with W := w })
-
-instance : Repr montgomery.ProjectivePoint where
-  reprPrec p prec := reprPrec (p.U, p.W) prec
-
--- backend.serial.curve_models.ProjectivePoint { X Y Z : FieldElement51 }
-instance : Arbitrary backend.serial.curve_models.ProjectivePoint where
-  arbitrary := do return { X := ← arbitrary, Y := ← arbitrary, Z := ← arbitrary }
-
-instance : Shrinkable backend.serial.curve_models.ProjectivePoint where
-  shrink p :=
-    (Shrinkable.shrink p.X).map (fun x => { p with X := x }) ++
-    (Shrinkable.shrink p.Y).map (fun y => { p with Y := y }) ++
-    (Shrinkable.shrink p.Z).map (fun z => { p with Z := z })
-
-instance : Repr backend.serial.curve_models.ProjectivePoint where
-  reprPrec p prec := reprPrec (p.X, p.Y, p.Z) prec
-
--- backend.serial.curve_models.ProjectiveNielsPoint { Y_plus_X Y_minus_X Z T2d : FieldElement51 }
-instance : Arbitrary backend.serial.curve_models.ProjectiveNielsPoint where
-  arbitrary := do
-    return { Y_plus_X := ← arbitrary, Y_minus_X := ← arbitrary,
-             Z        := ← arbitrary, T2d       := ← arbitrary }
-
-instance : Shrinkable backend.serial.curve_models.ProjectiveNielsPoint where
-  shrink p :=
-    (Shrinkable.shrink p.Y_plus_X).map  (fun x => { p with Y_plus_X  := x }) ++
-    (Shrinkable.shrink p.Y_minus_X).map (fun x => { p with Y_minus_X := x }) ++
-    (Shrinkable.shrink p.Z).map         (fun z => { p with Z         := z }) ++
-    (Shrinkable.shrink p.T2d).map       (fun t => { p with T2d       := t })
-
-instance : Repr backend.serial.curve_models.ProjectiveNielsPoint where
-  reprPrec p prec := reprPrec (p.Y_plus_X, p.Y_minus_X, p.Z, p.T2d) prec
-
--- backend.serial.curve_models.AffineNielsPoint { y_plus_x y_minus_x xy2d : FieldElement51 }
-instance : Arbitrary backend.serial.curve_models.AffineNielsPoint where
-  arbitrary := do
-    return { y_plus_x := ← arbitrary, y_minus_x := ← arbitrary, xy2d := ← arbitrary }
-
-instance : Shrinkable backend.serial.curve_models.AffineNielsPoint where
-  shrink p :=
-    (Shrinkable.shrink p.y_plus_x).map  (fun x => { p with y_plus_x  := x }) ++
-    (Shrinkable.shrink p.y_minus_x).map (fun x => { p with y_minus_x := x }) ++
-    (Shrinkable.shrink p.xy2d).map      (fun d => { p with xy2d      := d })
-
-instance : Repr backend.serial.curve_models.AffineNielsPoint where
-  reprPrec p prec := reprPrec (p.y_plus_x, p.y_minus_x, p.xy2d) prec
-
--- backend.serial.curve_models.CompletedPoint { X Y Z T : FieldElement51 }
-instance : Arbitrary backend.serial.curve_models.CompletedPoint where
-  arbitrary := do
-    return { X := ← arbitrary, Y := ← arbitrary, Z := ← arbitrary, T := ← arbitrary }
-
-instance : Shrinkable backend.serial.curve_models.CompletedPoint where
-  shrink p :=
-    (Shrinkable.shrink p.X).map (fun x => { p with X := x }) ++
-    (Shrinkable.shrink p.Y).map (fun y => { p with Y := y }) ++
-    (Shrinkable.shrink p.Z).map (fun z => { p with Z := z }) ++
-    (Shrinkable.shrink p.T).map (fun t => { p with T := t })
-
-instance : Repr backend.serial.curve_models.CompletedPoint where
-  reprPrec p prec := reprPrec (p.X, p.Y, p.Z, p.T) prec
 
 /-! ## Decidable bounded universal quantification
 
@@ -395,8 +225,5 @@ silently stop firing (no error) and search falls back to sampling. -/
 
 instance {α : Type*} {x : Result α} {p : Post α} [∀ a, Decidable (p a)] :
     Decidable (WP.spec x p) := by
-  unfold WP.spec theta
-  split
-  · unfold wp_return; infer_instance
-  · infer_instance
-  · infer_instance
+  unfold WP.spec theta wp_return
+  split <;> infer_instance

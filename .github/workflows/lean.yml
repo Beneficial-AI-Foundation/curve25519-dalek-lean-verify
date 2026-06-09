@@ -9,6 +9,8 @@ on:
     paths:
       - 'Curve25519Dalek/**'
       - 'Utils/**'
+      - 'Tests/**'
+      - 'Tests.lean'
       - 'lakefile.toml'
       - 'lean-toolchain'
       - '.github/workflows/lean.yml'
@@ -50,7 +52,7 @@ jobs:
           path: |
             .lake
             build
-          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('Curve25519Dalek/**/*.lean', 'Utils/**/*.lean') }}
+          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('Curve25519Dalek/**/*.lean', 'Utils/**/*.lean', 'Tests/**/*.lean', 'Tests.lean') }}
           restore-keys: |
             ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-
             ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-
@@ -61,6 +63,12 @@ jobs:
 
       - name: Build Lean project
         run: lake build
+
+      - name: Build Tests library
+        # `Tests` is excluded from `defaultTargets`, so `lake build` above does not
+        # compile the linter tests or the Plausible tests. Build it explicitly so a
+        # broken test build fails CI.
+        run: lake build Tests
 
       - name: Check functions.json and status.csv are up to date
         run: |
