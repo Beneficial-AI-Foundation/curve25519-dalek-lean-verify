@@ -33,7 +33,7 @@ call site — values from `Gen.choose` are already in range.
 `Nat.shrink` halves toward 0, giving a proper shrink sequence (not just `[]`). -/
 
 private def mkUScalar {ty : UScalarTy} (m : Nat) : UScalar ty :=
-  { bv := BitVec.ofNat _ m }
+  .mk (BitVec.ofNat _ m)
 
 -- Uniformly sample a `UScalar` from `[0, UScalar.max ty]` (`UScalar.max` is the same
 -- bound Aeneas uses to define the type, so this tracks any future change there).
@@ -63,7 +63,7 @@ types, drawing the bounds from `IScalar.min`/`IScalar.max` (the very definitions
 uses, so `Isize` automatically gets the platform-correct 64-bit range). -/
 
 private def mkIScalar {ty : IScalarTy} (m : Int) : IScalar ty :=
-  { bv := BitVec.ofInt _ m }
+  .mk (BitVec.ofInt _ m)
 
 -- Shrink an Int toward 0. Each step offers both the next value one closer to 0
 -- (`n - 1` / `n + 1`) — so Plausible can walk to the exact boundary of a violated
