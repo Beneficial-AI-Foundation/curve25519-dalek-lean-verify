@@ -66,23 +66,66 @@ The `Arbitrary`/`Shrinkable`/`SampleableExt` instances exist for every key type.
 /-! ## Signed-integer instances
 
 Sanity checks that the `Arbitrary`/`Shrinkable` instances for the signed scalar types
-(`I8`/`I16`/`I32`/`I64`/`Isize`) generate in-range values and that arrays of them work. -/
+(`I8`/`I16`/`I32`/`I64`/`Isize`) generate in-range values and that arrays of them work.
 
-example : ∀ (x : I8), x.val ≥ -128 ∧ x.val ≤ 127 := by
+`plausible` closes a goal it cannot refute like `admit`, leaving a `sorry` in the term (hence
+the captured `declaration uses sorry` warning). Each test is wrapped in `#guard_msgs`, which
+both consumes that warning — so it does not leak into the build log — and asserts that no
+counter-example is found. If a generator ever produced an out-of-range value, `plausible` would
+report a counter-example instead, the captured message would change, and `#guard_msgs` would
+fail the build, flagging the range error. -/
+
+/--
+info: Unable to find a counter-example
+---
+warning: declaration uses `sorry`
+-/
+#guard_msgs in
+example : ∀ (x : I8), x.val ≥ -128 ∧ x.val ≤ 256 := by
   plausible (config := { numInst := 100 })
 
+/--
+info: Unable to find a counter-example
+---
+warning: declaration uses `sorry`
+-/
+#guard_msgs in
 example : ∀ (x : I16), x.val ≥ -32768 ∧ x.val ≤ 32767 := by
   plausible (config := { numInst := 100 })
 
+/--
+info: Unable to find a counter-example
+---
+warning: declaration uses `sorry`
+-/
+#guard_msgs in
 example : ∀ (x : I64), x.val ≥ -9223372036854775808 := by
   plausible (config := { numInst := 100 })
 
 -- Arrays of signed integers generate at the requested length.
+/--
+info: Unable to find a counter-example
+---
+warning: declaration uses `sorry`
+-/
+#guard_msgs in
 example : ∀ (arr : Array I8 5#usize), arr.val.length = 5 := by
   plausible (config := { numInst := 100 })
 
+/--
+info: Unable to find a counter-example
+---
+warning: declaration uses `sorry`
+-/
+#guard_msgs in
 example : ∀ (x : I32), x.val ≥ -2147483648 ∧ x.val ≤ 2147483647 := by
   plausible (config := { numInst := 100 })
 
+/--
+info: Unable to find a counter-example
+---
+warning: declaration uses `sorry`
+-/
+#guard_msgs in
 example : ∀ (x : Isize), x.val ≥ -9223372036854775808 := by
   plausible (config := { numInst := 100 })
