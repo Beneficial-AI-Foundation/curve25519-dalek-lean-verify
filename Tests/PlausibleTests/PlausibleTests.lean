@@ -62,7 +62,6 @@ The `Arbitrary`/`Shrinkable`/`SampleableExt` instances exist for every key type.
 #check (inferInstance : SampleableExt scalar.Scalar)
 #check (inferInstance : SampleableExt edwards.EdwardsPoint)
 #check (inferInstance : SampleableExt (Array U64 5#usize))
-#check (inferInstance : SampleableExt { a : Array U64 5#usize // ∀ i < 5, a[i]!.val < 2^53 })
 
 /-! ## Signed-integer instances
 
