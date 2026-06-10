@@ -176,48 +176,6 @@ instance {n : Nat} {P : Nat → Prop} [DecidablePred P] :
   decidable_of_iff (∀ i : Fin n, P i.val)
     ⟨fun h i hi => h ⟨i, hi⟩, fun h i => h i.val i.isLt⟩
 
-/-! ### Coverage, gaps, and how to extend
-
-The three instances above fire only for this exact shape: a **universal**
-quantifier over **`Nat`** whose **leading** guard is a strict `i < n` (`n` any
-`Nat` term), with a **`DecidablePred` body**. This is complete and cost-optimal
-for the dominant `∀ i < n, <decidable Nat body>` pattern — it enumerates exactly
-`n` cases. A `≤` or `≠` *inside* the body, or as a *later* guard after a leading
-`i < n`, is already fine: it is just part of the decidable `Q`.
-
-`Fin`-typed universals (`∀ i : Fin n, P i`) need **no** instance here — Mathlib's
-`Fintype.decidableForallFintype` decides them whenever the body is
-`DecidablePred`. For those the quantifier is never the issue; usefulness depends
-on (1) the body being decidable *and computable* — a `noncomputable` `Decidable`
-instance like `MontgomeryPoint.IsValid` cannot be evaluated — and (2) whether
-free inputs must be generated under preconditions random sampling cannot satisfy.
-
-Known gaps, in rough order of how often they occur in `Specs`; add an instance
-when a spec needs it:
-
-1. Lower bound before upper bound — `∀ j, lo ≤ j → j < hi → Q j`
-   (`Scalar/Scalar/AsRadix16.lean`, `BatchInvert.lean`). Leading guard is `≤`, so
-   nothing fires and the `Nat` domain is unbounded → not decidable. Fix: add
-   `decidable_of_iff (∀ j : Fin hi, lo ≤ j.val → Q j.val)` in NamedBinder + plain
-   forms.
-2. Pure `≤` bound — `∀ i ≤ n, P i`. Fix: an instance enumerating `Fin (n+1)`.
-3. Unbounded disequality guard — `∀ k, k ≠ j → …` (`Scalar/ReadLeU64Into.lean`)
-   ranges over all of `ℕ` → undecidable. Spec smell; bound it (`∀ k < SIZE, …`).
-4. `USize`/`UInt64` bound — `∀ k : USize, k < n → P k` is `Fintype`-decidable but
-   enumerates 2⁶⁴. Fix: an instance restricting to the `< n` window.
-5. Bounded existentials — `∃ i < n, …` has no instance
-   (`decidable_of_iff (∃ i : Fin n, …)`).
-
-Out of scope (no instance helps): bodies over `ℝ`/`ℚ`; `noncomputable`-decidable
-predicates; and specs whose preconditions pin one generated input to a
-measure-zero set relative to another (`Window/LookupTable/From.lean`) — the
-guards are decidable but random generation essentially never satisfies them, so
-test those with hand-built witnesses.
-
-Meta-risk: these instances match the *exact* `NamedBinder s (i < n → Q i)` shape
-Plausible emits. A Plausible upgrade that changes that wrapping makes them
-silently stop firing (no error) and search falls back to sampling. -/
-
 /-! ## `WP.spec` Decidable instance
 
 `WP.spec x p = theta x p`.  `theta` pattern-matches on `Result`: `ok x` reduces to
@@ -227,3 +185,18 @@ instance {α : Type*} {x : Result α} {p : Post α} [∀ a, Decidable (p a)] :
     Decidable (WP.spec x p) := by
   unfold WP.spec theta wp_return
   split <;> infer_instance
+
+/-! ## TODO
+
+**Bound-aware scalar sampling.** Many specs guard a `U64` (or other wide scalar)
+input by a precondition far tighter than the type, e.g. `i : U64, i < 2^52 → P i`
+(field-element limbs are 52-bit; `2^52 ≪ 2^64`). The `Arbitrary Std.U64` instance
+above samples uniformly over the full `[0, 2^64)` range, so `i < 2^52` holds only
+about `2^-12` of the time. Plausible then spends ~99.98 % of its budget on inputs
+that satisfy the guard *vacuously* (`i ≥ 2^52` makes `i < 2^52 → P i` trivially
+true) and essentially never reaches `P i` — the property goes untested while the
+run still reports "passed".
+
+Fix: when a hypothesis has the shape `i < bound → P i` with `bound` below the
+type's max, infer `i` from `[0, bound)` directly instead of from the full type.
+-/
