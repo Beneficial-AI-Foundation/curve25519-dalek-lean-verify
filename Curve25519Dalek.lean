@@ -13,6 +13,8 @@ import Curve25519Dalek.Math.Montgomery.Curve
 import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Math.PrimeCerts
 import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Plausible
+import Curve25519Dalek.PlausibleDomain
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.AssertReceiverIsTotalEq
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.ConditionalAssign

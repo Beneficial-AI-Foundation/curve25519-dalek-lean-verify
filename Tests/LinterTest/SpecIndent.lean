@@ -13,10 +13,11 @@ Tests for the four indentation checks.  The first three checks fire only on `@[s
 theorems; the proof-body (Check 4) rule fires on every theorem.  Each `#guard_msgs` block
 targets exactly one violation so the expected-output annotation stays minimal.
 
-These tests live in the standalone `LinterTest` Lake library rather than in the
-`Curve25519Dalek` library, so the dummy theorems below (and their `@[step]` registrations)
-never leak into the production library or its public namespace.  They are additionally
-wrapped in the `Curve25519Dalek.Lint.Test` namespace as a second line of defence.
+These tests live in the `Tests` Lake library (module `Tests.LinterTest.SpecIndent`) rather
+than in the `Curve25519Dalek` library, so the dummy theorems below (and their `@[step]`
+registrations) never leak into the production library or its public namespace.  They are
+additionally wrapped in the `Curve25519Dalek.Lint.Test` namespace as a second line of
+defence.
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

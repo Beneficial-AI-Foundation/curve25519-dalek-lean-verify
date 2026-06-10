@@ -25,15 +25,18 @@ rev = "15fd61770c9a893af0f5cb7893ea98b7d0bf8d52"
 [[lean_lib]]
 name = "Curve25519Dalek"
 
-# Standalone library holding the project-linter `#guard_msgs` tests.  Kept separate from
-# `Curve25519Dalek` so the dummy `@[step]` test theorems never become public declarations
-# of the production library (nor leak into Aeneas's global `@[step]` database via it).
-# It is a default target so `lake build` still compiles and checks the tests.
-[[lean_lib]]
-name = "LinterTest"
-
 [[lean_lib]]
 name = "Utils"
+
+# Test suites: the project-linter `#guard_msgs` tests (`Tests.LinterTest.*`) and the
+# property-based Plausible tests (`Tests.PlausibleTests.*`).  Deliberately NOT in
+# `defaultTargets`, so neither the dummy `@[step]` linter theorems nor the randomized
+# Plausible checks run on a normal `lake build` — keeping the test `@[step]` theorems out
+# of the production library and Aeneas's global `@[step]` database.  Run them explicitly
+# with `lake build Tests`.  The `Tests.lean` root module imports both submodules, so Lake
+# discovers the whole suite from it.
+[[lean_lib]]
+name = "Tests"
 
 [[lean_exe]]
 name = "listfuns"
