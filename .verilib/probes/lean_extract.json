@@ -1,12 +1,12 @@
 {"tool": {"version": "0.6.2", "name": "probe-lean", "command": "extract"},
- "timestamp": "2026-05-22T14:37:02Z",
+ "timestamp": "2026-06-29T09:55:45Z",
  "source":
  {"repo":
   "https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify.git",
   "package-version": "0.1.0",
   "package": "Curve25519Dalek",
   "language": "lean",
-  "commit": "a70e109ca051cba55a2143ee8e9cb1b581470ae1"},
+  "commit": "b9fae801a9e47ac522ea6455a28b78e1d1e1fda5"},
  "schema-version": "2.0",
  "schema": "probe-lean/extract",
  "data":
@@ -24,7 +24,7 @@
    "is-extraction-artifact": false,
    "display-name": "u8_val_mod_u64_numBits",
    "dependencies": [],
-   "code-text": {"lines-start": 395, "lines-end": 397},
+   "code-text": {"lines-start": 396, "lines-end": 398},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:u8_mul_pow_mod_u64":
@@ -41,7 +41,7 @@
    "is-extraction-artifact": false,
    "display-name": "u8_mul_pow_mod_u64",
    "dependencies": [],
-   "code-text": {"lines-start": 399, "lines-end": 401},
+   "code-text": {"lines-start": 400, "lines-end": 402},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:u8_mul_pow_lt_u64_size":
@@ -58,7 +58,7 @@
    "is-extraction-artifact": false,
    "display-name": "u8_mul_pow_lt_u64_size",
    "dependencies": [],
-   "code-text": {"lines-start": 389, "lines-end": 393},
+   "code-text": {"lines-start": 390, "lines-end": 394},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:tacticExpand_With_":
@@ -109,7 +109,7 @@
    "is-extraction-artifact": false,
    "display-name": "pointwise_add_Field51_as_Nat",
    "dependencies": ["probe:Field51_as_Nat"],
-   "code-text": {"lines-start": 420, "lines-end": 434},
+   "code-text": {"lines-start": 421, "lines-end": 435},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:p":
@@ -497,7 +497,7 @@
    "is-extraction-artifact": false,
    "display-name": "or_split_at",
    "dependencies": [],
-   "code-text": {"lines-start": 367, "lines-end": 382},
+   "code-text": {"lines-start": 368, "lines-end": 383},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:or_mul_pow_two_eq_add":
@@ -514,7 +514,7 @@
    "is-extraction-artifact": false,
    "display-name": "or_mul_pow_two_eq_add",
    "dependencies": [],
-   "code-text": {"lines-start": 331, "lines-end": 358},
+   "code-text": {"lines-start": 332, "lines-end": 359},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:or_bytes_eq_sum":
@@ -531,7 +531,7 @@
    "is-extraction-artifact": false,
    "display-name": "or_bytes_eq_sum",
    "dependencies": [],
-   "code-text": {"lines-start": 403, "lines-end": 412},
+   "code-text": {"lines-start": 404, "lines-end": 413},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:modeq_of_add_mul_eq":
@@ -548,7 +548,7 @@
    "is-extraction-artifact": false,
    "display-name": "modeq_of_add_mul_eq",
    "dependencies": [],
-   "code-text": {"lines-start": 414, "lines-end": 418},
+   "code-text": {"lines-start": 415, "lines-end": 419},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:land_pow_two_sub_one_eq_mod":
@@ -565,9 +565,778 @@
    "is-extraction-artifact": false,
    "display-name": "land_pow_two_sub_one_eq_mod",
    "dependencies": [],
-   "code-text": {"lines-start": 268, "lines-end": 273},
+   "code-text": {"lines-start": 269, "lines-end": 274},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
+  "probe:instShrinkableUsize_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableUsize_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 55, "lines-end": 55},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instShrinkableU8_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableU8_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 51, "lines-end": 51},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instShrinkableU64_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableU64_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 54, "lines-end": 54},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instShrinkableU32_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableU32_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 53, "lines-end": 53},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instShrinkableU16_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableU16_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 52, "lines-end": 52},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instShrinkableScalar":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.scalar.Scalar"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.scalar.Scalar",
+    "probe:curve25519_dalek.scalar.Scalar.bytes",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU8_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableScalar",
+   "dependencies":
+   ["probe:curve25519_dalek.scalar.Scalar",
+    "probe:curve25519_dalek.scalar.Scalar.bytes",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU8_curve25519Dalek"],
+   "code-text": {"lines-start": 29, "lines-end": 30},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instShrinkableProjectivePoint_1":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Y",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableProjectivePoint_1",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Y",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "code-text": {"lines-start": 78, "lines-end": 82},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instShrinkableProjectivePoint":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.montgomery.ProjectivePoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint.U",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint.W",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableProjectivePoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint.U",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint.W",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "code-text": {"lines-start": 66, "lines-end": 69},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instShrinkableProjectiveNielsPoint":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.T2d",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Y_minus_X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Y_plus_X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableProjectiveNielsPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.T2d",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Y_minus_X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Y_plus_X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "code-text": {"lines-start": 93, "lines-end": 98},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instShrinkableIsize_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableIsize_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 100, "lines-end": 100},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instShrinkableI8_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableI8_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 96, "lines-end": 96},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instShrinkableI64_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableI64_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 99, "lines-end": 99},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instShrinkableI32_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableI32_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 98, "lines-end": 98},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instShrinkableI16_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableI16_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 97, "lines-end": 97},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instShrinkableEdwardsPoint":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.edwards.EdwardsPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.EdwardsPoint",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.T",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.X",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.Y",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.Z",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableEdwardsPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.EdwardsPoint",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.T",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.X",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.Y",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.Z",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "code-text": {"lines-start": 40, "lines-end": 45},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instShrinkableCompletedPoint":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.T",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.X",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Y",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableCompletedPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.T",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.X",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Y",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "code-text": {"lines-start": 122, "lines-end": 127},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instShrinkableArray_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableArray_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 138, "lines-end": 142},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instShrinkableAffinePoint":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.edwards.affine.AffinePoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint.x",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint.y",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableAffinePoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint.x",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint.y",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "code-text": {"lines-start": 54, "lines-end": 57},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instShrinkableAffineNielsPoint":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.xy2d",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.y_minus_x",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.y_plus_x",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instShrinkableAffineNielsPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.xy2d",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.y_minus_x",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.y_plus_x",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instShrinkableArray_curve25519Dalek",
+    "probe:instShrinkableU64_curve25519Dalek"],
+   "code-text": {"lines-start": 108, "lines-end": 112},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instReprScalar":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.scalar.Scalar"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.scalar.Scalar",
+    "probe:curve25519_dalek.scalar.Scalar.bytes",
+    "probe:instReprArray_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprScalar",
+   "dependencies":
+   ["probe:curve25519_dalek.scalar.Scalar",
+    "probe:curve25519_dalek.scalar.Scalar.bytes",
+    "probe:instReprArray_curve25519Dalek"],
+   "code-text": {"lines-start": 32, "lines-end": 33},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instReprProjectivePoint_1":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Y",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instReprArray_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprProjectivePoint_1",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Y",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instReprArray_curve25519Dalek"],
+   "code-text": {"lines-start": 84, "lines-end": 85},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instReprProjectivePoint":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.montgomery.ProjectivePoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint.U",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint.W",
+    "probe:instReprArray_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprProjectivePoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint.U",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint.W",
+    "probe:instReprArray_curve25519Dalek"],
+   "code-text": {"lines-start": 71, "lines-end": 72},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instReprProjectiveNielsPoint":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.T2d",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Y_minus_X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Y_plus_X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instReprArray_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprProjectiveNielsPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.T2d",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Y_minus_X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Y_plus_X",
+    "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instReprArray_curve25519Dalek"],
+   "code-text": {"lines-start": 100, "lines-end": 101},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instReprIsize_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprIsize_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 109, "lines-end": 109},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instReprI8_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprI8_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 105, "lines-end": 105},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instReprI64_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprI64_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 108, "lines-end": 108},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instReprI32_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprI32_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 107, "lines-end": 107},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instReprI16_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprI16_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 106, "lines-end": 106},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instReprEdwardsPoint":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.edwards.EdwardsPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.EdwardsPoint",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.T",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.X",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.Y",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.Z",
+    "probe:instReprArray_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprEdwardsPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.EdwardsPoint",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.T",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.X",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.Y",
+    "probe:curve25519_dalek.edwards.EdwardsPoint.Z",
+    "probe:instReprArray_curve25519Dalek"],
+   "code-text": {"lines-start": 47, "lines-end": 48},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instReprCompletedPoint":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.T",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.X",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Y",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instReprArray_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprCompletedPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.T",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.X",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Y",
+    "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Z",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instReprArray_curve25519Dalek"],
+   "code-text": {"lines-start": 129, "lines-end": 130},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instReprArray_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprArray_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 144, "lines-end": 146},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instReprAffinePoint":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.edwards.affine.AffinePoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint.x",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint.y",
+    "probe:instReprArray_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprAffinePoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint.x",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint.y",
+    "probe:instReprArray_curve25519Dalek"],
+   "code-text": {"lines-start": 59, "lines-end": 60},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instReprAffineNielsPoint":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.xy2d",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.y_minus_x",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.y_plus_x",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instReprArray_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instReprAffineNielsPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.xy2d",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.y_minus_x",
+    "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.y_plus_x",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instReprArray_curve25519Dalek"],
+   "code-text": {"lines-start": 114, "lines-end": 115},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
   "probe:instFactPrimeP":
   {"verification-status": "verified",
    "type-dependencies": ["probe:p"],
@@ -624,6 +1393,482 @@
    "code-path": "Curve25519Dalek/Types.lean",
    "code-module": "Curve25519Dalek.Types",
    "attributes": ["discriminant"]},
+  "probe:instDecidableSpec_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instDecidableSpec_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 184, "lines-end": 187},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instDecidableNamedBinder_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instDecidableNamedBinder_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 163, "lines-end": 164},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instDecidableForallNamedBinderForallLtNatOfDecidablePred_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name":
+   "instDecidableForallNamedBinderForallLtNatOfDecidablePred_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 168, "lines-end": 171},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instDecidableForallForallLtNatOfDecidablePred_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name":
+   "instDecidableForallForallLtNatOfDecidablePred_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 174, "lines-end": 177},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instDecidableEqArray_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instDecidableEqArray_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 150, "lines-end": 151},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryUsize_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryUsize_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 48, "lines-end": 48},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryU8_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryU8_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 44, "lines-end": 44},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryU64_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryU64_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 47, "lines-end": 47},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryU32_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryU32_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 46, "lines-end": 46},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryU16_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryU16_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 45, "lines-end": 45},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryScalar":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.scalar.Scalar"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.scalar.Scalar",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU8_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryScalar",
+   "dependencies":
+   ["probe:curve25519_dalek.scalar.Scalar",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU8_curve25519Dalek"],
+   "code-text": {"lines-start": 26, "lines-end": 27},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instArbitraryProjectivePoint_1":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryProjectivePoint_1",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "code-text": {"lines-start": 75, "lines-end": 76},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instArbitraryProjectivePoint":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.montgomery.ProjectivePoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryProjectivePoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.montgomery.ProjectivePoint",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "code-text": {"lines-start": 63, "lines-end": 64},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instArbitraryProjectiveNielsPoint":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryProjectiveNielsPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "code-text": {"lines-start": 88, "lines-end": 91},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instArbitraryIsize_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryIsize_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 93, "lines-end": 93},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryI8_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryI8_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 89, "lines-end": 89},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryI64_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryI64_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 92, "lines-end": 92},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryI32_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryI32_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 91, "lines-end": 91},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryI16_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryI16_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 90, "lines-end": 90},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryEdwardsPoint":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.edwards.EdwardsPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.EdwardsPoint",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryEdwardsPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.EdwardsPoint",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "code-text": {"lines-start": 36, "lines-end": 38},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instArbitraryCompletedPoint":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryCompletedPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "code-text": {"lines-start": 118, "lines-end": 120},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instArbitraryArray_curve25519Dalek":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryArray_curve25519Dalek",
+   "dependencies": [],
+   "code-text": {"lines-start": 125, "lines-end": 129},
+   "code-path": "Curve25519Dalek/Plausible.lean",
+   "code-module": "Curve25519Dalek.Plausible"},
+  "probe:instArbitraryAffinePoint":
+  {"verification-status": "verified",
+   "type-dependencies": ["probe:curve25519_dalek.edwards.affine.AffinePoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryAffinePoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:curve25519_dalek.edwards.affine.AffinePoint",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "code-text": {"lines-start": 51, "lines-end": 52},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
+  "probe:instArbitraryAffineNielsPoint":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint"],
+   "term-dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "instance",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "instArbitraryAffineNielsPoint",
+   "dependencies":
+   ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint",
+    "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
+    "probe:instArbitraryArray_curve25519Dalek",
+    "probe:instArbitraryU64_curve25519Dalek"],
+   "code-text": {"lines-start": 104, "lines-end": 106},
+   "code-path": "Curve25519Dalek/PlausibleDomain.lean",
+   "code-module": "Curve25519Dalek.PlausibleDomain"},
   "probe:horner_natCast":
   {"verification-status": "verified",
    "type-dependencies": ["probe:instFactPrimeP", "probe:p"],
@@ -638,7 +1883,7 @@
    "is-extraction-artifact": false,
    "display-name": "horner_natCast",
    "dependencies": ["probe:instFactPrimeP", "probe:p"],
-   "code-text": {"lines-start": 192, "lines-end": 201},
+   "code-text": {"lines-start": 193, "lines-end": 202},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:high_bit_zero_of_lt_L":
@@ -655,7 +1900,7 @@
    "is-extraction-artifact": false,
    "display-name": "high_bit_zero_of_lt_L",
    "dependencies": ["probe:L", "probe:U8x32_as_Nat"],
-   "code-text": {"lines-start": 128, "lines-end": 134},
+   "code-text": {"lines-start": 129, "lines-end": 135},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:high_bit_zero_of_lt_255":
@@ -672,7 +1917,7 @@
    "is-extraction-artifact": false,
    "display-name": "high_bit_zero_of_lt_255",
    "dependencies": ["probe:U8x32_as_Nat"],
-   "code-text": {"lines-start": 110, "lines-end": 126},
+   "code-text": {"lines-start": 111, "lines-end": 127},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:hdigits_aux":
@@ -751,7 +1996,7 @@
    "display-name": "fe_eq_of_limbs",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51"],
-   "code-text": {"lines-start": 93, "lines-end": 108},
+   "code-text": {"lines-start": 94, "lines-end": 109},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:externallyVerifiedAttr":
@@ -787,7 +2032,7 @@
    "is-extraction-artifact": false,
    "display-name": "double_cast_of_lt",
    "dependencies": [],
-   "code-text": {"lines-start": 309, "lines-end": 314},
+   "code-text": {"lines-start": 310, "lines-end": 315},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:d":
@@ -858,7 +2103,7 @@
    "dependencies":
    ["probe:curve25519_dalek.zeroize.DefaultIsZeroes",
     "probe:curve25519_dalek.zeroize.DefaultIsZeroes.coredefaultDefaultInst"],
-   "code-text": {"lines-start": 640, "lines-end": 643},
+   "code-text": {"lines-start": 641, "lines-end": 644},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -1482,7 +2727,7 @@
     "probe:curve25519_dalek.subtle.CtOption.is_some",
     "probe:curve25519_dalek.subtle.CtOption.new",
     "probe:curve25519_dalek.subtle.CtOption.value"],
-   "code-text": {"lines-start": 619, "lines-end": 630},
+   "code-text": {"lines-start": 620, "lines-end": 631},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -1509,7 +2754,7 @@
    "dependencies":
    ["probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.CtOption"],
-   "code-text": {"lines-start": 614, "lines-end": 617},
+   "code-text": {"lines-start": 615, "lines-end": 618},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -1640,7 +2885,7 @@
     "probe:curve25519_dalek.subtle.ConditionallySelectable",
     "probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_select",
     "probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_swap.default"],
-   "code-text": {"lines-start": 528, "lines-end": 552},
+   "code-text": {"lines-start": 529, "lines-end": 553},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -1671,7 +2916,7 @@
    ["probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.ConditionallySelectable",
     "probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_select"],
-   "code-text": {"lines-start": 518, "lines-end": 526},
+   "code-text": {"lines-start": 519, "lines-end": 527},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -1744,7 +2989,7 @@
     "probe:curve25519_dalek.subtle.ConditionallySelectable",
     "probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_assign.default",
     "probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_select"],
-   "code-text": {"lines-start": 495, "lines-end": 511},
+   "code-text": {"lines-start": 496, "lines-end": 512},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -1775,7 +3020,7 @@
    ["probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.ConditionallySelectable",
     "probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_select"],
-   "code-text": {"lines-start": 487, "lines-end": 493},
+   "code-text": {"lines-start": 488, "lines-end": 494},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -1852,7 +3097,7 @@
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.ConditionallySelectable",
     "probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_select"],
-   "code-text": {"lines-start": 604, "lines-end": 609},
+   "code-text": {"lines-start": 605, "lines-end": 610},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.subtle.Choice.valid":
@@ -1948,7 +3193,7 @@
    "dependencies":
    ["probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 243, "lines-end": 244},
+   "code-text": {"lines-start": 244, "lines-end": 245},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.subtle.Choice.ne_zero_iff_eq_one":
@@ -1996,7 +3241,7 @@
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.Insts.CoreOpsBitNotChoice.not",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 354, "lines-end": 372},
+   "code-text": {"lines-start": 355, "lines-end": 373},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -2027,7 +3272,7 @@
     "probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 346, "lines-end": 352},
+   "code-text": {"lines-start": 347, "lines-end": 353},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -2054,7 +3299,7 @@
     "probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 332, "lines-end": 339},
+   "code-text": {"lines-start": 333, "lines-end": 340},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -2078,7 +3323,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.Insts.CoreOpsBitBitAndChoiceChoice.bitand"],
-   "code-text": {"lines-start": 271, "lines-end": 323},
+   "code-text": {"lines-start": 272, "lines-end": 324},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -2109,7 +3354,7 @@
     "probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 262, "lines-end": 269},
+   "code-text": {"lines-start": 263, "lines-end": 270},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -2128,7 +3373,7 @@
    "is-extraction-artifact": false,
    "display-name": "from",
    "dependencies": ["probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 415, "lines-end": 422},
+   "code-text": {"lines-start": 416, "lines-end": 423},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun", "u8>}::from\""]},
@@ -2491,7 +3736,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply"],
-   "code-text": {"lines-start": 121, "lines-end": 157},
+   "code-text": {"lines-start": 77, "lines-end": 111},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/SquareMultiply.lean",
    "code-module":
@@ -2521,7 +3766,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply_loop"],
-   "code-text": {"lines-start": 65, "lines-end": 118},
+   "code-text": {"lines-start": 23, "lines-end": 74},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/SquareMultiply.lean",
    "code-module":
@@ -2552,7 +3797,7 @@
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.scalar.Scalar52.IsMont",
     "probe:instFactPrimeL"],
-   "code-text": {"lines-start": 93, "lines-end": 100},
+   "code-text": {"lines-start": 95, "lines-end": 102},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "code-module":
@@ -2583,7 +3828,7 @@
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.scalar.Scalar52.IsMont",
     "probe:instFactPrimeL"],
-   "code-text": {"lines-start": 82, "lines-end": 90},
+   "code-text": {"lines-start": 84, "lines-end": 92},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "code-module":
@@ -2614,7 +3859,7 @@
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.scalar.Scalar52.IsMont",
     "probe:instFactPrimeL"],
-   "code-text": {"lines-start": 103, "lines-end": 111},
+   "code-text": {"lines-start": 105, "lines-end": 113},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "code-module":
@@ -2647,7 +3892,7 @@
     "probe:curve25519_dalek.scalar.Scalar",
     "probe:curve25519_dalek.scalar.Scalar.bytes",
     "probe:curve25519_dalek.scalar.Scalar52.pack"],
-   "code-text": {"lines-start": 33, "lines-end": 44},
+   "code-text": {"lines-start": 20, "lines-end": 31},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Pack.lean",
    "code-module":
@@ -2704,7 +3949,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.scalar.Scalar52.montgomery_invert"],
-   "code-text": {"lines-start": 135, "lines-end": 323},
+   "code-text": {"lines-start": 118, "lines-end": 311},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "code-module":
@@ -2808,7 +4053,7 @@
    "is-extraction-artifact": false,
    "display-name": "isMont_sq",
    "dependencies": ["probe:L", "probe:curve25519_dalek.scalar.Scalar52.IsMont"],
-   "code-text": {"lines-start": 55, "lines-end": 61},
+   "code-text": {"lines-start": 57, "lines-end": 63},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "code-module":
@@ -2828,7 +4073,7 @@
    "is-extraction-artifact": false,
    "display-name": "isMont_mul",
    "dependencies": ["probe:L", "probe:curve25519_dalek.scalar.Scalar52.IsMont"],
-   "code-text": {"lines-start": 39, "lines-end": 53},
+   "code-text": {"lines-start": 41, "lines-end": 55},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "code-module":
@@ -2853,7 +4098,7 @@
    ["probe:L",
     "probe:curve25519_dalek.scalar.Scalar52.IsMont",
     "probe:instFactPrimeL"],
-   "code-text": {"lines-start": 63, "lines-end": 79},
+   "code-text": {"lines-start": 65, "lines-end": 81},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "code-module":
@@ -2880,7 +4125,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.scalar.Scalar52.invert"],
-   "code-text": {"lines-start": 45, "lines-end": 83},
+   "code-text": {"lines-start": 33, "lines-end": 73},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Invert.lean",
    "code-module":
@@ -2935,7 +4180,7 @@
    "is-extraction-artifact": false,
    "display-name": "IsMont",
    "dependencies": ["probe:L", "probe:instFactPrimeL"],
-   "code-text": {"lines-start": 34, "lines-end": 37},
+   "code-text": {"lines-start": 36, "lines-end": 39},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "code-module":
@@ -4733,7 +5978,7 @@
    ["probe:curve25519_dalek.scalar.Scalar",
     "probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_swap",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1267, "lines-end": 1291},
+   "code-text": {"lines-start": 1268, "lines-end": 1292},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -4762,7 +6007,7 @@
    "dependencies":
    ["probe:curve25519_dalek.scalar.Scalar",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1259, "lines-end": 1265},
+   "code-text": {"lines-start": 1260, "lines-end": 1266},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_spec":
@@ -4898,7 +6143,7 @@
    ["probe:curve25519_dalek.scalar.Scalar",
     "probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_assign",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1306, "lines-end": 1324},
+   "code-text": {"lines-start": 1307, "lines-end": 1325},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -4927,7 +6172,7 @@
    "dependencies":
    ["probe:curve25519_dalek.scalar.Scalar",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1300, "lines-end": 1304},
+   "code-text": {"lines-start": 1301, "lines-end": 1305},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable":
@@ -6609,7 +7854,7 @@
    ["probe:curve25519_dalek.scalar.Scalar",
     "probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne",
     "probe:curve25519_dalek.scalar.Scalar.bytes"],
-   "code-text": {"lines-start": 771, "lines-end": 810},
+   "code-text": {"lines-start": 772, "lines-end": 811},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -6644,7 +7889,7 @@
     "probe:curve25519_dalek.scalar.Scalar",
     "probe:curve25519_dalek.scalar.Scalar.bytes",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 762, "lines-end": 769},
+   "code-text": {"lines-start": 763, "lines-end": 770},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar.eq_spec":
@@ -6742,7 +7987,7 @@
    "dependencies":
    ["probe:curve25519_dalek.scalar.Scalar",
     "probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpEq.assert_receiver_is_total_eq"],
-   "code-text": {"lines-start": 823, "lines-end": 834},
+   "code-text": {"lines-start": 824, "lines-end": 835},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -6765,7 +8010,7 @@
    "is-extraction-artifact": false,
    "display-name": "assert_receiver_is_total_eq",
    "dependencies": ["probe:curve25519_dalek.scalar.Scalar"],
-   "code-text": {"lines-start": 819, "lines-end": 821},
+   "code-text": {"lines-start": 820, "lines-end": 822},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpEq":
@@ -8101,7 +9346,7 @@
    ["probe:curve25519_dalek.ristretto.RistrettoPoint",
     "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1826, "lines-end": 1850},
+   "code-text": {"lines-start": 1827, "lines-end": 1851},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -8130,7 +9375,7 @@
    "dependencies":
    ["probe:curve25519_dalek.ristretto.RistrettoPoint",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1814, "lines-end": 1824},
+   "code-text": {"lines-start": 1815, "lines-end": 1825},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select_spec":
@@ -8212,7 +9457,7 @@
    ["probe:curve25519_dalek.ristretto.RistrettoPoint",
     "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1866, "lines-end": 1884},
+   "code-text": {"lines-start": 1867, "lines-end": 1885},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -8241,7 +9486,7 @@
    "dependencies":
    ["probe:curve25519_dalek.ristretto.RistrettoPoint",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1860, "lines-end": 1864},
+   "code-text": {"lines-start": 1861, "lines-end": 1865},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable":
@@ -8732,7 +9977,7 @@
    "is-extraction-artifact": false,
    "display-name": "ne",
    "dependencies": ["probe:curve25519_dalek.ristretto.RistrettoPoint"],
-   "code-text": {"lines-start": 1783, "lines-end": 1784},
+   "code-text": {"lines-start": 1784, "lines-end": 1785},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq_spec":
@@ -8835,7 +10080,7 @@
    "is-extraction-artifact": false,
    "display-name": "assert_receiver_is_total_eq",
    "dependencies": ["probe:curve25519_dalek.ristretto.RistrettoPoint"],
-   "code-text": {"lines-start": 1790, "lines-end": 1791},
+   "code-text": {"lines-start": 1791, "lines-end": 1792},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpEq":
@@ -9743,7 +10988,7 @@
    "is-extraction-artifact": false,
    "display-name": "ne",
    "dependencies": ["probe:curve25519_dalek.ristretto.CompressedRistretto"],
-   "code-text": {"lines-start": 1773, "lines-end": 1777},
+   "code-text": {"lines-start": 1774, "lines-end": 1778},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpPartialEqCompressedRistretto.eq":
@@ -10947,7 +12192,7 @@
    ["probe:curve25519_dalek.montgomery.ProjectivePoint",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 1438, "lines-end": 1441},
+   "code-text": {"lines-start": 1439, "lines-end": 1442},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select_spec":
@@ -11039,7 +12284,7 @@
    ["probe:curve25519_dalek.montgomery.ProjectivePoint",
     "probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1635, "lines-end": 1654},
+   "code-text": {"lines-start": 1636, "lines-end": 1655},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -11068,7 +12313,7 @@
    "dependencies":
    ["probe:curve25519_dalek.montgomery.ProjectivePoint",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1629, "lines-end": 1633},
+   "code-text": {"lines-start": 1630, "lines-end": 1634},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable":
@@ -11830,7 +13075,7 @@
     "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 1534, "lines-end": 1551},
+   "code-text": {"lines-start": 1535, "lines-end": 1552},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -11859,7 +13104,7 @@
    "dependencies":
    ["probe:curve25519_dalek.montgomery.MontgomeryPoint",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1522, "lines-end": 1532},
+   "code-text": {"lines-start": 1523, "lines-end": 1533},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select_spec":
@@ -11941,7 +13186,7 @@
    ["probe:curve25519_dalek.montgomery.MontgomeryPoint",
     "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1568, "lines-end": 1587},
+   "code-text": {"lines-start": 1569, "lines-end": 1588},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -11970,7 +13215,7 @@
    "dependencies":
    ["probe:curve25519_dalek.montgomery.MontgomeryPoint",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1562, "lines-end": 1566},
+   "code-text": {"lines-start": 1563, "lines-end": 1567},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable":
@@ -12417,7 +13662,7 @@
    "is-extraction-artifact": false,
    "display-name": "ne",
    "dependencies": ["probe:curve25519_dalek.montgomery.MontgomeryPoint"],
-   "code-text": {"lines-start": 1593, "lines-end": 1594},
+   "code-text": {"lines-start": 1594, "lines-end": 1595},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.eq_spec":
@@ -12517,7 +13762,7 @@
    "dependencies":
    ["probe:curve25519_dalek.montgomery.MontgomeryPoint",
     "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq"],
-   "code-text": {"lines-start": 1607, "lines-end": 1618},
+   "code-text": {"lines-start": 1608, "lines-end": 1619},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -12540,7 +13785,7 @@
    "is-extraction-artifact": false,
    "display-name": "assert_receiver_is_total_eq",
    "dependencies": ["probe:curve25519_dalek.montgomery.MontgomeryPoint"],
-   "code-text": {"lines-start": 1603, "lines-end": 1605},
+   "code-text": {"lines-start": 1604, "lines-end": 1606},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpEq":
@@ -14896,7 +16141,7 @@
    "dependencies":
    ["probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 192, "lines-end": 194},
+   "code-text": {"lines-start": 193, "lines-end": 195},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.field.FieldElement51.sqrt_ratio_i_spec":
@@ -16391,7 +17636,7 @@
    ["probe:curve25519_dalek.edwards.affine.AffinePoint",
     "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1671, "lines-end": 1696},
+   "code-text": {"lines-start": 1672, "lines-end": 1697},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -16415,7 +17660,7 @@
    ["probe:curve25519_dalek.edwards.affine.AffinePoint",
     "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap'",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1161, "lines-end": 1185},
+   "code-text": {"lines-start": 1162, "lines-end": 1186},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -16444,7 +17689,7 @@
    "dependencies":
    ["probe:curve25519_dalek.edwards.affine.AffinePoint",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1148, "lines-end": 1159},
+   "code-text": {"lines-start": 1149, "lines-end": 1160},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap":
@@ -16474,7 +17719,7 @@
    ["probe:curve25519_dalek.edwards.affine.AffinePoint",
     "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap'",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1665, "lines-end": 1669},
+   "code-text": {"lines-start": 1666, "lines-end": 1670},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select_spec":
@@ -16560,7 +17805,7 @@
    ["probe:curve25519_dalek.edwards.affine.AffinePoint",
     "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1713, "lines-end": 1731},
+   "code-text": {"lines-start": 1714, "lines-end": 1732},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -16584,7 +17829,7 @@
    ["probe:curve25519_dalek.edwards.affine.AffinePoint",
     "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign'",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1195, "lines-end": 1213},
+   "code-text": {"lines-start": 1196, "lines-end": 1214},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -16613,7 +17858,7 @@
    "dependencies":
    ["probe:curve25519_dalek.edwards.affine.AffinePoint",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1188, "lines-end": 1193},
+   "code-text": {"lines-start": 1189, "lines-end": 1194},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign":
@@ -16643,7 +17888,7 @@
    ["probe:curve25519_dalek.edwards.affine.AffinePoint",
     "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign'",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1707, "lines-end": 1711},
+   "code-text": {"lines-start": 1708, "lines-end": 1712},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable":
@@ -16855,7 +18100,7 @@
    "is-extraction-artifact": false,
    "display-name": "ne",
    "dependencies": ["probe:curve25519_dalek.edwards.affine.AffinePoint"],
-   "code-text": {"lines-start": 1738, "lines-end": 1739},
+   "code-text": {"lines-start": 1739, "lines-end": 1740},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.eq_spec":
@@ -16962,7 +18207,7 @@
    "is-extraction-artifact": false,
    "display-name": "assert_receiver_is_total_eq",
    "dependencies": ["probe:curve25519_dalek.edwards.affine.AffinePoint"],
-   "code-text": {"lines-start": 1745, "lines-end": 1746},
+   "code-text": {"lines-start": 1746, "lines-end": 1747},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpEq":
@@ -19398,7 +20643,7 @@
    ["probe:curve25519_dalek.edwards.EdwardsPoint",
     "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_swap",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1368, "lines-end": 1392},
+   "code-text": {"lines-start": 1369, "lines-end": 1393},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -19427,7 +20672,7 @@
    "dependencies":
    ["probe:curve25519_dalek.edwards.EdwardsPoint",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1356, "lines-end": 1366},
+   "code-text": {"lines-start": 1357, "lines-end": 1367},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select_spec":
@@ -19517,7 +20762,7 @@
    ["probe:curve25519_dalek.edwards.EdwardsPoint",
     "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_assign",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1409, "lines-end": 1427},
+   "code-text": {"lines-start": 1410, "lines-end": 1428},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -19546,7 +20791,7 @@
    "dependencies":
    ["probe:curve25519_dalek.edwards.EdwardsPoint",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1403, "lines-end": 1407},
+   "code-text": {"lines-start": 1404, "lines-end": 1408},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable":
@@ -20139,7 +21384,7 @@
    "is-extraction-artifact": false,
    "display-name": "ne",
    "dependencies": ["probe:curve25519_dalek.edwards.EdwardsPoint"],
-   "code-text": {"lines-start": 1759, "lines-end": 1760},
+   "code-text": {"lines-start": 1760, "lines-end": 1761},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.eq_spec":
@@ -20246,7 +21491,7 @@
    "is-extraction-artifact": false,
    "display-name": "assert_receiver_is_total_eq",
    "dependencies": ["probe:curve25519_dalek.edwards.EdwardsPoint"],
-   "code-text": {"lines-start": 1766, "lines-end": 1767},
+   "code-text": {"lines-start": 1767, "lines-end": 1768},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpEq":
@@ -20986,7 +22231,7 @@
    "is-extraction-artifact": false,
    "display-name": "ne",
    "dependencies": ["probe:curve25519_dalek.edwards.CompressedEdwardsY"],
-   "code-text": {"lines-start": 1752, "lines-end": 1753},
+   "code-text": {"lines-start": 1753, "lines-end": 1754},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpPartialEqCompressedEdwardsY.eq":
@@ -21153,7 +22398,7 @@
    "is-extraction-artifact": false,
    "display-name": "map",
    "dependencies": [],
-   "code-text": {"lines-start": 31, "lines-end": 38},
+   "code-text": {"lines-start": 32, "lines-end": 39},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["@E>}::map\"", "rust_fun"]},
@@ -21173,7 +22418,7 @@
    "display-name": "index_spec",
    "dependencies":
    ["probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index"],
-   "code-text": {"lines-start": 83, "lines-end": 93},
+   "code-text": {"lines-start": 84, "lines-end": 94},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["simp", "step"]},
@@ -21193,7 +22438,7 @@
    "display-name": "index_mut_spec",
    "dependencies":
    ["probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut"],
-   "code-text": {"lines-start": 57, "lines-end": 67},
+   "code-text": {"lines-start": 58, "lines-end": 68},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["simp", "step"]},
@@ -21216,7 +22461,7 @@
    "is-extraction-artifact": false,
    "display-name": "index_mut",
    "dependencies": ["probe:curve25519_dalek.core.ops.range.RangeFull"],
-   "code-text": {"lines-start": 49, "lines-end": 55},
+   "code-text": {"lines-start": 50, "lines-end": 56},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -21239,7 +22484,7 @@
    "is-extraction-artifact": false,
    "display-name": "index",
    "dependencies": ["probe:curve25519_dalek.core.ops.range.RangeFull"],
-   "code-text": {"lines-start": 77, "lines-end": 81},
+   "code-text": {"lines-start": 78, "lines-end": 82},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -21258,7 +22503,7 @@
    "is-extraction-artifact": false,
    "display-name": "get_unchecked_mut",
    "dependencies": ["probe:curve25519_dalek.core.ops.range.RangeFull"],
-   "code-text": {"lines-start": 104, "lines-end": 110},
+   "code-text": {"lines-start": 105, "lines-end": 111},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -21277,7 +22522,7 @@
    "is-extraction-artifact": false,
    "display-name": "get_unchecked",
    "dependencies": ["probe:curve25519_dalek.core.ops.range.RangeFull"],
-   "code-text": {"lines-start": 121, "lines-end": 127},
+   "code-text": {"lines-start": 122, "lines-end": 128},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -21297,7 +22542,7 @@
    "display-name": "get_spec",
    "dependencies":
    ["probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get"],
-   "code-text": {"lines-start": 174, "lines-end": 184},
+   "code-text": {"lines-start": 175, "lines-end": 185},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["simp", "step"]},
@@ -21317,7 +22562,7 @@
    "display-name": "get_mut_spec",
    "dependencies":
    ["probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut"],
-   "code-text": {"lines-start": 146, "lines-end": 157},
+   "code-text": {"lines-start": 147, "lines-end": 158},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["simp", "step"]},
@@ -21340,7 +22585,7 @@
    "is-extraction-artifact": false,
    "display-name": "get_mut",
    "dependencies": ["probe:curve25519_dalek.core.ops.range.RangeFull"],
-   "code-text": {"lines-start": 138, "lines-end": 144},
+   "code-text": {"lines-start": 139, "lines-end": 145},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -21363,7 +22608,7 @@
    "is-extraction-artifact": false,
    "display-name": "get",
    "dependencies": ["probe:curve25519_dalek.core.ops.range.RangeFull"],
-   "code-text": {"lines-start": 167, "lines-end": 172},
+   "code-text": {"lines-start": 168, "lines-end": 173},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -21452,7 +22697,7 @@
    "is-extraction-artifact": false,
    "display-name": "rev",
    "dependencies": [],
-   "code-text": {"lines-start": 1901, "lines-end": 1913},
+   "code-text": {"lines-start": 1902, "lines-end": 1914},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -21471,7 +22716,7 @@
    "is-extraction-artifact": false,
    "display-name": "next_back",
    "dependencies": [],
-   "code-text": {"lines-start": 1915, "lines-end": 1924},
+   "code-text": {"lines-start": 1916, "lines-end": 1925},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -21735,7 +22980,7 @@
    "is-extraction-artifact": false,
    "display-name": "default",
    "dependencies": [],
-   "code-text": {"lines-start": 1926, "lines-end": 1937},
+   "code-text": {"lines-start": 1927, "lines-end": 1938},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -21754,7 +22999,7 @@
    "is-extraction-artifact": false,
    "display-name": "next",
    "dependencies": [],
-   "code-text": {"lines-start": 1888, "lines-end": 1899},
+   "code-text": {"lines-start": 1889, "lines-end": 1900},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -21938,7 +23183,7 @@
    "is-extraction-artifact": false,
    "display-name": "m_spec",
    "dependencies": ["probe:curve25519_dalek.backend.serial.u64.scalar.m"],
-   "code-text": {"lines-start": 23, "lines-end": 29},
+   "code-text": {"lines-start": 23, "lines-end": 31},
    "code-path": "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/M.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M",
    "attributes": ["step"]},
@@ -21975,7 +23220,7 @@
    "is-extraction-artifact": false,
    "display-name": "zero_array",
    "dependencies": [],
-   "code-text": {"lines-start": 40, "lines-end": 43},
+   "code-text": {"lines-start": 28, "lines-end": 31},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean",
    "code-module":
@@ -22000,7 +23245,7 @@
    ["probe:U8x64_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.word_of_bytes_64",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.words_wide_as_Nat"],
-   "code-text": {"lines-start": 236, "lines-end": 249},
+   "code-text": {"lines-start": 239, "lines-end": 252},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -22024,7 +23269,7 @@
    "is-extraction-artifact": false,
    "display-name": "words_wide_as_Nat",
    "dependencies": [],
-   "code-text": {"lines-start": 204, "lines-end": 208},
+   "code-text": {"lines-start": 207, "lines-end": 211},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -22098,7 +23343,7 @@
    "is-extraction-artifact": false,
    "display-name": "word_of_bytes_64",
    "dependencies": [],
-   "code-text": {"lines-start": 38, "lines-end": 43},
+   "code-text": {"lines-start": 41, "lines-end": 46},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -22152,7 +23397,7 @@
     "probe:U8x32_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes"],
-   "code-text": {"lines-start": 165, "lines-end": 191},
+   "code-text": {"lines-start": 165, "lines-end": 193},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ToBytes.lean",
    "code-module":
@@ -22204,7 +23449,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub"],
-   "code-text": {"lines-start": 263, "lines-end": 344},
+   "code-text": {"lines-start": 258, "lines-end": 340},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean",
    "code-module":
@@ -22232,7 +23477,7 @@
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Scalar52_partial_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop"],
-   "code-text": {"lines-start": 63, "lines-end": 261},
+   "code-text": {"lines-start": 56, "lines-end": 256},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean",
    "code-module":
@@ -22323,7 +23568,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.square"],
-   "code-text": {"lines-start": 63, "lines-end": 107},
+   "code-text": {"lines-start": 37, "lines-end": 81},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Square.lean",
    "code-module":
@@ -22349,7 +23594,7 @@
    ["probe:Scalar52_as_Nat",
     "probe:Scalar52_wide_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal"],
-   "code-text": {"lines-start": 55, "lines-end": 130},
+   "code-text": {"lines-start": 42, "lines-end": 117},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean",
    "code-module":
@@ -22461,7 +23706,7 @@
    "is-extraction-artifact": false,
    "display-name": "set_getElem!_eq",
    "dependencies": [],
-   "code-text": {"lines-start": 35, "lines-end": 38},
+   "code-text": {"lines-start": 23, "lines-end": 26},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean",
    "code-module":
@@ -22490,7 +23735,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul"],
-   "code-text": {"lines-start": 48, "lines-end": 94},
+   "code-text": {"lines-start": 24, "lines-end": 70},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Mul.lean",
    "code-module":
@@ -22516,7 +23761,7 @@
    ["probe:Scalar52_as_Nat",
     "probe:Scalar52_wide_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal"],
-   "code-text": {"lines-start": 29, "lines-end": 77},
+   "code-text": {"lines-start": 28, "lines-end": 76},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean",
    "code-module":
@@ -22604,7 +23849,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square"],
-   "code-text": {"lines-start": 39, "lines-end": 53},
+   "code-text": {"lines-start": 24, "lines-end": 40},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomerySquare.lean",
    "code-module":
@@ -22664,7 +23909,7 @@
     "probe:Scalar52_wide_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"],
-   "code-text": {"lines-start": 338, "lines-end": 704},
+   "code-text": {"lines-start": 299, "lines-end": 669},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryReduce.lean",
    "code-module":
@@ -22772,7 +24017,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul"],
-   "code-text": {"lines-start": 44, "lines-end": 60},
+   "code-text": {"lines-start": 23, "lines-end": 38},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryMul.lean",
    "code-module":
@@ -22926,7 +24171,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery"],
-   "code-text": {"lines-start": 79, "lines-end": 119},
+   "code-text": {"lines-start": 68, "lines-end": 113},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean",
    "code-module":
@@ -22950,7 +24195,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery_loop"],
-   "code-text": {"lines-start": 45, "lines-end": 77},
+   "code-text": {"lines-start": 33, "lines-end": 66},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean",
    "code-module":
@@ -23035,7 +24280,7 @@
     "probe:U8x64_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide"],
-   "code-text": {"lines-start": 798, "lines-end": 936},
+   "code-text": {"lines-start": 801, "lines-end": 942},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23063,7 +24308,7 @@
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.word_of_bytes_64",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.words_wide_as_Nat"],
-   "code-text": {"lines-start": 251, "lines-end": 267},
+   "code-text": {"lines-start": 254, "lines-end": 270},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23087,7 +24332,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.word_of_bytes_64"],
-   "code-text": {"lines-start": 50, "lines-end": 202},
+   "code-text": {"lines-start": 53, "lines-end": 205},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23134,7 +24379,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_lo34"],
-   "code-text": {"lines-start": 548, "lines-end": 580},
+   "code-text": {"lines-start": 551, "lines-end": 583},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23165,7 +24410,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"],
-   "code-text": {"lines-start": 500, "lines-end": 522},
+   "code-text": {"lines-start": 503, "lines-end": 525},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23188,7 +24433,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_lo12"],
-   "code-text": {"lines-start": 466, "lines-end": 498},
+   "code-text": {"lines-start": 469, "lines-end": 501},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23219,7 +24464,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"],
-   "code-text": {"lines-start": 417, "lines-end": 440},
+   "code-text": {"lines-start": 420, "lines-end": 443},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23244,7 +24489,7 @@
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_lo0"],
-   "code-text": {"lines-start": 406, "lines-end": 415},
+   "code-text": {"lines-start": 409, "lines-end": 418},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23277,7 +24522,7 @@
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO"],
-   "code-text": {"lines-start": 390, "lines-end": 395},
+   "code-text": {"lines-start": 393, "lines-end": 398},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23300,7 +24545,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_hi3"],
-   "code-text": {"lines-start": 752, "lines-end": 770},
+   "code-text": {"lines-start": 755, "lines-end": 773},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23331,7 +24576,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"],
-   "code-text": {"lines-start": 728, "lines-end": 738},
+   "code-text": {"lines-start": 731, "lines-end": 741},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23354,7 +24599,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_hi12"],
-   "code-text": {"lines-start": 694, "lines-end": 726},
+   "code-text": {"lines-start": 697, "lines-end": 729},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23385,7 +24630,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"],
-   "code-text": {"lines-start": 646, "lines-end": 668},
+   "code-text": {"lines-start": 649, "lines-end": 671},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23408,7 +24653,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_hi0_xfer"],
-   "code-text": {"lines-start": 618, "lines-end": 644},
+   "code-text": {"lines-start": 621, "lines-end": 647},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23439,7 +24684,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"],
-   "code-text": {"lines-start": 582, "lines-end": 598},
+   "code-text": {"lines-start": 585, "lines-end": 601},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23484,7 +24729,7 @@
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_lo34",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul"],
-   "code-text": {"lines-start": 774, "lines-end": 795},
+   "code-text": {"lines-start": 777, "lines-end": 798},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -23550,7 +24795,7 @@
     "probe:U8x32_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes"],
-   "code-text": {"lines-start": 379, "lines-end": 437},
+   "code-text": {"lines-start": 379, "lines-end": 439},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytes.lean",
    "code-module":
@@ -23986,7 +25231,7 @@
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_lo34"],
-   "code-text": {"lines-start": 524, "lines-end": 546},
+   "code-text": {"lines-start": 527, "lines-end": 549},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -24011,7 +25256,7 @@
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_lo12"],
-   "code-text": {"lines-start": 442, "lines-end": 464},
+   "code-text": {"lines-start": 445, "lines-end": 467},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -24038,7 +25283,7 @@
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_lo0"],
-   "code-text": {"lines-start": 397, "lines-end": 404},
+   "code-text": {"lines-start": 400, "lines-end": 407},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -24063,7 +25308,7 @@
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_hi3"],
-   "code-text": {"lines-start": 740, "lines-end": 750},
+   "code-text": {"lines-start": 743, "lines-end": 753},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -24088,7 +25333,7 @@
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_hi12"],
-   "code-text": {"lines-start": 670, "lines-end": 692},
+   "code-text": {"lines-start": 673, "lines-end": 695},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -24113,7 +25358,7 @@
    ["probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_hi0_xfer"],
-   "code-text": {"lines-start": 600, "lines-end": 616},
+   "code-text": {"lines-start": 603, "lines-end": 619},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -24146,7 +25391,7 @@
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 252, "lines-end": 294},
+   "code-text": {"lines-start": 198, "lines-end": 244},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ConditionalAddL.lean",
    "code-module":
@@ -24180,7 +25425,7 @@
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop",
     "probe:curve25519_dalek.instDecidableEqChoice",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 121, "lines-end": 250},
+   "code-text": {"lines-start": 55, "lines-end": 196},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ConditionalAddL.lean",
    "code-module":
@@ -24259,7 +25504,7 @@
    "is-extraction-artifact": false,
    "display-name": "bit_slicing_wide",
    "dependencies": [],
-   "code-text": {"lines-start": 311, "lines-end": 379},
+   "code-text": {"lines-start": 314, "lines-end": 382},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "code-module":
@@ -24307,7 +25552,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery"],
-   "code-text": {"lines-start": 40, "lines-end": 63},
+   "code-text": {"lines-start": 29, "lines-end": 57},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/AsMontgomery.lean",
    "code-module":
@@ -24363,7 +25608,7 @@
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.add"],
-   "code-text": {"lines-start": 247, "lines-end": 293},
+   "code-text": {"lines-start": 234, "lines-end": 283},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean",
    "code-module":
@@ -24389,7 +25634,7 @@
    ["probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop"],
-   "code-text": {"lines-start": 84, "lines-end": 245},
+   "code-text": {"lines-start": 64, "lines-end": 232},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean",
    "code-module":
@@ -24473,7 +25718,7 @@
    "dependencies":
    ["probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO"],
-   "code-text": {"lines-start": 24, "lines-end": 31},
+   "code-text": {"lines-start": 19, "lines-end": 25},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Zero.lean",
    "code-module":
@@ -24524,7 +25769,7 @@
    "is-extraction-artifact": false,
    "display-name": "Scalar52_partial_as_Nat",
    "dependencies": [],
-   "code-text": {"lines-start": 58, "lines-end": 60},
+   "code-text": {"lines-start": 51, "lines-end": 53},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean",
    "code-module":
@@ -24547,7 +25792,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.constants.RR",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52"],
-   "code-text": {"lines-start": 36, "lines-end": 38},
+   "code-text": {"lines-start": 25, "lines-end": 27},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/AsMontgomery.lean",
    "code-module":
@@ -24903,7 +26148,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
     "probe:p"],
-   "code-text": {"lines-start": 340, "lines-end": 721},
+   "code-text": {"lines-start": 336, "lines-end": 706},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -25022,7 +26267,7 @@
    "display-name": "square_stage_spec",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square_stage"],
-   "code-text": {"lines-start": 436, "lines-end": 512},
+   "code-text": {"lines-start": 445, "lines-end": 526},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -25049,7 +26294,7 @@
    "display-name": "square_stage",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.m"],
-   "code-text": {"lines-start": 126, "lines-end": 165},
+   "code-text": {"lines-start": 135, "lines-end": 174},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -25076,7 +26321,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "probe:p"],
-   "code-text": {"lines-start": 31, "lines-end": 43},
+   "code-text": {"lines-start": 18, "lines-end": 29},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square.lean",
    "code-module":
@@ -25104,7 +26349,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
     "probe:p"],
-   "code-text": {"lines-start": 72, "lines-end": 98},
+   "code-text": {"lines-start": 59, "lines-end": 83},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square2.lean",
    "code-module":
@@ -25128,7 +26373,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square2_loop"],
-   "code-text": {"lines-start": 39, "lines-end": 70},
+   "code-text": {"lines-start": 26, "lines-end": 57},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square2.lean",
    "code-module":
@@ -25235,7 +26480,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce",
     "probe:p"],
-   "code-text": {"lines-start": 32, "lines-end": 96},
+   "code-text": {"lines-start": 42, "lines-end": 108},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean",
    "code-module":
@@ -25257,7 +26502,7 @@
    "display-name": "LOW_51_BIT_MASK_spec",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK"],
-   "code-text": {"lines-start": 21, "lines-end": 25},
+   "code-text": {"lines-start": 26, "lines-end": 35},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean",
    "code-module":
@@ -25325,7 +26570,7 @@
    "is-extraction-artifact": false,
    "display-name": "recompose_decomposed_limb_shift6",
    "dependencies": [],
-   "code-text": {"lines-start": 75, "lines-end": 84},
+   "code-text": {"lines-start": 71, "lines-end": 80},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -25344,7 +26589,7 @@
    "is-extraction-artifact": false,
    "display-name": "recompose_decomposed_limb_shift4",
    "dependencies": [],
-   "code-text": {"lines-start": 96, "lines-end": 104},
+   "code-text": {"lines-start": 92, "lines-end": 100},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -25363,7 +26608,7 @@
    "is-extraction-artifact": false,
    "display-name": "recompose_decomposed_limb_shift3",
    "dependencies": [],
-   "code-text": {"lines-start": 65, "lines-end": 73},
+   "code-text": {"lines-start": 61, "lines-end": 69},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -25382,7 +26627,7 @@
    "is-extraction-artifact": false,
    "display-name": "recompose_decomposed_limb_shift1",
    "dependencies": [],
-   "code-text": {"lines-start": 86, "lines-end": 94},
+   "code-text": {"lines-start": 82, "lines-end": 90},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -25401,7 +26646,7 @@
    "is-extraction-artifact": false,
    "display-name": "recompose_decomposed_limb",
    "dependencies": [],
-   "code-text": {"lines-start": 47, "lines-end": 58},
+   "code-text": {"lines-start": 43, "lines-end": 54},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -25428,7 +26673,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
     "probe:p"],
-   "code-text": {"lines-start": 827, "lines-end": 837},
+   "code-text": {"lines-start": 856, "lines-end": 869},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -25454,7 +26699,7 @@
    ["probe:Field51_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop",
     "probe:p"],
-   "code-text": {"lines-start": 737, "lines-end": 825},
+   "code-text": {"lines-start": 761, "lines-end": 854},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -25579,7 +26824,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.negate",
     "probe:p"],
-   "code-text": {"lines-start": 31, "lines-end": 51},
+   "code-text": {"lines-start": 21, "lines-end": 42},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean",
    "code-module":
@@ -25627,7 +26872,7 @@
    "display-name": "m_spec",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.m"],
-   "code-text": {"lines-start": 114, "lines-end": 117},
+   "code-text": {"lines-start": 113, "lines-end": 121},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -25649,7 +26894,7 @@
    "display-name": "load8_at_val_spec",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes.load8_at"],
-   "code-text": {"lines-start": 61, "lines-end": 73},
+   "code-text": {"lines-start": 63, "lines-end": 75},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
    "code-module":
@@ -25697,7 +26942,7 @@
    ["probe:Field51_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"],
-   "code-text": {"lines-start": 38, "lines-end": 47},
+   "code-text": {"lines-start": 21, "lines-end": 30},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromLimbs.lean",
    "code-module":
@@ -25751,7 +26996,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "probe:p"],
-   "code-text": {"lines-start": 171, "lines-end": 252},
+   "code-text": {"lines-start": 173, "lines-end": 260},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
    "code-module":
@@ -25822,7 +27067,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.m",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square_stage"],
-   "code-text": {"lines-start": 225, "lines-end": 243},
+   "code-text": {"lines-start": 234, "lines-end": 252},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -25843,7 +27088,7 @@
    "display-name": "fold_final_reduce_stage",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.final_reduce_stage"],
-   "code-text": {"lines-start": 270, "lines-end": 283},
+   "code-text": {"lines-start": 279, "lines-end": 292},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -25866,7 +27111,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.carry_prop_stage",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK"],
-   "code-text": {"lines-start": 245, "lines-end": 268},
+   "code-text": {"lines-start": 254, "lines-end": 277},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -25887,7 +27132,7 @@
    "display-name": "final_reduce_stage_spec",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.final_reduce_stage"],
-   "code-text": {"lines-start": 659, "lines-end": 731},
+   "code-text": {"lines-start": 678, "lines-end": 755},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -25912,7 +27157,7 @@
    "is-extraction-artifact": false,
    "display-name": "final_reduce_stage",
    "dependencies": [],
-   "code-text": {"lines-start": 206, "lines-end": 221},
+   "code-text": {"lines-start": 215, "lines-end": 230},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -25931,7 +27176,7 @@
    "is-extraction-artifact": false,
    "display-name": "decompose_or_limbs_shift6",
    "dependencies": [],
-   "code-text": {"lines-start": 116, "lines-end": 122},
+   "code-text": {"lines-start": 112, "lines-end": 118},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -25950,7 +27195,7 @@
    "is-extraction-artifact": false,
    "display-name": "decompose_or_limbs_shift4",
    "dependencies": [],
-   "code-text": {"lines-start": 132, "lines-end": 138},
+   "code-text": {"lines-start": 128, "lines-end": 134},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -25969,7 +27214,7 @@
    "is-extraction-artifact": false,
    "display-name": "decompose_or_limbs_shift3",
    "dependencies": [],
-   "code-text": {"lines-start": 108, "lines-end": 114},
+   "code-text": {"lines-start": 104, "lines-end": 110},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -25988,7 +27233,7 @@
    "is-extraction-artifact": false,
    "display-name": "decompose_or_limbs_shift1",
    "dependencies": [],
-   "code-text": {"lines-start": 124, "lines-end": 130},
+   "code-text": {"lines-start": 120, "lines-end": 126},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -26009,7 +27254,7 @@
    "display-name": "carry_prop_stage_spec",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.carry_prop_stage"],
-   "code-text": {"lines-start": 516, "lines-end": 655},
+   "code-text": {"lines-start": 530, "lines-end": 674},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -26036,7 +27281,7 @@
    "display-name": "carry_prop_stage",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK"],
-   "code-text": {"lines-start": 167, "lines-end": 204},
+   "code-text": {"lines-start": 176, "lines-end": 213},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -26055,7 +27300,7 @@
    "is-extraction-artifact": false,
    "display-name": "byte_packing_eq",
    "dependencies": ["probe:Field51_as_Nat", "probe:U8x32_as_Nat"],
-   "code-text": {"lines-start": 186, "lines-end": 217},
+   "code-text": {"lines-start": 182, "lines-end": 213},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -26084,7 +27329,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.as_bytes",
     "probe:p"],
-   "code-text": {"lines-start": 31, "lines-end": 40},
+   "code-text": {"lines-start": 20, "lines-end": 31},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean",
    "code-module":
@@ -26136,7 +27381,7 @@
    ["probe:Field51_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"],
-   "code-text": {"lines-start": 34, "lines-end": 44},
+   "code-text": {"lines-start": 21, "lines-end": 34},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ZERO.lean",
    "code-module":
@@ -26182,7 +27427,7 @@
    "is-extraction-artifact": false,
    "display-name": "U64_cast_U8",
    "dependencies": [],
-   "code-text": {"lines-start": 38, "lines-end": 44},
+   "code-text": {"lines-start": 34, "lines-end": 40},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "code-module":
@@ -26208,7 +27453,7 @@
    ["probe:Field51_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"],
-   "code-text": {"lines-start": 33, "lines-end": 43},
+   "code-text": {"lines-start": 20, "lines-end": 32},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ONE.lean",
    "code-module":
@@ -26262,7 +27507,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE",
     "probe:p"],
-   "code-text": {"lines-start": 37, "lines-end": 44},
+   "code-text": {"lines-start": 20, "lines-end": 30},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/MINUS_ONE.lean",
    "code-module":
@@ -26310,7 +27555,7 @@
    "display-name": "LOW_51_BIT_MASK_spec",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK"],
-   "code-text": {"lines-start": 119, "lines-end": 122},
+   "code-text": {"lines-start": 123, "lines-end": 131},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "code-module":
@@ -26398,7 +27643,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 38, "lines-end": 55},
+   "code-text": {"lines-start": 21, "lines-end": 39},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/CtEq.lean",
    "code-module":
@@ -26509,7 +27754,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 26, "lines-end": 56},
+   "code-text": {"lines-start": 24, "lines-end": 55},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalSelect.lean",
    "code-module":
@@ -26566,7 +27811,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 29, "lines-end": 51},
+   "code-text": {"lines-start": 27, "lines-end": 51},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalAssign.lean",
    "code-module":
@@ -26654,7 +27899,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51.sub_assign",
     "probe:p"],
-   "code-text": {"lines-start": 27, "lines-end": 41},
+   "code-text": {"lines-start": 24, "lines-end": 38},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/SubAssign.lean",
    "code-module":
@@ -26729,7 +27974,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign"],
-   "code-text": {"lines-start": 65, "lines-end": 77},
+   "code-text": {"lines-start": 64, "lines-end": 76},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean",
    "code-module":
@@ -26753,7 +27998,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop"],
-   "code-text": {"lines-start": 28, "lines-end": 61},
+   "code-text": {"lines-start": 26, "lines-end": 60},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean",
    "code-module":
@@ -26881,7 +28126,7 @@
    "display-name": "ne",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51"],
-   "code-text": {"lines-start": 743, "lines-end": 745},
+   "code-text": {"lines-start": 744, "lines-end": 746},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec":
@@ -26982,7 +28227,7 @@
    "display-name": "assert_receiver_is_total_eq",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51"],
-   "code-text": {"lines-start": 751, "lines-end": 752},
+   "code-text": {"lines-start": 752, "lines-end": 753},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpEq":
@@ -27203,7 +28448,7 @@
     "probe:curve25519_dalek.backend.serial.u64.constants.SQRT_M1_raw",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:p"],
-   "code-text": {"lines-start": 37, "lines-end": 49},
+   "code-text": {"lines-start": 25, "lines-end": 39},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SqrtM1.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SqrtM1",
@@ -27228,7 +28473,7 @@
    "display-name": "SQRT_M1_raw",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51"],
-   "code-text": {"lines-start": 32, "lines-end": 35},
+   "code-text": {"lines-start": 20, "lines-end": 23},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SqrtM1.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SqrtM1"},
@@ -27286,7 +28531,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:d",
     "probe:p"],
-   "code-text": {"lines-start": 39, "lines-end": 51},
+   "code-text": {"lines-start": 27, "lines-end": 41},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SqrtAdMinusOne.lean",
    "code-module":
@@ -27312,7 +28557,7 @@
    "display-name": "SQRT_AD_MINUS_ONE_raw",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.FieldElement51"],
-   "code-text": {"lines-start": 34, "lines-end": 37},
+   "code-text": {"lines-start": 22, "lines-end": 25},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SqrtAdMinusOne.lean",
    "code-module":
@@ -27363,7 +28608,7 @@
    ["probe:L",
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.constants.R"],
-   "code-text": {"lines-start": 33, "lines-end": 34},
+   "code-text": {"lines-start": 32, "lines-end": 33},
    "code-path": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/R.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R"},
   "probe:curve25519_dalek.backend.serial.u64.constants.R_spec":
@@ -27388,7 +28633,7 @@
     "probe:R",
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.constants.R"],
-   "code-text": {"lines-start": 24, "lines-end": 29},
+   "code-text": {"lines-start": 22, "lines-end": 28},
    "code-path": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/R.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R",
    "attributes": ["simp"]},
@@ -27410,7 +28655,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.constants.R",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52"],
-   "code-text": {"lines-start": 31, "lines-end": 31},
+   "code-text": {"lines-start": 30, "lines-end": 30},
    "code-path": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/R.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R"},
   "probe:curve25519_dalek.backend.serial.u64.constants.RR_value_lt_L":
@@ -27433,7 +28678,7 @@
    ["probe:L",
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.constants.RR"],
-   "code-text": {"lines-start": 33, "lines-end": 34},
+   "code-text": {"lines-start": 31, "lines-end": 32},
    "code-path": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/RR.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR"},
   "probe:curve25519_dalek.backend.serial.u64.constants.RR_spec":
@@ -27458,7 +28703,7 @@
     "probe:R",
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.constants.RR"],
-   "code-text": {"lines-start": 24, "lines-end": 29},
+   "code-text": {"lines-start": 22, "lines-end": 27},
    "code-path": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/RR.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR",
    "attributes": ["simp"]},
@@ -27480,7 +28725,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.constants.RR",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52"],
-   "code-text": {"lines-start": 31, "lines-end": 31},
+   "code-text": {"lines-start": 29, "lines-end": 29},
    "code-path": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/RR.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR"},
   "probe:curve25519_dalek.backend.serial.u64.constants.RR":
@@ -27561,7 +28806,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:d",
     "probe:p"],
-   "code-text": {"lines-start": 21, "lines-end": 34},
+   "code-text": {"lines-start": 24, "lines-end": 42},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/OneMinusEdwardsDSquared.lean",
    "code-module":
@@ -27613,7 +28858,7 @@
    ["probe:Field51_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51"],
-   "code-text": {"lines-start": 22, "lines-end": 31},
+   "code-text": {"lines-start": 20, "lines-end": 32},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MontgomeryA.lean",
    "code-module":
@@ -27641,7 +28886,7 @@
     "probe:curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_NEG",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:p"],
-   "code-text": {"lines-start": 23, "lines-end": 34},
+   "code-text": {"lines-start": 21, "lines-end": 33},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MontgomeryANeg.lean",
    "code-module":
@@ -27721,7 +28966,7 @@
     "probe:curve25519_dalek.backend.serial.u64.constants.MINUS_ONE",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:p"],
-   "code-text": {"lines-start": 22, "lines-end": 32},
+   "code-text": {"lines-start": 20, "lines-end": 32},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MinusOne.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MinusOne",
@@ -27772,7 +29017,7 @@
    ["probe:L",
     "probe:Scalar52_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.constants.L"],
-   "code-text": {"lines-start": 21, "lines-end": 27},
+   "code-text": {"lines-start": 18, "lines-end": 24},
    "code-path": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/L.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L",
    "attributes": ["simp"]},
@@ -27794,7 +29039,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.constants.L",
     "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52"],
-   "code-text": {"lines-start": 30, "lines-end": 35},
+   "code-text": {"lines-start": 26, "lines-end": 32},
    "code-path": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/L.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L"},
   "probe:curve25519_dalek.backend.serial.u64.constants.LFACTOR_spec":
@@ -27813,7 +29058,7 @@
    "display-name": "LFACTOR_spec",
    "dependencies":
    ["probe:L", "probe:curve25519_dalek.backend.serial.u64.constants.LFACTOR"],
-   "code-text": {"lines-start": 22, "lines-end": 30},
+   "code-text": {"lines-start": 20, "lines-end": 28},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Lfactor.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Lfactor"},
@@ -27891,7 +29136,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:d",
     "probe:p"],
-   "code-text": {"lines-start": 22, "lines-end": 34},
+   "code-text": {"lines-start": 21, "lines-end": 33},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/InvsqrtAMinusD.lean",
    "code-module":
@@ -27959,7 +29204,7 @@
     "probe:curve25519_dalek.edwards.EdwardsPoint.toPoint",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 31, "lines-end": 67},
+   "code-text": {"lines-start": 30, "lines-end": 67},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EightTorsion.lean",
    "code-module":
@@ -28036,7 +29281,7 @@
     "probe:curve25519_dalek.backend.serial.u64.constants.EDWARDS_D",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:d"],
-   "code-text": {"lines-start": 21, "lines-end": 32},
+   "code-text": {"lines-start": 20, "lines-end": 32},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsD.lean",
    "code-module": "Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EdwardsD",
@@ -28065,7 +29310,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:d",
     "probe:p"],
-   "code-text": {"lines-start": 21, "lines-end": 32},
+   "code-text": {"lines-start": 25, "lines-end": 41},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsDMinusOneSquared.lean",
    "code-module":
@@ -28121,7 +29366,7 @@
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:d",
     "probe:p"],
-   "code-text": {"lines-start": 21, "lines-end": 32},
+   "code-text": {"lines-start": 20, "lines-end": 32},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsD2.lean",
    "code-module":
@@ -28225,7 +29470,7 @@
     "probe:curve25519_dalek.edwards.EdwardsPoint.toPoint",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 42, "lines-end": 65},
+   "code-text": {"lines-start": 26, "lines-end": 55},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Ed25519BasepointPoint.lean",
    "code-module":
@@ -28279,7 +29524,7 @@
    ["probe:Field51_as_Nat",
     "probe:curve25519_dalek.backend.serial.u64.constants.APLUS2_OVER_FOUR",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51"],
-   "code-text": {"lines-start": 41, "lines-end": 54},
+   "code-text": {"lines-start": 23, "lines-end": 37},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Aplus2OverFour.lean",
    "code-module":
@@ -30576,7 +31821,7 @@
    ["probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint",
     "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 998, "lines-end": 1020},
+   "code-text": {"lines-start": 999, "lines-end": 1021},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -30605,7 +31850,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 989, "lines-end": 996},
+   "code-text": {"lines-start": 990, "lines-end": 997},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select_spec":
@@ -32756,7 +34001,7 @@
    ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint",
     "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1102, "lines-end": 1122},
+   "code-text": {"lines-start": 1103, "lines-end": 1123},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -32780,7 +34025,7 @@
    ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint",
     "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1063, "lines-end": 1085},
+   "code-text": {"lines-start": 1064, "lines-end": 1086},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -32809,7 +34054,7 @@
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1054, "lines-end": 1061},
+   "code-text": {"lines-start": 1055, "lines-end": 1062},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap":
@@ -32839,7 +34084,7 @@
    ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint",
     "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 1095, "lines-end": 1100},
+   "code-text": {"lines-start": 1096, "lines-end": 1101},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select_spec":
@@ -33214,7 +34459,7 @@
    "display-name": "ne",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint"],
-   "code-text": {"lines-start": 734, "lines-end": 736},
+   "code-text": {"lines-start": 735, "lines-end": 737},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint.eq_spec":
@@ -33526,7 +34771,7 @@
    "dependencies":
    ["probe:curve25519_dalek.alloc.vec.Vec.Insts.ZeroizeZeroize.zeroize",
     "probe:curve25519_dalek.zeroize.Zeroize"],
-   "code-text": {"lines-start": 712, "lines-end": 725},
+   "code-text": {"lines-start": 713, "lines-end": 726},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -33549,7 +34794,7 @@
    "is-extraction-artifact": false,
    "display-name": "zeroize",
    "dependencies": ["probe:curve25519_dalek.zeroize.Zeroize"],
-   "code-text": {"lines-start": 706, "lines-end": 710},
+   "code-text": {"lines-start": 707, "lines-end": 711},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -33592,7 +34837,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.U8.Insts.SubtleConstantTimeEq.ct_eq",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 455, "lines-end": 479},
+   "code-text": {"lines-start": 456, "lines-end": 480},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -33620,7 +34865,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 450, "lines-end": 453},
+   "code-text": {"lines-start": 451, "lines-end": 454},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -33665,7 +34910,7 @@
    "dependencies":
    ["probe:curve25519_dalek.U8.Insts.SubtleConditionallySelectable.conditional_select",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 692, "lines-end": 697},
+   "code-text": {"lines-start": 693, "lines-end": 698},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -33689,7 +34934,7 @@
    ["probe:curve25519_dalek.U8.Insts.SubtleConditionallySelectable.conditional_select",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 665, "lines-end": 675},
+   "code-text": {"lines-start": 666, "lines-end": 676},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -33716,7 +34961,7 @@
    "dependencies":
    ["probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 659, "lines-end": 663},
+   "code-text": {"lines-start": 660, "lines-end": 664},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -33739,7 +34984,7 @@
    "dependencies":
    ["probe:curve25519_dalek.U8.Insts.SubtleConditionallySelectable.conditional_select",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 682, "lines-end": 685},
+   "code-text": {"lines-start": 683, "lines-end": 686},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -33808,7 +35053,7 @@
    "dependencies":
    ["probe:curve25519_dalek.U64.Insts.SubtleConditionallySelectable.conditional_select",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 594, "lines-end": 599},
+   "code-text": {"lines-start": 595, "lines-end": 600},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -33834,7 +35079,7 @@
     "probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.U64.Insts.SubtleConditionallySelectable.conditional_select",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 104, "lines-end": 114},
+   "code-text": {"lines-start": 35, "lines-end": 45},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ConditionalAddL.lean",
    "code-module":
@@ -33860,7 +35105,7 @@
    ["probe:curve25519_dalek.U64.Insts.SubtleConditionallySelectable.conditional_select",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 566, "lines-end": 576},
+   "code-text": {"lines-start": 567, "lines-end": 577},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -33888,7 +35133,7 @@
    "dependencies":
    ["probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 559, "lines-end": 564},
+   "code-text": {"lines-start": 560, "lines-end": 565},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -33911,7 +35156,7 @@
    "dependencies":
    ["probe:curve25519_dalek.U64.Insts.SubtleConditionallySelectable.conditional_select",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 583, "lines-end": 587},
+   "code-text": {"lines-start": 584, "lines-end": 588},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -33935,7 +35180,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.U16.Insts.SubtleConstantTimeEq.ct_eq",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 384, "lines-end": 408},
+   "code-text": {"lines-start": 385, "lines-end": 409},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -33964,7 +35209,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 379, "lines-end": 382},
+   "code-text": {"lines-start": 380, "lines-end": 383},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -33991,7 +35236,7 @@
     "probe:curve25519_dalek.Slice.Insts.SubtleConstantTimeEq.ct_eq",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.ConstantTimeEq"],
-   "code-text": {"lines-start": 432, "lines-end": 445},
+   "code-text": {"lines-start": 433, "lines-end": 446},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -34014,7 +35259,7 @@
    "dependencies":
    ["probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.ConstantTimeEq"],
-   "code-text": {"lines-start": 427, "lines-end": 430},
+   "code-text": {"lines-start": 428, "lines-end": 431},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -36181,7 +37426,7 @@
     "probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:p"],
-   "code-text": {"lines-start": 46, "lines-end": 139},
+   "code-text": {"lines-start": 27, "lines-end": 113},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean",
    "code-module":
@@ -36260,7 +37505,7 @@
     "probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:p"],
-   "code-text": {"lines-start": 25, "lines-end": 37},
+   "code-text": {"lines-start": 20, "lines-end": 32},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Neg.lean",
    "code-module":
@@ -36339,7 +37584,7 @@
     "probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51",
     "probe:p"],
-   "code-text": {"lines-start": 832, "lines-end": 890},
+   "code-text": {"lines-start": 855, "lines-end": 914},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36361,7 +37606,7 @@
    "display-name": "mul_product_stage_spec",
    "dependencies":
    ["probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_product_stage"],
-   "code-text": {"lines-start": 485, "lines-end": 623},
+   "code-text": {"lines-start": 493, "lines-end": 636},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36388,7 +37633,7 @@
    "display-name": "mul_product_stage",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m"],
-   "code-text": {"lines-start": 122, "lines-end": 190},
+   "code-text": {"lines-start": 130, "lines-end": 198},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36409,7 +37654,7 @@
    "display-name": "mul_final_reduce_stage_spec",
    "dependencies":
    ["probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_final_reduce_stage"],
-   "code-text": {"lines-start": 762, "lines-end": 828},
+   "code-text": {"lines-start": 780, "lines-end": 851},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36434,7 +37679,7 @@
    "is-extraction-artifact": false,
    "display-name": "mul_final_reduce_stage",
    "dependencies": [],
-   "code-text": {"lines-start": 233, "lines-end": 248},
+   "code-text": {"lines-start": 241, "lines-end": 256},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36455,7 +37700,7 @@
    "display-name": "mul_carry_prop_stage_spec",
    "dependencies":
    ["probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_carry_prop_stage"],
-   "code-text": {"lines-start": 627, "lines-end": 758},
+   "code-text": {"lines-start": 640, "lines-end": 776},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36482,7 +37727,7 @@
    "display-name": "mul_carry_prop_stage",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK"],
-   "code-text": {"lines-start": 192, "lines-end": 231},
+   "code-text": {"lines-start": 200, "lines-end": 239},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36531,7 +37776,7 @@
    "display-name": "m_spec",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m"],
-   "code-text": {"lines-start": 35, "lines-end": 40},
+   "code-text": {"lines-start": 34, "lines-end": 43},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36555,7 +37800,7 @@
    "dependencies":
    ["probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_product_stage",
     "probe:curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m"],
-   "code-text": {"lines-start": 252, "lines-end": 292},
+   "code-text": {"lines-start": 260, "lines-end": 300},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36576,7 +37821,7 @@
    "display-name": "fold_mul_final_reduce_stage",
    "dependencies":
    ["probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_final_reduce_stage"],
-   "code-text": {"lines-start": 320, "lines-end": 333},
+   "code-text": {"lines-start": 328, "lines-end": 341},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36599,7 +37844,7 @@
    "dependencies":
    ["probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_carry_prop_stage",
     "probe:curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK"],
-   "code-text": {"lines-start": 294, "lines-end": 318},
+   "code-text": {"lines-start": 302, "lines-end": 326},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36618,7 +37863,7 @@
    "is-extraction-artifact": false,
    "display-name": "decompose",
    "dependencies": ["probe:p"],
-   "code-text": {"lines-start": 48, "lines-end": 118},
+   "code-text": {"lines-start": 56, "lines-end": 126},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36639,7 +37884,7 @@
    "display-name": "LOW_51_BIT_MASK_spec",
    "dependencies":
    ["probe:curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK"],
-   "code-text": {"lines-start": 42, "lines-end": 46},
+   "code-text": {"lines-start": 45, "lines-end": 54},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "code-module":
@@ -36688,7 +37933,7 @@
    "dependencies":
    ["probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51"],
-   "code-text": {"lines-start": 24, "lines-end": 38},
+   "code-text": {"lines-start": 22, "lines-end": 34},
    "code-path":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean",
    "code-module":
@@ -38159,7 +39404,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 215, "lines-end": 215},
+   "code-text": {"lines-start": 216, "lines-end": 216},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["simp"]},
@@ -38191,7 +39436,7 @@
    "is-extraction-artifact": false,
    "display-name": "zero",
    "dependencies": ["probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 187, "lines-end": 187},
+   "code-text": {"lines-start": 188, "lines-end": 188},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.Choice.val_eq_zero_or_one":
@@ -38212,7 +39457,7 @@
    "dependencies":
    ["probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 197, "lines-end": 203},
+   "code-text": {"lines-start": 198, "lines-end": 204},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.Choice.val_eq_one_iff":
@@ -38235,7 +39480,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 233, "lines-end": 238},
+   "code-text": {"lines-start": 234, "lines-end": 239},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.Choice.one_ne_zero":
@@ -38258,7 +39503,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 214, "lines-end": 214},
+   "code-text": {"lines-start": 215, "lines-end": 215},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["simp"]},
@@ -38303,7 +39548,7 @@
    "is-extraction-artifact": false,
    "display-name": "one",
    "dependencies": ["probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 188, "lines-end": 188},
+   "code-text": {"lines-start": 189, "lines-end": 189},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.Choice.ne_zero_iff":
@@ -38326,7 +39571,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 222, "lines-end": 225},
+   "code-text": {"lines-start": 223, "lines-end": 226},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["simp"]},
@@ -38350,7 +39595,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 217, "lines-end": 220},
+   "code-text": {"lines-start": 218, "lines-end": 221},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["simp"]},
@@ -38374,7 +39619,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.subtle.Choice"],
-   "code-text": {"lines-start": 206, "lines-end": 212},
+   "code-text": {"lines-start": 207, "lines-end": 213},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.Choice.eq_zero_of_val":
@@ -38397,7 +39642,7 @@
    ["probe:curve25519_dalek.Choice.zero",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 227, "lines-end": 228},
+   "code-text": {"lines-start": 228, "lines-end": 229},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.Choice.eq_one_of_val":
@@ -38420,7 +39665,7 @@
    ["probe:curve25519_dalek.Choice.one",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 230, "lines-end": 231},
+   "code-text": {"lines-start": 231, "lines-end": 232},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal"},
   "probe:curve25519_dalek.Choice.eq_one":
@@ -38506,7 +39751,7 @@
    "dependencies":
    ["probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val"],
-   "code-text": {"lines-start": 252, "lines-end": 254},
+   "code-text": {"lines-start": 253, "lines-end": 255},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun", "subtle::Choice>}::from\""]},
@@ -38548,7 +39793,7 @@
    "is-extraction-artifact": false,
    "display-name": "zeroize",
    "dependencies": ["probe:curve25519_dalek.zeroize.Zeroize"],
-   "code-text": {"lines-start": 649, "lines-end": 652},
+   "code-text": {"lines-start": 650, "lines-end": 653},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -38575,7 +39820,7 @@
    ["probe:curve25519_dalek.Array.Insts.SubtleConditionallySelectable.conditional_select",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.ConditionallySelectable"],
-   "code-text": {"lines-start": 883, "lines-end": 896},
+   "code-text": {"lines-start": 884, "lines-end": 897},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -38601,7 +39846,7 @@
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val",
     "probe:curve25519_dalek.subtle.ConditionallySelectable"],
-   "code-text": {"lines-start": 850, "lines-end": 862},
+   "code-text": {"lines-start": 851, "lines-end": 863},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["step"]},
@@ -38632,7 +39877,7 @@
    ["probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.Choice.val",
     "probe:curve25519_dalek.subtle.ConditionallySelectable"],
-   "code-text": {"lines-start": 841, "lines-end": 848},
+   "code-text": {"lines-start": 842, "lines-end": 849},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -38659,7 +39904,7 @@
    ["probe:curve25519_dalek.Array.Insts.SubtleConditionallySelectable.conditional_select",
     "probe:curve25519_dalek.subtle.Choice",
     "probe:curve25519_dalek.subtle.ConditionallySelectable"],
-   "code-text": {"lines-start": 869, "lines-end": 876},
+   "code-text": {"lines-start": 870, "lines-end": 877},
    "code-path": "Curve25519Dalek/FunsExternal.lean",
    "code-module": "Curve25519Dalek.FunsExternal",
    "attributes": ["rust_fun"]},
@@ -38765,7 +40010,7 @@
    "is-extraction-artifact": false,
    "display-name": "carry_mod_eq",
    "dependencies": [],
-   "code-text": {"lines-start": 316, "lines-end": 318},
+   "code-text": {"lines-start": 317, "lines-end": 319},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:carry_fits_U64":
@@ -38782,7 +40027,7 @@
    "is-extraction-artifact": false,
    "display-name": "carry_fits_U64",
    "dependencies": [],
-   "code-text": {"lines-start": 303, "lines-end": 307},
+   "code-text": {"lines-start": 304, "lines-end": 308},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:cancelR":
@@ -38914,7 +40159,7 @@
    "is-extraction-artifact": false,
    "display-name": "U8x32_as_Nat_is_NatofDigits",
    "dependencies": ["probe:U8x32_as_Nat"],
-   "code-text": {"lines-start": 148, "lines-end": 168},
+   "code-text": {"lines-start": 149, "lines-end": 169},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:U8x32_as_Nat_injective":
@@ -38931,7 +40176,7 @@
    "is-extraction-artifact": false,
    "display-name": "U8x32_as_Nat_injective",
    "dependencies": ["probe:U8x32_as_Nat"],
-   "code-text": {"lines-start": 238, "lines-end": 266},
+   "code-text": {"lines-start": 239, "lines-end": 267},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:U8x32_as_Nat_foldr":
@@ -38951,7 +40196,7 @@
    "is-extraction-artifact": false,
    "display-name": "U8x32_as_Nat_foldr",
    "dependencies": [],
-   "code-text": {"lines-start": 436, "lines-end": 437},
+   "code-text": {"lines-start": 437, "lines-end": 438},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:U8x32_as_Nat_eq_foldr'":
@@ -38968,7 +40213,7 @@
    "is-extraction-artifact": false,
    "display-name": "U8x32_as_Nat_eq_foldr'",
    "dependencies": ["probe:U8x32_as_Nat", "probe:U8x32_as_Nat_foldr"],
-   "code-text": {"lines-start": 439, "lines-end": 442},
+   "code-text": {"lines-start": 440, "lines-end": 443},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:U8x32_as_Nat_eq_foldr":
@@ -38985,7 +40230,7 @@
    "is-extraction-artifact": false,
    "display-name": "U8x32_as_Nat_eq_foldr",
    "dependencies": ["probe:U8x32_as_Nat"],
-   "code-text": {"lines-start": 220, "lines-end": 228},
+   "code-text": {"lines-start": 221, "lines-end": 229},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:U8x32_as_Nat":
@@ -39118,7 +40363,7 @@
     "probe:U8x32_as_Nat",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 230, "lines-end": 236},
+   "code-text": {"lines-start": 231, "lines-end": 237},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:U8x32_as_Field":
@@ -39160,7 +40405,7 @@
    "is-extraction-artifact": false,
    "display-name": "U64_shiftRight_le",
    "dependencies": [],
-   "code-text": {"lines-start": 27, "lines-end": 29},
+   "code-text": {"lines-start": 28, "lines-end": 30},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:U64_cast_U8":
@@ -39177,7 +40422,7 @@
    "is-extraction-artifact": false,
    "display-name": "U64_cast_U8",
    "dependencies": [],
-   "code-text": {"lines-start": 360, "lines-end": 365},
+   "code-text": {"lines-start": 361, "lines-end": 366},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:U64_cast_U128_val":
@@ -39194,7 +40439,7 @@
    "is-extraction-artifact": false,
    "display-name": "U64_cast_U128_val",
    "dependencies": [],
-   "code-text": {"lines-start": 288, "lines-end": 295},
+   "code-text": {"lines-start": 289, "lines-end": 296},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux",
    "attributes": ["simp"]},
@@ -39212,7 +40457,7 @@
    "is-extraction-artifact": false,
    "display-name": "U128_cast_U64_val",
    "dependencies": [],
-   "code-text": {"lines-start": 283, "lines-end": 286},
+   "code-text": {"lines-start": 284, "lines-end": 287},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux",
    "attributes": ["simp"]},
@@ -39230,7 +40475,7 @@
    "is-extraction-artifact": false,
    "display-name": "U128_cast_U64_cast_U128_val",
    "dependencies": [],
-   "code-text": {"lines-start": 297, "lines-end": 301},
+   "code-text": {"lines-start": 298, "lines-end": 302},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux",
    "attributes": ["simp"]},
@@ -39287,7 +40532,7 @@
    "is-extraction-artifact": false,
    "display-name": "Scalar52_top_limb_lt_of_as_Nat_lt",
    "dependencies": ["probe:Scalar52_as_Nat"],
-   "code-text": {"lines-start": 136, "lines-end": 146},
+   "code-text": {"lines-start": 137, "lines-end": 147},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:Scalar52_limb_le_nat":
@@ -43891,7 +45136,7 @@
     "probe:Edwards.zsmul_Ed25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 272, "lines-end": 283},
+   "code-text": {"lines-start": 352, "lines-end": 363},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.zsmul_Ed25519":
@@ -43929,7 +45174,7 @@
     "probe:Edwards.nsmul_Ed25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 209, "lines-end": 212},
+   "code-text": {"lines-start": 289, "lines-end": 292},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.zero_y":
@@ -43960,7 +45205,7 @@
     "probe:Edwards.instZeroPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 179, "lines-end": 179},
+   "code-text": {"lines-start": 259, "lines-end": 259},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve",
    "attributes": ["simp"]},
@@ -43992,7 +45237,7 @@
     "probe:Edwards.instZeroPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 178, "lines-end": 178},
+   "code-text": {"lines-start": 258, "lines-end": 258},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve",
    "attributes": ["simp"]},
@@ -44024,7 +45269,7 @@
     "probe:Edwards.instZeroPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 233, "lines-end": 239},
+   "code-text": {"lines-start": 313, "lines-end": 319},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.nsmul_succ_Ed25519":
@@ -44055,7 +45300,7 @@
     "probe:Edwards.nsmul_Ed25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 267, "lines-end": 270},
+   "code-text": {"lines-start": 347, "lines-end": 350},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.nsmul_eightTorsionGen_eq":
@@ -44123,7 +45368,7 @@
     "probe:Edwards.Point",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 194, "lines-end": 197},
+   "code-text": {"lines-start": 274, "lines-end": 277},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.neg_y":
@@ -44154,7 +45399,7 @@
     "probe:Edwards.instNegPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 189, "lines-end": 189},
+   "code-text": {"lines-start": 269, "lines-end": 269},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve",
    "attributes": ["simp"]},
@@ -44186,7 +45431,7 @@
     "probe:Edwards.instNegPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 188, "lines-end": 188},
+   "code-text": {"lines-start": 268, "lines-end": 268},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve",
    "attributes": ["simp"]},
@@ -44239,7 +45484,7 @@
     "probe:Edwards.instZeroPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 248, "lines-end": 261},
+   "code-text": {"lines-start": 328, "lines-end": 341},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.lift_mod_eq":
@@ -44261,6 +45506,35 @@
    "code-text": {"lines-start": 137, "lines-end": 139},
    "code-path": "Curve25519Dalek/Math/Basic.lean",
    "code-module": "Curve25519Dalek.Math.Basic"},
+  "probe:Edwards.lam_sq_eq_one_impossible":
+  {"verification-status": "verified",
+   "type-dependencies":
+   ["probe:Edwards.EdwardsCurve",
+    "probe:Edwards.EdwardsCurve.a",
+    "probe:Edwards.EdwardsCurve.d",
+    "probe:Edwards.Point",
+    "probe:Edwards.Point.x",
+    "probe:Edwards.Point.y"],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "theorem",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "lam_sq_eq_one_impossible",
+   "dependencies":
+   ["probe:Edwards.EdwardsCurve",
+    "probe:Edwards.EdwardsCurve.a",
+    "probe:Edwards.EdwardsCurve.d",
+    "probe:Edwards.Point",
+    "probe:Edwards.Point.x",
+    "probe:Edwards.Point.y"],
+   "code-text": {"lines-start": 87, "lines-end": 169},
+   "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
+   "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.instZeroPointCurveFieldEd25519":
   {"verification-status": "verified",
    "type-dependencies":
@@ -44313,7 +45587,7 @@
     "probe:Edwards.Point",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 175, "lines-end": 176},
+   "code-text": {"lines-start": 255, "lines-end": 256},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.instSubPointCurveFieldEd25519":
@@ -44354,7 +45628,7 @@
     "probe:Edwards.instNegPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 191, "lines-end": 192},
+   "code-text": {"lines-start": 271, "lines-end": 272},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.instSMulNatPointCurveFieldEd25519":
@@ -44421,7 +45695,7 @@
     "probe:Edwards.nsmul_Ed25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 214, "lines-end": 214},
+   "code-text": {"lines-start": 294, "lines-end": 294},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.instSMulIntPointCurveFieldEd25519":
@@ -44460,7 +45734,7 @@
     "probe:Edwards.zsmul_Ed25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 215, "lines-end": 215},
+   "code-text": {"lines-start": 295, "lines-end": 295},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.instReprPoint.repr":
@@ -44552,7 +45826,7 @@
     "probe:Edwards.Point.y",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 181, "lines-end": 186},
+   "code-text": {"lines-start": 261, "lines-end": 266},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.instNeZeroCurveFieldOfNat":
@@ -44719,7 +45993,7 @@
     "probe:Edwards.add_coords",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 168, "lines-end": 173},
+   "code-text": {"lines-start": 248, "lines-end": 253},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.instAddCommGroupPointCurveFieldEd25519":
@@ -44777,7 +46051,7 @@
     "probe:Edwards.zsmul_succ_Ed25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 293, "lines-end": 306},
+   "code-text": {"lines-start": 373, "lines-end": 386},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.four_nsmul_gen_ne_zero":
@@ -45011,7 +46285,7 @@
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.complete_addition_denominators_ne_zero":
-  {"verification-status": "unverified",
+  {"verification-status": "verified",
    "type-dependencies":
    ["probe:Edwards.EdwardsCurve",
     "probe:Edwards.EdwardsCurve.a",
@@ -45036,7 +46310,7 @@
     "probe:Edwards.Point",
     "probe:Edwards.Point.x",
     "probe:Edwards.Point.y"],
-   "code-text": {"lines-start": 87, "lines-end": 102},
+   "code-text": {"lines-start": 171, "lines-end": 182},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.binary_nsmul_Ed25519_eq":
@@ -45067,7 +46341,7 @@
     "probe:Edwards.instSMulNatPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 314, "lines-end": 327},
+   "code-text": {"lines-start": 394, "lines-end": 407},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.binary_nsmul_Ed25519":
@@ -45101,7 +46375,7 @@
     "probe:Edwards.Point",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 199, "lines-end": 207},
+   "code-text": {"lines-start": 279, "lines-end": 287},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.basepoint_order_L":
@@ -45240,7 +46514,7 @@
     "probe:Edwards.instZeroPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 241, "lines-end": 246},
+   "code-text": {"lines-start": 321, "lines-end": 326},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.add_y":
@@ -45277,7 +46551,7 @@
     "probe:Edwards.instAddPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 229, "lines-end": 231},
+   "code-text": {"lines-start": 309, "lines-end": 311},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.add_x":
@@ -45312,7 +46586,7 @@
     "probe:Edwards.instAddPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 225, "lines-end": 227},
+   "code-text": {"lines-start": 305, "lines-end": 307},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.add_def":
@@ -45347,7 +46621,7 @@
     "probe:Edwards.instAddPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 308, "lines-end": 312},
+   "code-text": {"lines-start": 388, "lines-end": 392},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.add_coords_mk":
@@ -45372,7 +46646,7 @@
     "probe:Edwards.EdwardsCurve.a",
     "probe:Edwards.EdwardsCurve.d",
     "probe:Edwards.add_coords"],
-   "code-text": {"lines-start": 219, "lines-end": 223},
+   "code-text": {"lines-start": 299, "lines-end": 303},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.add_coords":
@@ -45400,7 +46674,7 @@
    ["probe:Edwards.EdwardsCurve",
     "probe:Edwards.EdwardsCurve.a",
     "probe:Edwards.EdwardsCurve.d"],
-   "code-text": {"lines-start": 114, "lines-end": 119},
+   "code-text": {"lines-start": 194, "lines-end": 199},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.add_comm_Ed25519":
@@ -45429,7 +46703,7 @@
     "probe:Edwards.instAddPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 263, "lines-end": 265},
+   "code-text": {"lines-start": 343, "lines-end": 345},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.add_closure_Ed25519":
@@ -45466,7 +46740,7 @@
     "probe:Edwards.add_coords",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 159, "lines-end": 164},
+   "code-text": {"lines-start": 239, "lines-end": 244},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.add_closure":
@@ -45497,7 +46771,7 @@
     "probe:Edwards.Point.x",
     "probe:Edwards.Point.y",
     "probe:Edwards.add_coords"],
-   "code-text": {"lines-start": 122, "lines-end": 155},
+   "code-text": {"lines-start": 202, "lines-end": 235},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.add_assoc_Ed25519":
@@ -45526,7 +46800,7 @@
     "probe:Edwards.instAddPointCurveFieldEd25519",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 285, "lines-end": 291},
+   "code-text": {"lines-start": 365, "lines-end": 371},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.Point.y":
@@ -45544,6 +46818,7 @@
     "probe:Edwards.add_x",
     "probe:Edwards.add_y",
     "probe:Edwards.complete_addition_denominators_ne_zero",
+    "probe:Edwards.lam_sq_eq_one_impossible",
     "probe:Edwards.neg_y",
     "probe:Edwards.zero_y",
     "probe:Montgomery.T_point_x",
@@ -45615,6 +46890,7 @@
     "probe:Edwards.add_x",
     "probe:Edwards.add_y",
     "probe:Edwards.complete_addition_denominators_ne_zero",
+    "probe:Edwards.lam_sq_eq_one_impossible",
     "probe:Edwards.neg_x",
     "probe:Edwards.zero_x",
     "probe:Montgomery.T_point_x",
@@ -45773,6 +47049,7 @@
     "probe:Edwards.eight_nsmul_gen_eq_zero",
     "probe:Edwards.four_nsmul_basepoint_ne_zero",
     "probe:Edwards.four_nsmul_gen_ne_zero",
+    "probe:Edwards.lam_sq_eq_one_impossible",
     "probe:Edwards.neg_add_cancel_Ed25519",
     "probe:Edwards.neg_x",
     "probe:Edwards.neg_y",
@@ -45963,6 +47240,7 @@
     "probe:Edwards.add_y",
     "probe:Edwards.complete_addition_denominators_ne_zero",
     "probe:Edwards.d_not_square",
+    "probe:Edwards.lam_sq_eq_one_impossible",
     "probe:Montgomery.B_d_relation",
     "probe:Montgomery.a_plus_d",
     "probe:Montgomery.a_sub_d",
@@ -46018,6 +47296,7 @@
     "probe:Edwards.add_coords_mk",
     "probe:Edwards.add_y",
     "probe:Edwards.complete_addition_denominators_ne_zero",
+    "probe:Edwards.lam_sq_eq_one_impossible",
     "probe:Montgomery.B_d_relation",
     "probe:Montgomery.a_plus_d",
     "probe:Montgomery.a_sub_d",
@@ -46064,7 +47343,8 @@
     "probe:Edwards.Point.on_curve",
     "probe:Edwards.add_closure",
     "probe:Edwards.add_coords_mk",
-    "probe:Edwards.complete_addition_denominators_ne_zero"],
+    "probe:Edwards.complete_addition_denominators_ne_zero",
+    "probe:Edwards.lam_sq_eq_one_impossible"],
    "rust-source": null,
    "language": "lean",
    "kind": "structure",
@@ -46108,7 +47388,7 @@
     "probe:Edwards.Point.y",
     "probe:instFactPrimeP",
     "probe:p"],
-   "code-text": {"lines-start": 104, "lines-end": 110},
+   "code-text": {"lines-start": 184, "lines-end": 190},
    "code-path": "Curve25519Dalek/Math/Edwards/Curve.lean",
    "code-module": "Curve25519Dalek.Math.Edwards.Curve"},
   "probe:Edwards.Ed25519":
@@ -46519,6 +47799,42 @@
    "code-text": {"lines-start": 134, "lines-end": 135},
    "code-path": "Curve25519Dalek/Math/Basic.lean",
    "code-module": "Curve25519Dalek.Math.Basic"},
+  "probe:Curve25519Dalek.Lint.specIndentLinter":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies":
+   ["probe:Curve25519Dalek.Lint.linter.curve25519.specIndent"],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "def",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "specIndentLinter",
+   "dependencies": ["probe:Curve25519Dalek.Lint.linter.curve25519.specIndent"],
+   "code-text": {"lines-start": 214, "lines-end": 235},
+   "code-path": "Curve25519Dalek/Lint/SpecIndent.lean",
+   "code-module": "Curve25519Dalek.Lint.SpecIndent",
+   "attributes": ["step"]},
+  "probe:Curve25519Dalek.Lint.linter.curve25519.specIndent":
+  {"verification-status": "verified",
+   "type-dependencies": [],
+   "term-dependencies": [],
+   "rust-source": null,
+   "language": "lean",
+   "kind": "opaque",
+   "is-relevant": true,
+   "is-in-package": true,
+   "is-ignored": false,
+   "is-hidden": false,
+   "is-extraction-artifact": false,
+   "display-name": "specIndent",
+   "dependencies": [],
+   "code-text": {"lines-start": 33, "lines-end": 38},
+   "code-path": "Curve25519Dalek/Lint/SpecIndent.lean",
+   "code-module": "Curve25519Dalek.Lint.SpecIndent"},
   "probe:Array.val_getElem!_eq'":
   {"verification-status": "verified",
    "type-dependencies": [],
@@ -46533,7 +47849,7 @@
    "is-extraction-artifact": false,
    "display-name": "val_getElem!_eq'",
    "dependencies": [],
-   "code-text": {"lines-start": 47, "lines-end": 49},
+   "code-text": {"lines-start": 48, "lines-end": 50},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:Array.set_of_ne_getElem!":
@@ -46550,7 +47866,7 @@
    "is-extraction-artifact": false,
    "display-name": "set_of_ne_getElem!",
    "dependencies": [],
-   "code-text": {"lines-start": 79, "lines-end": 84},
+   "code-text": {"lines-start": 80, "lines-end": 85},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:Array.set_of_ne'":
@@ -46567,7 +47883,7 @@
    "is-extraction-artifact": false,
    "display-name": "set_of_ne'",
    "dependencies": [],
-   "code-text": {"lines-start": 59, "lines-end": 64},
+   "code-text": {"lines-start": 60, "lines-end": 65},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:Array.set_of_ne":
@@ -46584,7 +47900,7 @@
    "is-extraction-artifact": false,
    "display-name": "set_of_ne",
    "dependencies": [],
-   "code-text": {"lines-start": 51, "lines-end": 57},
+   "code-text": {"lines-start": 52, "lines-end": 58},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux",
    "attributes": ["simp"]},
@@ -46602,7 +47918,7 @@
    "is-extraction-artifact": false,
    "display-name": "set_of_eq",
    "dependencies": [],
-   "code-text": {"lines-start": 86, "lines-end": 91},
+   "code-text": {"lines-start": 87, "lines-end": 92},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:Array.getElem_usize_eq_getElem!":
@@ -46619,7 +47935,7 @@
    "is-extraction-artifact": false,
    "display-name": "getElem_usize_eq_getElem!",
    "dependencies": [],
-   "code-text": {"lines-start": 71, "lines-end": 77},
+   "code-text": {"lines-start": 72, "lines-end": 78},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:Array.getElem_eq_getElem!":
@@ -46636,7 +47952,7 @@
    "is-extraction-artifact": false,
    "display-name": "getElem_eq_getElem!",
    "dependencies": [],
-   "code-text": {"lines-start": 66, "lines-end": 69},
+   "code-text": {"lines-start": 67, "lines-end": 70},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"},
   "probe:Aeneas.Std.U64.shiftRight_51":
@@ -46653,6 +47969,6 @@
    "is-extraction-artifact": false,
    "display-name": "shiftRight_51",
    "dependencies": [],
-   "code-text": {"lines-start": 37, "lines-end": 39},
+   "code-text": {"lines-start": 38, "lines-end": 40},
    "code-path": "Curve25519Dalek/Aux.lean",
    "code-module": "Curve25519Dalek.Aux"}}}
