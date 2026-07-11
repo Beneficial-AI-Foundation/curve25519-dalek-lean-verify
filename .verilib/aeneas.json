@@ -1,0 +1,7 @@
+{
+  "out-of-scope": [
+    "*core::fmt::Debug*",
+    "*core::fmt::Display*",
+    "*core::hash::Hash*"
+  ]
+}
