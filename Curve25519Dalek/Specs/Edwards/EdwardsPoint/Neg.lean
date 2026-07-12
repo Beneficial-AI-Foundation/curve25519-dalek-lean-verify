@@ -15,6 +15,12 @@ Negate an Edwards point via elliptic curve negation: negates the X and T
 coordinates while keeping Y and Z unchanged, which corresponds to negating
 the x-coordinate in affine form.
 
+- The core implementation (`-&EdwardsPoint`) takes the EdwardsPoint by reference,
+  negates the X and T coordinates via field negation, and returns the result as
+  a new EdwardsPoint.
+- The by-value wrapper (`-EdwardsPoint`) takes its operand by value and delegates
+  to the core `- &EdwardsPoint` negation.
+
 Source: "curve25519-dalek/src/edwards.rs"
 -/
 
@@ -76,3 +82,22 @@ theorem neg_spec
   · simp only [Edwards.neg_y]
 
 end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint
+
+namespace curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint
+
+/-- **Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::neg`**
+• The function always succeeds (no panic) for valid inputs
+• The result is a valid Edwards point
+• The result represents the negation of the input (in the context of elliptic curve negation)
+-/
+@[step]
+theorem neg_spec
+    (self : EdwardsPoint)
+    (h_self_valid : self.IsValid) :
+    neg self ⦃ (result : EdwardsPoint) =>
+      result.IsValid ∧
+      result.toPoint = -self.toPoint ⦄ := by
+  unfold neg
+  step*
+
+end curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint

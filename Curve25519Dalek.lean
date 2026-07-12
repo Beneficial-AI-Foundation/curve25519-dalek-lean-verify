@@ -15,6 +15,7 @@ import Curve25519Dalek.Math.PrimeCerts
 import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Plausible
 import Curve25519Dalek.PlausibleDomain
+import Curve25519Dalek.Specs.Backend.GetSelectedBackend
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.AssertReceiverIsTotalEq
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.ConditionalAssign
@@ -59,6 +60,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AsBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSwap
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
@@ -82,6 +84,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ConditionalAddL
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromBytesWide
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Index
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.IndexMut
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Invert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryInvert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
@@ -97,14 +101,17 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ToBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.StrausMultiscalarMul
+import Curve25519Dalek.Specs.Backend.VariableBaseMul
 import Curve25519Dalek.Specs.Backend.VartimeDoubleBaseMul
 import Curve25519Dalek.Specs.Constants.BASEPOINT_ORDER_PRIVATE
 import Curve25519Dalek.Specs.Constants.RISTRETTO_BASEPOINT_POINT
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Compress
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.ConditionalSelect
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.CtEq
+import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Default
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Eq
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Identity
+import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Mul
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.ToEdwards
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.CtEq
@@ -113,6 +120,7 @@ import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.FromSlice
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Identity
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Step1
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Step2
+import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.ToBytes
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Add
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsAffineNiels
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjective
@@ -178,6 +186,7 @@ import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.FromUniformBytes
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Identity
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.MulBase
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Neg
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Sub
 import Curve25519Dalek.Specs.Scalar.ClampInteger
 import Curve25519Dalek.Specs.Scalar.ReadLeU64Into
@@ -188,6 +197,7 @@ import Curve25519Dalek.Specs.Scalar.Scalar.AsRadix2w
 import Curve25519Dalek.Specs.Scalar.Scalar.BatchInvert
 import Curve25519Dalek.Specs.Scalar.Scalar.ConditionalSelect
 import Curve25519Dalek.Specs.Scalar.Scalar.CtEq
+import Curve25519Dalek.Specs.Scalar.Scalar.Default
 import Curve25519Dalek.Specs.Scalar.Scalar.Eq
 import Curve25519Dalek.Specs.Scalar.Scalar.FromBytesModOrder
 import Curve25519Dalek.Specs.Scalar.Scalar.FromBytesModOrderWide
@@ -197,6 +207,7 @@ import Curve25519Dalek.Specs.Scalar.Scalar.FromU16
 import Curve25519Dalek.Specs.Scalar.Scalar.FromU32
 import Curve25519Dalek.Specs.Scalar.Scalar.FromU64
 import Curve25519Dalek.Specs.Scalar.Scalar.FromU8
+import Curve25519Dalek.Specs.Scalar.Scalar.Index
 import Curve25519Dalek.Specs.Scalar.Scalar.Invert
 import Curve25519Dalek.Specs.Scalar.Scalar.IsCanonical
 import Curve25519Dalek.Specs.Scalar.Scalar.Mul
@@ -210,6 +221,7 @@ import Curve25519Dalek.Specs.Scalar.Scalar.ToBytes
 import Curve25519Dalek.Specs.Scalar.Scalar.ToRadix2wSizeHint
 import Curve25519Dalek.Specs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Specs.Scalar.Scalar.Zero
+import Curve25519Dalek.Specs.Traits.IsIdentity
 import Curve25519Dalek.Specs.Window.LookupTable.From
 import Curve25519Dalek.Specs.Window.LookupTable.Select
 import Curve25519Dalek.Tactics

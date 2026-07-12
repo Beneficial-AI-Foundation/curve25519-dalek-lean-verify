@@ -798,11 +798,13 @@
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem neg_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :\n    neg self ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = -self.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Neg.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::neg`**\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Ristretto point\n• The result represents the negation of the input (in the context of elliptic curve negation)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Neg<curve25519_dalek::ristretto::RistrettoPoint> for &0 (curve25519_dalek::ristretto::RistrettoPoint)}::neg",
@@ -813,7 +815,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg"]},
@@ -1777,11 +1779,13 @@
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub"]},
   {"visibility": null,
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem get_selected_backend_spec :\n    get_selected_backend ⦃ (result : BackendKind) =>\n      result = BackendKind.Serial ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Backend/GetSelectedBackend.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::backend::get_selected_backend`**\n• The function always succeeds (no panic)\n• The result is `BackendKind.Serial`\n-/",
    "source": "curve25519-dalek/src/backend/mod.rs",
    "rust_name": "curve25519_dalek::backend::get_selected_backend",
    "lines": "L55-L75",
@@ -1790,7 +1794,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"visibility": null,
@@ -1978,11 +1982,14 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem neg_spec\n    (self : backend.serial.curve_models.AffineNielsPoint)\n    (self_bound : ∀ i < 5, self.xy2d[i]!.val < 2 ^ 54) :\n    neg self ⦃ (result : AffineNielsPoint) =>\n      result.y_plus_x = self.y_minus_x ∧\n      result.y_minus_x = self.y_plus_x ∧\n      (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0 ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Neg.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::neg`**\n\nSpecification for the owned-value\n`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::neg`.\n• The function always succeeds (no panic) for an AffineNielsPoint `self` with coordinates\n  (y_plus_x, y_minus_x, xy2d) satisfying the limb bound `self.xy2d[i] < 2^54`\n• The output AffineNielsPoint computed by `neg self` has coordinates (y_plus_x', y_minus_x', xy2d')\n  • y_plus_x' = y_minus_x (the coordinates are swapped)\n  • y_minus_x' = y_plus_x (the coordinates are swapped)\n  • `xy2d' ≡ -xy2d (mod p)` (the xy2d coordinate is negated modulo p = 2^255 - 19)\n\nMirrors the shared-reference `Shared0…neg_spec`; the owned `neg` is just a\none-step delegation to it (Rust source: `-&self`). -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::neg",
@@ -1993,7 +2000,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg"]},
@@ -3243,11 +3250,14 @@
    "externally_verified": false,
    "dependencies": []},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem conditional_swap_spec\n    (a b : backend.serial.u64.field.FieldElement51)\n    (choice : subtle.Choice) :\n    conditional_swap a b choice ⦃\n      (res : FieldElement51 × FieldElement51) =>\n      (∀ i < 5, res.1[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) ∧\n      (∀ i < 5, res.2[i]! = (if choice.val = 1#u8 then a[i]! else b[i]!)) ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalSwap.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_swap`**\n• The function always succeeds (no panic)\n• For each limb `i`, `res.1[i]` equals `b[i]` when `choice = 1` and `a[i]` when `choice = 0`\n• For each limb `i`, `res.2[i]` equals `a[i]` when `choice = 1` and `b[i]` when `choice = 0`\n• Consequently, when `choice = Choice.one` the result is `(b, a)`;\n  when `choice = Choice.zero` the result is `(a, b)`.\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_swap",
@@ -3258,7 +3268,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"visibility": null,
@@ -3822,11 +3832,14 @@
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem index_mut_spec (self : backend.serial.u64.scalar.Scalar52) (_index : Std.Usize)\n    (h_bound : _index.val < 5) :\n    index_mut self _index ⦃ (result : Std.U64 × (Std.U64 → backend.serial.u64.scalar.Scalar52)) =>\n      result.1 = self.val[_index.val]! ∧\n      result.2 = Aeneas.Std.Array.set self _index ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/IndexMut.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::index_mut`**\n• The function succeeds (no panic) when `_index < 5`\n• The first component of the result equals `self.val[_index]`, the limb at the given position\n• The second component is `Array.set self _index`, which replaces the limb at position `_index`\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::IndexMut<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index_mut",
@@ -3837,7 +3850,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"visibility": null,
@@ -3861,11 +3874,14 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem index_spec (self : backend.serial.u64.scalar.Scalar52) (_index : Std.Usize)\n    (h_bound : _index.val < 5) :\n    index self _index ⦃ (result : Std.U64) =>\n      result = self.val[_index.val]! ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Index.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::index`**\n• The function succeeds (no panic) when `_index < 5`\n• The result equals `self.val[_index]`, the limb at the given position\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::Index<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index",
@@ -3876,7 +3892,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"visibility": null,
@@ -4117,7 +4133,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_loop",
@@ -4238,7 +4254,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index"]},
@@ -4403,7 +4419,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
@@ -4452,7 +4468,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
@@ -4565,11 +4581,13 @@
    "externally_verified": false,
    "dependencies": []},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem variable_base_mul_spec\n    (point : edwards.EdwardsPoint) (scalar : scalar.Scalar)\n    (h_point_valid : point.IsValid)\n    (h_top : (scalar.bytes[31]!).val ≤ 127) :\n    variable_base_mul point scalar ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = ((U8x32_as_Nat scalar.bytes : ℕ) : ℤ) • point.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Backend/VariableBaseMul.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::backend::variable_base_mul`**\n• The function always succeeds (no panic) for a valid input `EdwardsPoint` and a\n  `Scalar` whose top byte satisfies `scalar.bytes[31] ≤ 127`\n• The result is a valid `EdwardsPoint`\n• `result.toPoint` equals `(U8x32_as_Nat scalar.bytes) • point.toPoint`, i.e., scalar\n  multiplication of `point.toPoint` by the natural number encoded by `scalar.bytes`\n-/",
    "source": "curve25519-dalek/src/backend/mod.rs",
    "rust_name": "curve25519_dalek::backend::variable_base_mul",
    "lines": "L253-L263",
@@ -5004,11 +5022,13 @@
    "externally_verified": false,
    "dependencies": []},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem to_bytes_spec (self : CompressedEdwardsY) :\n    to_bytes self ⦃ (result : Array U8 32#usize) =>\n      result = self ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/ToBytes.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::edwards::CompressedEdwardsY::to_bytes`**\n• The function succeeds (always returns `ok`)\n• The result is exactly the internal byte array representation -/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::to_bytes",
@@ -5018,7 +5038,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"visibility": null,
@@ -5322,11 +5342,13 @@
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem neg_spec\n    (self : EdwardsPoint)\n    (h_self_valid : self.IsValid) :\n    neg self ⦃ (result : EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = -self.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Neg.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::neg`**\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the negation of the input (in the context of elliptic curve negation)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Neg<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::neg",
@@ -5337,7 +5359,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg"]},
@@ -6018,11 +6040,13 @@
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreDefaultDefault.default"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem default_spec :\n    default ⦃ (q : AffinePoint) =>\n      Field51_as_Nat q.x = 0 ∧\n      Field51_as_Nat q.y = 1 ∧\n      q.IsValid ∧\n      q.toPoint = 0 ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/Default.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::edwards::affine::AffinePoint::default`**\n• The function always succeeds (no panic)\n• The x-coordinate of the result is `0`\n• The y-coordinate of the result is `1`\n• The resulting `AffinePoint` is valid\n• The result represents the identity element of the Ed25519 group\n-/",
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{core::default::Default for curve25519_dalek::edwards::affine::AffinePoint}::default",
@@ -6033,7 +6057,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
@@ -6607,11 +6631,14 @@
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_assign_spec (self : MontgomeryPoint) (rhs : scalar.Scalar)\n    (hself_bound : U8x32_as_Nat self < 2 ^ 255) :\n    mul_assign self rhs ⦃ (result : MontgomeryPoint) =>\n      let m := (U8x32_as_Nat rhs.bytes) % 2^255\n      MontgomeryPoint.mkPoint result = m • (MontgomeryPoint.mkPoint self) ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulAssign.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::mul_assign`**\n• The function always succeeds (no panic)\n• The result satisfies `MontgomeryPoint.mkPoint result = m • MontgomeryPoint.mkPoint self`,\n  where `m = (U8x32_as_Nat rhs.bytes) % 2^255`\n-/",
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::MulAssign<curve25519_dalek::scalar::Scalar> for curve25519_dalek::montgomery::MontgomeryPoint}::mul_assign",
@@ -7909,11 +7936,13 @@
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem neg_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :\n    neg self ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = -self.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Neg.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::neg`**\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Ristretto point\n• The result represents the negation of the input (in the context of elliptic curve negation)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Neg<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::neg",
@@ -7924,7 +7953,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg"]},
@@ -8639,11 +8668,13 @@
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreDefaultDefault.default"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem default_spec :\n    default ⦃ (result : scalar.Scalar) =>\n      U8x32_as_Nat result.bytes = 0 ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Default.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::default`**\n• The function always succeeds (no panic)\n• The result satisfies `U8x32_as_Nat result.bytes = 0`\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::default::Default for curve25519_dalek::scalar::Scalar}::default",
@@ -8654,7 +8685,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": ["curve25519_dalek.scalar.Scalar.ZERO"]},
   {"visibility": null,
@@ -8778,11 +8809,13 @@
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAffinePointEdwardsPoint.mul"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_spec\n    (self : scalar.Scalar) (rhs : edwards.affine.AffinePoint)\n    (h_self_canonical : U8x32_as_Nat self.bytes < 2 ^ 255)\n    (h_rhs_valid : rhs.IsValid)\n    (hx53 : ∀ i < 5, rhs.x[i]!.val < 2 ^ 53)\n    (hy53 : ∀ i < 5, rhs.y[i]!.val < 2 ^ 53) :\n    mul self rhs ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = (U8x32_as_Nat self.bytes) • rhs.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/Mul.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::mul`**\n(trait impl `Mul<AffinePoint> for Scalar`).\n• The function always succeeds (no panic) for a canonical Scalar `self` and a valid\n  AffinePoint `rhs` with limbs < 2^53\n• The result is a valid EdwardsPoint\n• `result.toPoint` equals `(U8x32_as_Nat self.bytes) • rhs.toPoint`, i.e., scalar\n  multiplication of `rhs.toPoint` by the natural number encoded by `self.bytes`\n-/",
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{core::ops::arith::Mul<curve25519_dalek::edwards::affine::AffinePoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::scalar::Scalar}::mul",
@@ -9070,11 +9103,13 @@
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulShared0AffinePointEdwardsPoint.mul"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_spec\n    (self : scalar.Scalar) (rhs : edwards.affine.AffinePoint)\n    (h_self_canonical : U8x32_as_Nat self.bytes < 2 ^ 255)\n    (h_rhs_valid : rhs.IsValid)\n    (hx53 : ∀ i < 5, rhs.x[i]!.val < 2 ^ 53)\n    (hy53 : ∀ i < 5, rhs.y[i]!.val < 2 ^ 53) :\n    mul self rhs ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = (U8x32_as_Nat self.bytes) • rhs.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/Mul.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::mul`**\n(trait impl `Mul<&AffinePoint> for Scalar`).\n• The function always succeeds (no panic) for a canonical Scalar `self` and a valid\n  AffinePoint `rhs` with limbs < 2^53\n• The result is a valid EdwardsPoint\n• `result.toPoint` equals `(U8x32_as_Nat self.bytes) • rhs.toPoint`, i.e., scalar\n  multiplication of `rhs.toPoint` by the natural number encoded by `self.bytes`\n-/",
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{core::ops::arith::Mul<&0 (curve25519_dalek::edwards::affine::AffinePoint), curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::scalar::Scalar}::mul",
@@ -9395,11 +9430,13 @@
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem index_spec (self : scalar.Scalar) (_index : Std.Usize)\n    (h_bound : _index.val < 32) :\n    index self _index ⦃ (result : Std.U8) =>\n      result = self.bytes.val[_index.val]! ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Index.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::index`**\n• The function succeeds (no panic) when `_index < 32`\n• The result equals `self.bytes[_index]`, the byte at the given position\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::index::Index<usize, u8> for curve25519_dalek::scalar::Scalar}::index",
@@ -9410,7 +9447,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"visibility": null,
@@ -9650,7 +9687,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index",
@@ -9713,7 +9750,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index",
@@ -10165,7 +10202,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes"]},
@@ -10358,11 +10395,13 @@
    "externally_verified": false,
    "dependencies": []},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem is_identity_spec\n    {T : Type} {P : T → Prop} {Q : T → subtle.Choice → Prop}\n    (subtleConstantTimeEqInst : subtle.ConstantTimeEq T)\n    (IdentityInst : traits.Identity T)\n    (self : T)\n    (h_id : IdentityInst.identity ⦃ P ⦄)\n    (h_ct : ∀ t, P t → subtleConstantTimeEqInst.ct_eq self t ⦃ Q t ⦄) :\n    is_identity subtleConstantTimeEqInst IdentityInst self ⦃ (result : Bool) =>\n      ∃ t c, P t ∧ Q t c ∧ (result ↔ c = Choice.one) ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Traits/IsIdentity.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::traits::IsIdentity::is_identity`**\n• The function succeeds whenever `identity` and `ct_eq` succeed\n• The returned `Bool` is `true` if and only if `ct_eq self (identity)` yields `Choice.one`\n• Postconditions `P` (on the identity element) and `Q` (on the ct_eq result) are\n  forwarded from the caller's hypotheses into the conclusion\n-/",
    "source": "curve25519-dalek/src/traits.rs",
    "rust_name":
    "curve25519_dalek::traits::{curve25519_dalek::traits::IsIdentity for T}::is_identity",
@@ -10372,7 +10411,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"visibility": "public",
