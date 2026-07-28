@@ -110,10 +110,10 @@ theorem as_extended_spec (q : CompletedPoint)
       simp only at this
       unfold FieldElement51.toField
       grind
-    · grind
-    · grind
-    · grind
-    · grind
+    · intro i hi; grind [Array.getElem!_Nat_eq, Array.val_getElem!_eq']
+    · intro i hi; grind [Array.getElem!_Nat_eq, Array.val_getElem!_eq']
+    · intro i hi; grind [Array.getElem!_Nat_eq, Array.val_getElem!_eq']
+    · intro i hi; grind [Array.getElem!_Nat_eq, Array.val_getElem!_eq']
   simp only [this, true_and]
   unfold toPoint   edwards.EdwardsPoint.toPoint
   simp only [this, ↓reduceDIte, h_q_Valid]

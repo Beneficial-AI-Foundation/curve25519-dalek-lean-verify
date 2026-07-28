@@ -54,34 +54,29 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
   unfold reduce
   step*
   · scalar_tac
-  · simp only [Array.set_val_eq, UScalar.ofNatCore_val_eq, List.length_set, List.Vector.length_val,
-    Nat.ofNat_pos, getElem!_pos, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, List.getElem_set_ne,
-    one_ne_zero, List.getElem_set_self, UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod,
-    Nat.lt_add_one, i16_post, limbs5_post, limbs4_post, limbs3_post, limbs2_post, limbs1_post,
-    i6_post1, i_post, i5_post, i15_post, c4_post1, i4_post]; scalar_tac
-  · simp only [Array.set_val_eq, UScalar.ofNatCore_val_eq, List.length_set, List.Vector.length_val,
-    Nat.one_lt_ofNat, getElem!_pos, ne_eq, zero_ne_one, not_false_eq_true, List.getElem_set_ne,
-    OfNat.ofNat_ne_one, List.getElem_set_self, UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod,
-    Nat.ofNat_pos, i18_post, limbs6_post, limbs5_post, limbs4_post, limbs3_post, limbs2_post,
-    limbs1_post, i8_post1, i7_post, i5_post, c0_post1, i_post]; scalar_tac
-  · simp only [Array.set_val_eq, UScalar.ofNatCore_val_eq, List.length_set, List.Vector.length_val,
-    Nat.reduceLT, getElem!_pos, ne_eq, OfNat.one_ne_ofNat, not_false_eq_true, List.getElem_set_ne,
-    OfNat.zero_ne_ofNat, Nat.reduceEqDiff, Nat.succ_ne_self, List.getElem_set_self, UScalar.val_and,
-    Nat.and_two_pow_sub_one_eq_mod, Nat.one_lt_ofNat, i20_post, limbs7_post, limbs6_post,
-    limbs5_post, limbs4_post, limbs3_post, limbs2_post, limbs1_post, i10_post1, i9_post, i5_post,
-    c1_post1, i1_post]; scalar_tac
-  · simp only [Array.set_val_eq, UScalar.ofNatCore_val_eq, List.length_set, List.Vector.length_val,
-    Nat.reduceLT, getElem!_pos, ne_eq, Nat.reduceEqDiff, not_false_eq_true, List.getElem_set_ne,
-    OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat, Nat.succ_ne_self, List.getElem_set_self,
-    UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod, i22_post, limbs8_post, limbs7_post,
-    limbs6_post, limbs5_post, limbs4_post, limbs3_post, limbs2_post, limbs1_post, i12_post1,
-    i11_post, i5_post, c2_post1, i2_post]; scalar_tac
-  · simp only [Array.set_val_eq, UScalar.ofNatCore_val_eq, List.length_set, List.Vector.length_val,
-    Nat.lt_add_one, getElem!_pos, ne_eq, Nat.reduceEqDiff, not_false_eq_true, List.getElem_set_ne,
-    OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat, List.getElem_set_self, UScalar.val_and,
-    Nat.and_two_pow_sub_one_eq_mod, Nat.reduceLT, i24_post, limbs9_post, limbs8_post, limbs7_post,
-    limbs6_post, limbs5_post, limbs4_post, limbs3_post, limbs2_post, limbs1_post, i14_post1,
-    i13_post, i5_post, c3_post1, i3_post]; scalar_tac
+  · simp only [Array.set_val_eq, UScalar.ofNatCore_val_eq, ne_eq, OfNat.ofNat_ne_zero,
+    not_false_eq_true, List.getElem_set_ne, one_ne_zero, List.getElem_set_self, UScalar.val_and,
+    Nat.and_two_pow_sub_one_eq_mod, i16_post, limbs5_post, limbs4_post, limbs3_post, limbs2_post,
+    limbs1_post, i6_post1, i_post, i5_post, i15_post, c4_post1, i4_post]; scalar_tac
+  · simp only [Array.set_val_eq, UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one, not_false_eq_true,
+    List.getElem_set_ne, OfNat.ofNat_ne_one, List.getElem_set_self, UScalar.val_and,
+    Nat.and_two_pow_sub_one_eq_mod, i18_post, limbs6_post, limbs5_post, limbs4_post, limbs3_post,
+    limbs2_post, limbs1_post, i8_post1, i7_post, i5_post, c0_post1, i_post]; scalar_tac
+  · simp only [Array.set_val_eq, UScalar.ofNatCore_val_eq, ne_eq, OfNat.one_ne_ofNat,
+    not_false_eq_true, List.getElem_set_ne, OfNat.zero_ne_ofNat, Nat.reduceEqDiff, Nat.succ_ne_self,
+    List.getElem_set_self, UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod, i20_post, limbs7_post,
+    limbs6_post, limbs5_post, limbs4_post, limbs3_post, limbs2_post, limbs1_post, i10_post1,
+    i9_post, i5_post, c1_post1, i1_post]; scalar_tac
+  · simp only [Array.set_val_eq, UScalar.ofNatCore_val_eq, ne_eq, Nat.reduceEqDiff,
+    not_false_eq_true, List.getElem_set_ne, OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat,
+    Nat.succ_ne_self, List.getElem_set_self, UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod,
+    i22_post, limbs8_post, limbs7_post, limbs6_post, limbs5_post, limbs4_post, limbs3_post,
+    limbs2_post, limbs1_post, i12_post1, i11_post, i5_post, c2_post1, i2_post]; scalar_tac
+  · simp only [Array.set_val_eq, UScalar.ofNatCore_val_eq, ne_eq, Nat.reduceEqDiff,
+    not_false_eq_true, List.getElem_set_ne, OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat,
+    List.getElem_set_self, UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod, i24_post, limbs9_post,
+    limbs8_post, limbs7_post, limbs6_post, limbs5_post, limbs4_post, limbs3_post, limbs2_post,
+    limbs1_post, i14_post1, i13_post, i5_post, c3_post1, i3_post]; scalar_tac
   · -- A ∧ B: limb bounds ∧ ModEq
     constructor
     · intro i _
@@ -98,7 +93,7 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos,
       Option.getD_some, one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
       Nat.lt_add_one, p, Array.set_val_eq, List.length_set, ne_eq, OfNat.ofNat_ne_zero,
-      not_false_eq_true, List.getElem_set_ne, one_ne_zero, List.getElem_set_self, getElem!_pos,
+      not_false_eq_true, List.getElem_set_ne, one_ne_zero, List.getElem_set_self,
       UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod, OfNat.ofNat_ne_one, zero_ne_one,
       Nat.reduceEqDiff, Nat.succ_ne_self, OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat, limbs10_post,
       limbs9_post, limbs8_post, limbs7_post, limbs6_post, limbs5_post, limbs4_post, limbs3_post,

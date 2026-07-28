@@ -5,7 +5,7 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 
 /-!
 # Spec theorem for `<curve25519_dalek::scalar::Scalar as From<u128>>::from`
@@ -162,7 +162,7 @@ theorem from_spec (x : Std.U128) :
   let* ⟨ s2, s2_post ⟩ ← Array.to_slice.step_spec
   let* ⟨ s3, s3_post ⟩ ← core.slice.Slice.copy_from_slice.step_spec
   simp_all only [UScalarTy.U8_numBits_eq, Usize.ofNatCore_val_eq, Array.val_to_slice,
-    List.length_map, Nat.reduceMod, BitVec.toLEBytes_length, Nat.reduceDiv, Array.repeat_val,
+    List.length_map, BitVec.toLEBytes_length, Nat.reduceDiv, Array.repeat_val,
     UScalar.ofNatCore_val_eq, List.reduceReplicate, List.slice_zero_j, List.take_succ_cons,
     List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil,
     zero_add, Nat.reduceAdd, Slice.setSlice!_val, List.length_setSlice!, ↓reduceDIte]

@@ -5,7 +5,7 @@ Authors: Hoang Le Truong, Alessandro D'Angelo, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 
 /-! # Auxiliary theorems for Types
 

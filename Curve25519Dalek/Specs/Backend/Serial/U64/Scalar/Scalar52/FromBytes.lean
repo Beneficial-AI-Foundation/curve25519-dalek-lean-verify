@@ -5,7 +5,7 @@ Authors: Markus Dablander, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 
 /-! # Spec theorem
 
@@ -74,6 +74,16 @@ theorem from_bytes_loop_helper (bytes : Array U8 32#usize)
         -- i37 = cascaded OR = byte sum via or_bytes_eq_sum
         simp (discharger := omega) only [*, UScalar.val_or, UScalar.cast_val_eq,
           u8_val_mod_u64_numBits, Nat.shiftLeft_eq, u8_mul_pow_mod_u64]
+        have hlen : bytes.val.length = 32 := by simp
+        have hi4 : (i.val : Nat) < 4 := by scalar_tac
+        rw [← getElem!_pos bytes.val (i.val * 8) (by omega),
+            ← getElem!_pos bytes.val (i.val * 8 + 1) (by omega),
+            ← getElem!_pos bytes.val (i.val * 8 + 2) (by omega),
+            ← getElem!_pos bytes.val (i.val * 8 + 3) (by omega),
+            ← getElem!_pos bytes.val (i.val * 8 + 4) (by omega),
+            ← getElem!_pos bytes.val (i.val * 8 + 5) (by omega),
+            ← getElem!_pos bytes.val (i.val * 8 + 6) (by omega),
+            ← getElem!_pos bytes.val (i.val * 8 + 7) (by omega)]
         rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
           (bytes.val[i.val * 8]!).hmax (bytes.val[i.val * 8 + 1]!).hmax
           (bytes.val[i.val * 8 + 2]!).hmax (bytes.val[i.val * 8 + 3]!).hmax
@@ -84,13 +94,10 @@ theorem from_bytes_loop_helper (bytes : Array U8 32#usize)
         simp only [Array.getElem!_Nat_eq]; ring_nf
       · -- j ≠ i: unchanged entry, use h_prev
         have hj' : j < i.val := by omega
-        have hne : Nat.not_eq i.val j := by simp [Nat.not_eq]; omega
-        simp only [Array.getElem!_Nat_eq, Array.set_val_eq, List.getElem!_set_ne _ _ _ _ hne,
-          List.getElem!_eq_getElem?_getD]
-        exact h_prev j hj'
-    · rename_i x
-      have := words'_post1 x ‹_›
-      exact this
+        simp only [Array.getElem!_Nat_eq, Array.set_val_eq,
+          List.getElem!_eq_getElem?_getD, List.getElem?_set_ne (show (i.val) ≠ j by omega)]
+        have := h_prev j hj'
+        simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using this
 
 /-! ## Part 2: Helper lemma for bit-slicing -/
 
@@ -279,7 +286,7 @@ theorem from_bytes_limb0_spec (words1 : Std.Array U64 4#usize) :
               bind_assoc_eq, bind_tc_ok]
   let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
   let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
-  exact i2_post
+  exact i2_post.trans (getElem!_pos _ _ (by simp)).symm
 
 @[step]
 theorem from_bytes_limb1_spec
@@ -298,7 +305,7 @@ theorem from_bytes_limb1_spec
   let* ⟨ i6, i6_post1, i6_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ i7, i7_post1, i7_post2 ⟩ ← UScalar.or_spec
   let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
-  refine ⟨i5_post, ?_, ?_⟩
+  refine ⟨i5_post.trans (getElem!_pos _ _ (by simp)).symm, ?_, ?_⟩
   · rw [i7_post1, UScalar.val_or, i4_post1, i6_post1]
   · have h3 : i3 = i2 &&& mask := by
       apply U64.bv_eq_imp_eq
@@ -322,7 +329,7 @@ theorem from_bytes_limb2_spec
   let* ⟨ i11, i11_post1, i11_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ i12, i12_post1, i12_post2 ⟩ ← UScalar.or_spec
   let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
-  refine ⟨i10_post, ?_, ?_⟩
+  refine ⟨i10_post.trans (getElem!_pos _ _ (by simp)).symm, ?_, ?_⟩
   · rw [i12_post1, UScalar.val_or, i9_post1, i11_post1]
   · have h8 : i8 = i7 &&& mask := by
       apply U64.bv_eq_imp_eq
@@ -346,7 +353,7 @@ theorem from_bytes_limb3_spec
   let* ⟨ i16, i16_post1, i16_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ i17, i17_post1, i17_post2 ⟩ ← UScalar.or_spec
   let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
-  refine ⟨i15_post, ?_, ?_⟩
+  refine ⟨i15_post.trans (getElem!_pos _ _ (by simp)).symm, ?_, ?_⟩
   · rw [i17_post1, UScalar.val_or, i14_post1, i16_post1]
   · have h13 : i13 = i12 &&& mask := by
       apply U64.bv_eq_imp_eq

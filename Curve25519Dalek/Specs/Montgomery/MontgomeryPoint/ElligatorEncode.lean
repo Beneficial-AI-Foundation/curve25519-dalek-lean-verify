@@ -5,7 +5,7 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
@@ -505,7 +505,9 @@ theorem elligator_encode_spec
   step as ⟨ fe2, hfe2, hfe2_b⟩
   step as ⟨ inner, hinner, hinner_b⟩
   step as ⟨ eps, heps, heps_b⟩
-  step as ⟨ pp, hp_b, hp_case_1, hp_case_2, hp_case_3, hp_case_4, hp_case_5, hp_case_6⟩
+  step as ⟨ ppt, hp_case_1, hp_case_2, hp_case_3, hp_case_4, hp_case_5, hp_case_6⟩
+  obtain ⟨pp, hp_b⟩ := ppt
+  simp only [] at hp_case_1 hp_case_2 hp_case_3 hp_case_4 hp_case_5 hp_case_6
   step as ⟨ zero, zero_eq, zero_bound⟩
   step as ⟨ Atemp, hAtemp⟩
   step as ⟨ u, hu, hu_b⟩
@@ -672,13 +674,14 @@ theorem elligator_encode_spec
       rw [this] at change_heps
       rw [← change_heps]
       exact isSquare_eps_of_choice_one pp.val (Field51_as_Nat eps) (Field51_as_Nat one) one_eq
-        (fun cond => (hp_case_6 cond).left) h_one
+        (fun ⟨h1, h2, h3⟩ => (hp_case_6 h1 h2 h3).left) h_one
     · -- Backward: IsSquare → choice = 1
       exact choice_one_of_isSquare_eps pp.val
         (Field51_as_Nat eps) (Field51_as_Nat d) (Field51_as_Nat A1) (Field51_as_Nat A_neg)
         (Field51_as_Nat fe1) (Field51_as_Nat d_1) (Field51_as_Nat one)
         d0 r0 hd0 one_eq hA change_heps hd change_A change_d_1 hfe1_non hfe1_0
-        (fun h => (hp_case_3 h).left) (fun h => (hp_case_5 h).left)
+        (fun h => (hp_case_3 h).left)
+        (fun ⟨h1, h2, h3⟩ => (hp_case_5 h1 h2 h3.choose h3.choose_spec).left)
   -- ── Final assembly ──
   constructor
   · exact iff_sq
@@ -716,14 +719,15 @@ theorem elligator_encode_spec
                     · constructor
                       · rw [one_eq]; decide
                       · exact h
-                have := (hp_case_5 this).left
+                have := (hp_case_5 this.1 this.2.1 this.2.2.choose this.2.2.choose_spec).left
                 simp [this] at h_zero
-          have hp5 := hp_case_6 h_nqr_cond
+          have hp5 := hp_case_6 h_nqr_cond.1 h_nqr_cond.2.1 h_nqr_cond.2.2
           exact elligator_nqr_twist d0 r0 hd0
             (U8x32_as_Nat a) (Field51_as_Nat eps) (Field51_as_Nat d) (Field51_as_Nat A1)
             (Field51_as_Nat A_neg) (Field51_as_Nat fe1) (Field51_as_Nat d_1) (Field51_as_Nat one)
             pp.val a_eq one_eq hA change_heps hd change_A change_d_1 hfe1_non non_d_1
-            (fun h => (hp_case_3 h).left) (fun h => (hp_case_5 h).left)
+            (fun h => (hp_case_3 h).left)
+            (fun ⟨h1, h2, h3⟩ => (hp_case_5 h1 h2 h3.choose h3.choose_spec).left)
             h_zero (Field51_as_Nat hp_b % p)
             (fun _ => hp5.right)
 

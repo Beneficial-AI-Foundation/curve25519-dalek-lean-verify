@@ -9,7 +9,7 @@ import Curve25519Dalek.Lint.SpecIndent
 # Curve25519Dalek project linters
 
 Importing this module activates all project-specific linters.  It is imported transitively
-by `Curve25519Dalek.Aux` and `Curve25519Dalek.FunsExternal`, which together cover the full
+by `Curve25519Dalek.Auxiliary` and `Curve25519Dalek.FunsExternal`, which together cover the full
 transitive import graph of spec theorem files.
 
 ## Linters provided

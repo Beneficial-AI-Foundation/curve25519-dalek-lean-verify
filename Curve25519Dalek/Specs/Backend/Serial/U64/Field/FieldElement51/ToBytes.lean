@@ -5,7 +5,7 @@ Authors: Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
 import Curve25519Dalek.Tactics
 import Curve25519Dalek.ExternallyVerified
@@ -349,27 +349,35 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   let* ⟨ fe, fe_post1, fe_post2, fe_post3 ⟩ ← reduce_spec
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ i1, i1_post ⟩ ← U64.add_spec
+  · have := fe_post1 0 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac)] at this
+    rw [i_post]; scalar_tac
   let* ⟨ q, q_post1, q_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
   let* ⟨ i3, i3_post ⟩ ← U64.add_spec
-  · expand fe_post1 with 5; scalar_tac
+  · have := fe_post1 1 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 1 (by scalar_tac), ← i2_post] at this; scalar_tac
   let* ⟨ q1, q1_post1, q1_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i4, i4_post ⟩ ← Array.index_usize_spec
   let* ⟨ i5, i5_post ⟩ ← U64.add_spec
-  · expand fe_post1 with 5; scalar_tac
+  · have := fe_post1 2 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 2 (by scalar_tac), ← i4_post] at this; scalar_tac
   let* ⟨ q2, q2_post1, q2_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
   let* ⟨ i7, i7_post ⟩ ← U64.add_spec
-  · expand fe_post1 with 5; scalar_tac
+  · have := fe_post1 3 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 3 (by scalar_tac), ← i6_post] at this; scalar_tac
   let* ⟨ q3, q3_post1, q3_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i8, i8_post ⟩ ← Array.index_usize_spec
   let* ⟨ i9, i9_post ⟩ ← U64.add_spec
-  · expand fe_post1 with 5; scalar_tac
+  · have := fe_post1 4 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 4 (by scalar_tac), ← i8_post] at this; scalar_tac
   let* ⟨ q4, q4_post1, q4_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i10, i10_post ⟩ ← U64.mul_spec
   · expand fe_post1 with 5; scalar_tac
   let* ⟨ i11, i11_post ⟩ ← U64.add_spec
-  · expand fe_post1 with 5; scalar_tac
+  · have := fe_post1 0 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac), ← i_post] at this; scalar_tac
   let* ⟨ limbs, limbs_post ⟩ ← Array.update_spec
   let* ⟨ i12, i12_post1, i12_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ low_51_bit_mask, low_51_bit_mask_post1, low_51_bit_mask_post2 ⟩ ← U64.sub_spec
@@ -381,13 +389,10 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
       have : (i13 : U64).val < (2^64 : ℕ) := by agrind
       rw [i14_post1, Nat.shiftRight_eq_div_pow]; agrind
     have h15 : (i15 : U64).val < (2^52 : ℕ) := by
-      simp only [i15_post, limbs_post, Array.set_val_eq] at *;
-      simp_all only [Array.getElem!_Nat_eq,
-        List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos,
-        Nat.ofNat_pos, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, Nat.one_lt_ofNat,
-        Nat.reduceLT, Nat.lt_add_one, Nat.reduceShiftLeft, U64.ofNat_bv, BitVec.reduceHShiftLeft,
-        List.length_set, List.getElem_set_self, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true,
-        one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self, ↓List.getElem!_set_ne]
+      have hb : i15.val = fe[1]!.val := by
+        rw [i15_post, ← getElem!_pos limbs.val 1 (by scalar_tac), ← Array.getElem!_Nat_eq,
+          limbs_post, Array.set_of_ne_getElem! _ _ 1 0 (by agrind) (by agrind) (by omega)]
+      rw [hb]; exact fe_post1 1 (by omega)
     grind only [= U64.max_eq]
   let* ⟨ limbs1, limbs1_post ⟩ ← Array.update_spec
   let* ⟨ i17, i17_post ⟩ ← Array.index_usize_spec
@@ -553,11 +558,9 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   let* ⟨ ⟩ ← massert_spec
   · -- Resolve array lookups to concrete variables
     have h99 : i99 = i38 := by simp only [i99_post, limbs9_post, Array.set_val_eq,
-      UScalar.ofNatCore_val_eq, List.length_set, List.Vector.length_val, Nat.lt_add_one,
-      getElem!_pos, List.getElem_set_self]
+      UScalar.ofNatCore_val_eq, List.getElem_set_self]
     have h115_eq : i115 = i114 := by simp only [i115_post, s32_post, Array.set_val_eq,
-      UScalar.ofNatCore_val_eq, List.length_set, List.Vector.length_val, Nat.lt_add_one,
-      getElem!_pos, List.getElem_set_self]
+      UScalar.ofNatCore_val_eq, List.getElem_set_self]
     -- Compute mask value: low_51_bit_mask = (1 <<< 51) - 1 = 2^51 - 1
     have hmask : low_51_bit_mask.val = 2^51 - 1 := by
       simp only [low_51_bit_mask_post1, i12_post1, U64.size, U64.numBits,
@@ -670,23 +673,23 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
     List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
     List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
-    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, one_ne_zero, OfNat.ofNat_ne_zero,
+    Nat.ofNat_pos, one_ne_zero, OfNat.ofNat_ne_zero,
     land_pow_two_sub_one_eq_mod, *])
     (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
     List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
     List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
-    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, zero_ne_one, OfNat.ofNat_ne_one,
+    Nat.one_lt_ofNat, Nat.ofNat_pos, zero_ne_one, OfNat.ofNat_ne_one,
     land_pow_two_sub_one_eq_mod, *])
     (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
     List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
     List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
-    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff,
+    Nat.reduceLT, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff,
     Nat.succ_ne_self, zero_ne_one, OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat,
     land_pow_two_sub_one_eq_mod, *])
     (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
     List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
     List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
-    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff,
+    Nat.reduceLT, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff,
     Nat.succ_ne_self, zero_ne_one, OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat,
     land_pow_two_sub_one_eq_mod, *])
     (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,

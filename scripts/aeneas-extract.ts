@@ -74,6 +74,7 @@ async function main(): Promise<void> {
 
   const aeneasArgs: string[] = [
     "-backend", "lean",  // we only ever target the Lean backend
+    "-emit-json", 
     ...config.aeneas_args.options.map((o) => `-${o}`),
     "-dest", destDir,
     llbcPath,  // absolute path since aeneas runs from root, LLBC is in crateDir

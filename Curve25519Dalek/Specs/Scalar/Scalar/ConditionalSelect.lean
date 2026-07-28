@@ -33,32 +33,21 @@ theorem next_spec (range : core.ops.range.Range Usize) :
           opt = some range.start ∧
           range'.start.val = range.start.val + 1 ∧
           range'.end = range.end) := by
-  simp only [core.iter.range.IteratorRange.next]
-  simp only [liftFun2, liftFun1, core.clone.impls.CloneUsize.clone, bind_tc_ok, not_lt]
-  have h_lt_iff :
-      (core.cmp.impls.PartialOrdUsize.lt range.start range.end = true) =
-      (range.start.val < range.end.val) := by
-    simp [core.cmp.impls.PartialOrdUsize.lt]
-  simp only [h_lt_iff]
+  simp only [core.iter.range.IteratorRange.next,
+    show core.iter.range.StepUsize.partialOrdInst.lt range.start range.end
+      = ok (decide (range.start.val < range.end.val)) from rfl,
+    show core.iter.range.StepUsize.cloneInst.clone range.start = ok range.start from rfl,
+    bind_tc_ok]
   by_cases hlt : range.start.val < range.end.val
-  · rw [if_pos hlt]
-    have hbound : range.start.val + 1 ≤ Usize.max := by
-      have := range.end.hBounds; scalar_tac
-    refine ⟨some range.start, {range with start := ⟨range.start.val + 1, by scalar_tac⟩},
-            ?_, ?_, ?_⟩
-    · simp only [core.iter.range.StepUsize.forward_checked, bind_tc_ok]
-      have hca := Usize.checked_add_bv_spec range.start 1#usize
-      rcases heq : Usize.checked_add range.start 1#usize with _ | z
-      · rw [heq] at hca; scalar_tac
-      · simp only
-        rw [heq] at hca
-        obtain ⟨_, hval, _⟩ := hca
-        have hzval : z.val = range.start.val + 1 := by scalar_tac
-        congr 4
-        exact UScalar.eq_of_val_eq hzval
-    · intro h; omega
-    · intro _; exact ⟨rfl, rfl, rfl⟩
-  · rw [if_neg hlt]
+  · rw [if_pos (by simp [hlt])]
+    simp only [core.iter.range.StepUsize, core.iter.range.UScalarStep,
+      core.iter.range.UScalarStep.forward_checked,
+      show range.start.val + (1#usize).val ≤ UScalar.max UScalarTy.Usize from by scalar_tac,
+      ↓reduceDIte, bind_tc_ok]
+    refine ⟨_, _, rfl, ?_, ?_⟩
+    · intro h; exact absurd hlt h
+    · intro _; refine ⟨rfl, ?_, rfl⟩; simp [UScalar.ofNatCore_val_eq]
+  · rw [if_neg (by simp [hlt])]
     exact ⟨none, range, rfl, fun _ => ⟨rfl, rfl⟩, fun h => absurd h hlt⟩
 
 /-- **Spec theorem for `Array.update`** (specialised to `Array U8 32`)
@@ -79,9 +68,9 @@ private lemma Array_U8_32_update_spec (arr : Array U8 32#usize) (j : Usize)
   constructor
   · intro k hk
     simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-    exact List.getElem!_set_ne arr.val j.val k v (Or.inl (Ne.symm hk))
+    simp [hk]
   · simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-    exact List.getElem!_set arr.val j.val v (by scalar_tac)
+    rw [getElem!_pos _ _ (by simpa using hbound), List.getElem_set_self]
 
 /-- **Spec theorem for `curve25519_dalek::scalar::Scalar::conditional_select_loop`**
 • The loop always succeeds (no panic) given valid range bounds and loop invariant
@@ -137,9 +126,9 @@ theorem conditional_select_loop_spec
             rw [hbytes'_curr, hci]
             split_ifs with h
             · simp only [Array.getElem!_Nat_eq]
-              exact hbi
+              exact hbi.trans (getElem!_pos _ _ (by simpa using hi_lt32)).symm
             · simp only [Array.getElem!_Nat_eq]
-              exact hai
+              exact hai.trans (getElem!_pos _ _ (by simpa using hi_lt32)).symm
           · rw [hbytes'_other j hje]
             apply hinv
             omega))

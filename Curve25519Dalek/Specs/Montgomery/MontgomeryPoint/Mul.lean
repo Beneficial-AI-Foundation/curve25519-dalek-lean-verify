@@ -12,6 +12,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ZERO
 import Curve25519Dalek.Specs.Scalar.Scalar.AsBytes
 import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.AsAffine
+import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.ConditionalSelect
 import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.DifferentialAddAndDouble
 
 /-!
@@ -200,6 +201,14 @@ lemma mul_spec_mkPoint_from_affine
     exact hmodeq
   rw [this, ← eq1, res_field, loop_inv, hxP]
 
+/-- Two field elements whose first five limbs agree have equal `toField` values. -/
+private lemma toField_eq_of_forall_limb_eq
+    {a b : backend.serial.u64.field.FieldElement51}
+    (h : ∀ i < 5, a[i]! = b[i]!) : a.toField = b.toField := by
+  unfold backend.serial.u64.field.FieldElement51.toField Field51_as_Nat
+  congr 1
+  exact Finset.sum_congr rfl (fun i hi => by rw [h i (Finset.mem_range.mp hi)])
+
 /-- **Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::mul`**
 • The function always succeeds (no panic) for any valid Montgomery point and scalar input
 • The result encodes the u-coordinate of the scalar multiple `[m]P` on the Montgomery curve:
@@ -213,7 +222,7 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar)
       let m := (U8x32_as_Nat scalar.bytes) % 2^255
       MontgomeryPoint.mkPoint result = m • (MontgomeryPoint.mkPoint P) ⦄ := by
   unfold mul IdentityMontgomeryProjectivePoint.identity subtle.Choice.Insts.CoreConvertFromU8.from
-  step as ⟨x , hmod_x, h_valid⟩
+  step as ⟨xf , hmod_x, h_valid⟩
   step as ⟨ one, one_eq, one_bound⟩
   step as ⟨ zero, zero_eq, zero_bound⟩
   step as ⟨ one1, one1_eq, one_bound⟩
@@ -227,15 +236,21 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar)
         UScalar.val_not_eq_imp_not_eq, ↓reduceDIte]
     by_cases hi: y= 1#u8
     · simp only [hi, ↓reduceDIte, bind_tc_ok]
-      unfold montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
+      unfold subtle.ConditionallySelectable.conditional_swap.default
         zeroize.Zeroize.Blanket.zeroize
-      simp only [↓reduceIte, core.default.DefaultBool.default, bind_tc_ok]
-      step*
-        -- Use `mul_spec_mkPoint_from_affine` to assemble the final result.
-        -- We first construct the loop invariant with the simplified scalar.
-      refine mul_spec_mkPoint_from_affine result P scalar x _
+      simp only [core.default.DefaultBool.default, bind_tc_ok]
+      step as ⟨sw, sw_postU, sw_postW⟩
+      step as ⟨sw2, sw2_postU, sw2_postW⟩
+      step as ⟨result, result_post1, result_post2⟩
+      case h_valid =>
+        simp only [if_true] at sw_postW
+        rw [toField_eq_of_forall_limb_eq sw_postW]
+        exact ct_post.2.2.2.2.1
+      simp only [if_true] at sw_postU sw_postW
+      refine mul_spec_mkPoint_from_affine result P scalar xf _
           hmod_x result_post2 result_post1 hP_bound ?_
-      rw [ct_post.right.right.right.right.right]
+      rw [toField_eq_of_forall_limb_eq sw_postU, toField_eq_of_forall_limb_eq sw_postW,
+        ct_post.right.right.right.right.right]
       have := aux_eq_mod_mul scalar
       rw [← this]
       have : false.toNat = 0 := by decide
@@ -254,18 +269,21 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar)
         UScalar.val_not_eq_imp_not_eq, ↓reduceDIte]
     have :  y = 0#u8 := by scalar_tac
     simp only [this, ↓reduceDIte, bind_tc_ok]
-    unfold montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
+    unfold subtle.ConditionallySelectable.conditional_swap.default
       zeroize.Zeroize.Blanket.zeroize
-    simp only [Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one, not_false_eq_true,
-        one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
-        UScalar.val_not_eq_imp_not_eq, ↓reduceIte, core.default.DefaultBool.default,
-        bind_tc_ok]
-    step*
-      -- Use `mul_spec_mkPoint_from_affine` to assemble the final result.
-      -- We first construct the loop invariant with the simplified scalar.
-    refine mul_spec_mkPoint_from_affine result P scalar x _
+    simp only [core.default.DefaultBool.default, bind_tc_ok]
+    step as ⟨sw, sw_postU, sw_postW⟩
+    step as ⟨sw2, sw2_postU, sw2_postW⟩
+    step as ⟨result, result_post1, result_post2⟩
+    case h_valid =>
+      simp only [show ((0#u8 = 1#u8) = False) from by decide, if_false] at sw_postW
+      rw [toField_eq_of_forall_limb_eq sw_postW]
+      exact cf_post.2.2.2.2.1
+    simp only [show ((0#u8 = 1#u8) = False) from by decide, if_false] at sw_postU sw_postW
+    refine mul_spec_mkPoint_from_affine result P scalar xf _
         hmod_x result_post2 result_post1 hP_bound ?_
-    rw [cf_post.right.right.right.right.right]
+    rw [toField_eq_of_forall_limb_eq sw_postU, toField_eq_of_forall_limb_eq sw_postW,
+      cf_post.right.right.right.right.right]
     have := aux_eq_mod_mul scalar
     simp only [Nat.reducePow, Int.reduceDiv, Int.reduceToNat, Array.getElem!_Nat_eq,
         List.getElem!_eq_getElem?_getD, Nat.reduceMul, List.Vector.length_val,

@@ -5,7 +5,7 @@ Authors: Oliver Butterley, Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 
 /-!
 # Spec theorem for `curve25519_dalek::scalar::read_le_u64_into`
@@ -106,7 +106,7 @@ private lemma fromLEBytes_toNat_list (l : List Byte) :
     simp only [List.length_cons, Finset.sum_range_succ',
                List.getElem!_cons_zero, Nat.mul_zero, pow_zero, mul_one]
     have hcons : ∀ j, (b :: l)[j + 1]! = l[j]! :=
-      fun j => List.getElem!_cons_eq_getElem!_sub b l (j + 1) (by omega)
+      fun _ => List.getElem!_cons_succ
     simp_rw [hcons, show ∀ j, 8 * (j + 1) = 8 * j + 8 from fun j => by ring,
              pow_add]
     simp only [BitVec.toNat_or, BitVec.toNat_setWidth, BitVec.toNat_shiftLeft,
@@ -267,28 +267,28 @@ private theorem read_le_u64_into_loop_spec_strong
     have hoff6_val : off6.val = 8 * i.val + 6 := by scalar_tac
     have hoff7_val : off7.val = 8 * i.val + 7 := by scalar_tac
     have hb0_src : b0 = src.val[8 * i.val + 0]! := by
-      have h : b0 = src.val[start.val]! := by simp [hb0]
+      have h : b0 = src.val[start.val]! := by rw [hb0, getElem!_pos _ _ (by scalar_tac)]
       grind only
     have hb1_src : b1 = src.val[8 * i.val + 1]! := by
-      have h : b1 = src.val[off1.val]! := by simp [hb1]
+      have h : b1 = src.val[off1.val]! := by rw [hb1, getElem!_pos _ _ (by scalar_tac)]
       grind only
     have hb2_src : b2 = src.val[8 * i.val + 2]! := by
-      have h : b2 = src.val[off2.val]! := by simp [hb2]
+      have h : b2 = src.val[off2.val]! := by rw [hb2, getElem!_pos _ _ (by scalar_tac)]
       grind only
     have hb3_src : b3 = src.val[8 * i.val + 3]! := by
-      have h : b3 = src.val[off3.val]! := by simp [hb3]
+      have h : b3 = src.val[off3.val]! := by rw [hb3, getElem!_pos _ _ (by scalar_tac)]
       grind only
     have hb4_src : b4 = src.val[8 * i.val + 4]! := by
-      have h : b4 = src.val[off4.val]! := by simp [hb4]
+      have h : b4 = src.val[off4.val]! := by rw [hb4, getElem!_pos _ _ (by scalar_tac)]
       grind only
     have hb5_src : b5 = src.val[8 * i.val + 5]! := by
-      have h : b5 = src.val[off5.val]! := by simp [hb5]
+      have h : b5 = src.val[off5.val]! := by rw [hb5, getElem!_pos _ _ (by scalar_tac)]
       grind only
     have hb6_src : b6 = src.val[8 * i.val + 6]! := by
-      have h : b6 = src.val[off6.val]! := by simp [hb6]
+      have h : b6 = src.val[off6.val]! := by rw [hb6, getElem!_pos _ _ (by scalar_tac)]
       grind only
     have hb7_src : b7 = src.val[8 * i.val + 7]! := by
-      have h : b7 = src.val[off7.val]! := by simp [hb7]
+      have h : b7 = src.val[off7.val]! := by rw [hb7, getElem!_pos _ _ (by scalar_tac)]
       grind only
     have h_chunk : v.val = U8Slice_chunk_as_U64 src i.val := by
       rw [hv]
@@ -296,7 +296,7 @@ private theorem read_le_u64_into_loop_spec_strong
       simp only [Finset.sum_range_succ, Finset.sum_range_zero,
                  Array.getElem!_Nat_eq, Array.make,
                  hb0_src, hb1_src, hb2_src, hb3_src, hb4_src, hb5_src, hb6_src, hb7_src]
-      grind only [= List.getElem!_length_le, = getElem!_pos, = List.getElem!_cons_eq_getElem!_sub,
+      grind only [= List.getElem!_length_le, = getElem!_pos, = List.getElem!_cons_succ,
     = List.getElem!_cons_zero', usr Usize.cMax_bound, usr Usize.cMax_bound', usr Isize.cMax_bound',
     usr Isize.cMax_bound, = UScalar.default_val]
     have h_inv' : ∀ k < i'.val, (dst'.val[k]!).val = U8Slice_chunk_as_U64 src k := by

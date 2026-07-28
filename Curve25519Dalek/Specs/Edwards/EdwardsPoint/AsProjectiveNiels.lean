@@ -12,7 +12,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EdwardsD2
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 
 /-!
 # Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::as_projective_niels`
@@ -99,7 +99,6 @@ theorem as_projective_niels_spec
           · unfold toField
             simp_all only
             have := hself.T_relation
-            simp only at this
             unfold toField at this
             ring_nf
             have : Edwards.Ed25519.d = d := rfl

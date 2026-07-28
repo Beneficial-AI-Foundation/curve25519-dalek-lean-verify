@@ -5,7 +5,7 @@ Authors: Markus Dablander, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l`
@@ -85,7 +85,8 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     have hL_i : constants.L[i.val]!.val < 2 ^ 52 := constants.L_limbs_spec i hi'
     step as ⟨i1, hi1⟩  -- L[i]
     step as ⟨addend, haddend_one, haddend_zero⟩  -- conditional_select
-    have hi1_eq : i1.val = constants.L[i.val]!.val := by simp [hi1]
+    have hi1_eq : i1.val = constants.L[i.val]!.val := by
+      simp [hi1, Array.getElem!_Nat_eq, getElem!_pos, hi']
     have haddend_bound : addend.val < 2 ^ 52 := by
       cases Choice.eq_zero_or_one condition with
       | inl h => have := haddend_zero h; subst this; decide
@@ -93,7 +94,8 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     step as ⟨i2, hi2⟩  -- carry >>> 52
     have hi2_bound : i2.val < 2 := by simp [hi2, Nat.shiftRight_eq_div_pow]; omega
     step as ⟨i3, hi3⟩  -- self[i]
-    have hi3_eq : i3.val = self[i.val]!.val := by simp [hi3]
+    have hi3_eq : i3.val = self[i.val]!.val := by
+      simp [hi3, Array.getElem!_Nat_eq, getElem!_pos, hi']
     have hi3_bound : i3.val < 2 ^ 52 := by rw [hi3_eq]; exact hself_i
     have hi2i3_ok : i2.val + i3.val < 2 ^ 64 := by omega
     step as ⟨i4, hi4⟩  -- i2 + i3
@@ -101,7 +103,9 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     have hi4addend_ok : i4.val + addend.val < 2 ^ 64 := by omega
     step as ⟨carry1, hcarry1⟩  -- i4 + addend
     have hcarry1_bound : carry1.val < 2 ^ 53 := by simp [hcarry1]; omega
-    step as ⟨_, index_mut_back, h_imb, _⟩  -- index_mut
+    step as ⟨imb_pair, index_mut_back, h_imb⟩  -- index_mut
+    obtain ⟨_, _⟩ := imb_pair
+    dsimp only at index_mut_back h_imb
     step as ⟨i5, hi5⟩  -- carry1 &&& mask
     have hi5_mod : i5.val = carry1.val % 2 ^ 52 := by
       simp [hi5, UScalar.val_and, hmask]
@@ -124,7 +128,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
           Nat.and_two_pow_sub_one_eq_mod, Order.add_one_le_iff, UScalar.ofNat_self_val,
           Array.set_val_eq, List.length_set, gt_iff_lt]; agrind
     rw [← h_imb] at hself1_limbs
-    step as ⟨res, res_scalar, hres_limbs, hres_inv⟩
+    step as ⟨res, hres_limbs, hres_inv⟩
     refine ⟨hres_limbs, ?_⟩
     rw [h_imb] at hres_inv
     simp only [hi6] at hres_inv
@@ -136,7 +140,8 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       rw [Nat.mul_add, Nat.mul_one, Nat.pow_add]
     have hself1_nat : Scalar52_as_Nat (Aeneas.Std.Array.set self i i5) =
         Scalar52_as_Nat self - 2 ^ (52 * i.val) * self[i.val]!.val + 2 ^ (52 * i.val) * i5.val := by
-      clear haddend_one haddend_zero haddend_bound hres_inv hres_limbs res
+      clear haddend_one haddend_zero haddend_bound hres_inv hres_limbs res index_mut_back h_imb
+        hself1_limbs hi1 hi3
       unfold Scalar52_as_Nat
       have h_acc : ∀ j, j < 5 → (Aeneas.Std.Array.set self i i5)[j]!.val =
           if j = i.val then i5.val else self[j]!.val := by
@@ -144,10 +149,12 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
         by_cases h : j = i.val <;> simp only [Array.getElem!_Nat_eq, Array.set_val_eq,
           List.getElem_set, List.length_set, List.Vector.length_val, UScalar.ofNatCore_val_eq,
           getElem!_pos, ↓reduceIte, *]; agrind
-      simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
-      interval_cases i.val <;> simp (config := { decide := true }) only [h_acc 0 (by omega),
-        h_acc 1 (by omega), h_acc 2 (by omega), h_acc 3 (by omega), h_acc 4 (by omega),
-        ite_true, ite_false] <;> omega
+      simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add,
+        h_acc 0 (by omega), h_acc 1 (by omega), h_acc 2 (by omega), h_acc 3 (by omega),
+        h_acc 4 (by omega)]
+      clear h_acc
+      interval_cases i.val <;>
+        simp (config := { decide := true }) only [ite_true, ite_false] <;> omega
     have : ∑ j ∈ Finset.Ico 0 (i.val + 1), 2 ^ (52 * j) * constants.L[j]!.val =
         ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val +
         2 ^ (52 * i.val) * constants.L[i.val]!.val := by
@@ -218,28 +225,27 @@ theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
       (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self) ⦄ := by
   unfold conditional_add_l
   step*
-  rename_i _ out_scalar
   rw [constants.L_spec] at *
   refine ⟨by assumption, ?_, ?_, ?_⟩
   · -- result < L
     cases Choice.val_eq_zero_or_one condition with
     | inl =>
       have := Choice.eq_zero_of_val condition (by assumption)
-      have : Scalar52_as_Nat out_scalar + 2 ^ 260 * (result.val / 2 ^ 52) =
+      have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1 / 2 ^ 52) =
           Scalar52_as_Nat self := by simp [*]
       agrind
     | inr =>
       have := Choice.eq_one_of_val condition (by assumption)
-      have : Scalar52_as_Nat out_scalar < 2 ^ 260 :=
-        Scalar52_as_Nat_bounded out_scalar (by assumption)
+      have : Scalar52_as_Nat result.2 < 2 ^ 260 :=
+        Scalar52_as_Nat_bounded result.2 (by assumption)
       grind [Finset.Ico_self]
   · -- condition = Choice.one case
-    have : Scalar52_as_Nat out_scalar < 2 ^ 260 :=
-      Scalar52_as_Nat_bounded out_scalar (by assumption)
+    have : Scalar52_as_Nat result.2 < 2 ^ 260 :=
+      Scalar52_as_Nat_bounded result.2 (by assumption)
     grind [Finset.Ico_self, L_lt]
   · -- condition = Choice.zero case
     intro _
-    have : Scalar52_as_Nat out_scalar + 2 ^ 260 * (result.val / 2 ^ 52) = Scalar52_as_Nat self := by
+    have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1 / 2 ^ 52) = Scalar52_as_Nat self := by
       simp [*]
     agrind [L_lt]
 

@@ -61,7 +61,7 @@ theorem invsqrt_spec
   unfold invsqrt ONE from_limbs
   simp only [bind_tc_ok]
   -- aeneas#963: uncurried postcondition destructure
-  step as ⟨c, r, h_bounds, h_nonneg, h_case1, h_case2, h_case3, h_case4⟩
+  step as ⟨c, h_bounds, h_nonneg, h_case1, h_case2, h_case3, h_case4⟩
   · intro i _; interval_cases i; all_goals decide
   -- Rewrite Field51_as_Nat of literal ONE to 1 in all case hypotheses
   have h_one : Field51_as_Nat (Array.make 5#usize [1#u64, 0#u64, 0#u64, 0#u64, 0#u64]) % p = 1 :=
@@ -70,13 +70,13 @@ theorem invsqrt_spec
   refine ⟨h_bounds, h_nonneg, ?_, ?_, ?_⟩
   · -- Case 1: v = 0 → Choice(0) ∧ r = 0
     intro hv
-    exact h_case2 ⟨by decide, hv⟩
+    exact h_case2 (by decide) hv
   · -- Case 2: v ≠ 0, 1/v is a square → Choice(1) ∧ r^2 * v ≡ 1
-    intro ⟨hv, hx⟩
-    exact h_case3 ⟨by decide, hv, hx⟩
+    intro hv x hx
+    exact h_case3 (by decide) hv x hx
   · -- Case 3: v ≠ 0, 1/v is not a square → Choice(0) ∧ r^2 * v ≡ i
-    intro ⟨hv, hx⟩
-    have h := h_case4 ⟨by decide, hv, hx⟩
+    intro hv hx
+    have h := h_case4 (by decide) hv hx
     refine ⟨h.1, ?_⟩
     have h2 := h.2
     rw [mul_one, Nat.mod_mod_of_dvd _ (dvd_refl p)] at h2

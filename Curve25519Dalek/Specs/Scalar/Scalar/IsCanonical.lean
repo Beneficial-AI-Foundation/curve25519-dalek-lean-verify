@@ -5,7 +5,7 @@ Authors: Oliver Butterley, Markus Dablander, Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Specs.Scalar.Scalar.Reduce
 import Curve25519Dalek.Specs.Scalar.Scalar.CtEq
 

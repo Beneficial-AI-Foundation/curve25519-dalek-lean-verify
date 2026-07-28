@@ -3,7 +3,7 @@ Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
@@ -38,17 +38,33 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
   split
   · let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
     let* ⟨ i2, i2_post ⟩ ← U64.mul_spec
+    case hmax =>
+      have h := h_no_overflow i.val (by scalar_tac) (le_refl _)
+      grind [Array.getElem!_Nat_eq, Array.val_getElem!_eq']
     let* ⟨ a, a_post ⟩ ← Array.update_spec
     let* ⟨ i3, i3_post ⟩ ← Usize.add_spec
     let* ⟨ result, result_post1, result_post2 ⟩ ← square2_loop_spec
     case h_no_overflow =>
       intro j hj hj2
-      simp_all only [Array.getElem!_Nat_eq, UScalar.lt_equiv, UScalar.ofNatCore_val_eq,
-        Order.add_one_le_iff, Array.set_val_eq, Nat.not_eq, ne_eq, true_or, or_true,
-        ↓List.getElem!_set_ne]
-      exact h_no_overflow j hj (by omega)
+      have hne : j ≠ i.val := by scalar_tac
+      have := Array.set_of_ne_getElem! square i2 j i.val (by scalar_tac) (by scalar_tac) hne
+      rw [a_post, show square.set i i2 = square.set (i.val)#usize i2 from rfl, this]
+      exact h_no_overflow j hj (by scalar_tac)
     refine ⟨fun j _ _ ↦ ?_, fun j _ _ ↦ ?_⟩
-    · obtain _ | _ := (show j = i ∨ i + 1 ≤ j by omega) <;> simp_all
+    · rcases (show j = i.val ∨ i.val + 1 ≤ j by omega) with rfl | hlt
+      · rw [result_post2 i.val (by scalar_tac) (by scalar_tac), a_post, Array.getElem!_Nat_eq,
+          Array.set_val_eq,
+          getElem!_pos _ _
+            (by
+              simp only [List.length_set, List.Vector.length_val, UScalar.ofNatCore_val_eq]
+              scalar_tac),
+          List.getElem_set_self]
+        rw [i2_post, i1_post, Array.getElem!_Nat_eq,
+          getElem!_pos _ _
+            (by simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq]; scalar_tac)]
+      · rw [result_post1 j (by scalar_tac) (by scalar_tac), a_post,
+          show square.set i i2 = square.set (i.val)#usize i2 from rfl,
+          Array.set_of_ne_getElem! square i2 j i.val (by scalar_tac) (by scalar_tac) (by omega)]
     · have := result_post2 j (by omega) (by omega)
       simp_all
   · simp only [step_simps]

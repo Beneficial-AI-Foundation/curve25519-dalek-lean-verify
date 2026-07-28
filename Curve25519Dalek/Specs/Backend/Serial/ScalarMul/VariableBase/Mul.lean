@@ -111,8 +111,12 @@ theorem mul_spec (point : EdwardsPoint) (hpoint : point.IsValid)
   -- 4. Read s_63.
   let* ⟨ i63, h_i63 ⟩ ← Array.index_usize_spec
   -- Derive bounds for select_spec (needs -8 ≤ i63.val ≤ 8).
-  have hi63_lo : -8 ≤ i63.val := by rw [h_i63]; agrind
-  have hi63_hi : i63.val ≤ 8 := by rw [h_i63]; agrind
+  have hi63_lo : -8 ≤ i63.val := by
+    rw [h_i63, List.Inhabited_getElem_eq_getElem! scalar_digits.val 63 (by scalar_tac),
+      ← Array.getElem!_Nat_eq]; omega
+  have hi63_hi : i63.val ≤ 8 := by
+    rw [h_i63, List.Inhabited_getElem_eq_getElem! scalar_digits.val 63 (by scalar_tac),
+      ← Array.getElem!_Nat_eq]; omega
   -- 5. Select lookup_table[s_63] = s_63 • point.
   let* ⟨ pnp, pnp_valid, pnp_point ⟩ ← window.LookupTable.select_spec (P := point)
   -- 6. Add: tmp1 = tmp3 + pnp (EdwardsPoint + PNP → CompletedPoint).

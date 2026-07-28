@@ -2,7 +2,7 @@
 # Used by `npm run aeneas-{install,extract}` to run charon and aeneas for Lean code generation.
 
 aeneas:
-  commit: "1b39931d"
+  commit: "6e167c9b"
   repo: "https://github.com/AeneasVerif/aeneas.git"
 
 crate:
@@ -39,9 +39,8 @@ tweaks:
         set_option linter.style.setOption false
         set_option linter.style.longLine false
 
-    # --- Fix shift syntax error ---
-
-    - find: "  let i41 ← lift (U64.shr i36 20#i32)"
+    # See: https://github.com/AeneasVerif/charon/issues/1041
+    - find: "  let i41 ← lift (Std.U64.wrapping_shr i36 20#i32)"
       replace: "  let i41 ← (i36 >>> 20#i32)"
 
     # --- Fix parameter name shadowing: variable `scalar` shadows namespace ---
@@ -51,3 +50,7 @@ tweaks:
 
     - find: "  let scalar_bytes ← scalar.Scalar.as_bytes scalar"
       replace: "  let scalar_bytes ← scalar.as_bytes"
+
+    # TODO: add link to issue
+    - find: "core.cmp.Eq.assert_fields_are_eq.default"
+      replace: "assert_fields_are_eq_trait_default"

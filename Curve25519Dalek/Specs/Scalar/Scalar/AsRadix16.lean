@@ -5,7 +5,7 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 
 /-!
 # Spec theorem for `curve25519_dalek::scalar::Scalar::as_radix_16`: loop 0
@@ -130,9 +130,9 @@ private lemma I8x64_update_get (arr : Array I8 64#usize) (j : Usize)
   constructor
   · intro k hk
     simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-    exact List.getElem!_set_ne arr.val j.val k v (Or.inl (Ne.symm hk))
+    simp [hk]
   · simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-    exact List.getElem!_set arr.val j.val v (by scalar_tac)
+    rw [getElem!_pos _ _ (by simpa using hbound), List.getElem_set_self]
 
 private lemma inv_step
     (self : Scalar) (output a : Array I8 64#usize) (i : ℕ)
@@ -239,14 +239,14 @@ private theorem as_radix_16_loop0_spec_strong
       simp only [IScalar.max]; scalar_tac)
       simp only [lift, WP.spec_ok] at hspec
       rw [hi4, hspec]
-      simp[h]
+      rw [Array.getElem!_Nat_eq, getElem!_pos _ _ (by simpa using hi')]; simp [h]
     have h_hi7 : i7.val = ↑((self.bytes[i.val]!).val / 16) := by
       have h := hi5_val; rw [hi1] at h
       have hspec := UScalar.hcast_inBounds_spec .I8 i5 (by
       simp only [IScalar.max]; scalar_tac)
       simp only [lift, WP.spec_ok] at hspec
       rw [hi7, hspec]
-      simp[h]
+      rw [Array.getElem!_Nat_eq, getElem!_pos _ _ (by simpa using hi')]; simp [h]
     have ha_even : a[2 * i.val]! = i4 := by
       have h6_ne_3 : i3.val ≠ i6.val := by omega
       simp_all
@@ -557,7 +557,7 @@ private theorem as_radix_16_loop1_spec_strong
     have h_i_lt : i.val < 64 := by omega
     step as ⟨i1, hi1⟩
     have h_i1_val : i1.val = (output[i.val]!).val := by
-      simp [hi1]
+      rw [hi1, Array.getElem!_Nat_eq, getElem!_pos _ _ (by simpa using h_i_lt)]
     have h_i1_lo : 0 ≤ i1.val := by rw [h_i1_val]; exact h_curr.1
     have h_i1_hi : i1.val ≤ 16   := by rw [h_i1_val]; exact h_curr.2
     step as ⟨i2, hi2⟩
@@ -576,6 +576,15 @@ private theorem as_radix_16_loop1_spec_strong
     have h_i5_lt : i5.val < 64 := by omega
     step as ⟨i6, hi6⟩
     step as ⟨i7, hi7⟩
+    case hmax =>
+      have hne : i5.val ≠ i.val := by omega
+      have h6 := h_upd1 i5.val hne
+      have hb := h_tail i5.val (by omega) (by omega)
+      have hi6v : i6.val = (output1[i5.val]!).val := by
+        rw [hi6, Array.getElem!_Nat_eq, getElem!_pos _ _ (by simpa using h_i5_lt)]
+      rw [hi6v, h6]
+      have hcle : carry.val ≤ 1 := by rcases h_carry_01 with hc | hc <;> omega
+      scalar_tac
     step as ⟨a, h_upd2⟩
     have h_carry_val : carry.val = (i1.val + 8) / 16 := by
       simp_all
@@ -722,9 +731,13 @@ theorem as_radix_16_spec (self : Scalar)
   unfold scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index
   step as ⟨i1, hi1⟩
   step*
+  · subst hi1
+    have hb := h_top
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ _ (by scalar_tac)] at hb
+    scalar_tac
   · simp
-  · simp only [UScalar.ofNatCore_val_eq, mul_zero, zero_le, Array.getElem!_Nat_eq,
-      Array.repeat_val, List.replicate, forall_const]
-    decide
+  · intro j _ hj
+    simp only [Array.getElem!_Nat_eq, Array.repeat_val]
+    rw [List.getElem!_replicate] <;> first | rfl | scalar_tac
 
 end curve25519_dalek.scalar.Scalar

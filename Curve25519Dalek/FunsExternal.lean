@@ -24,6 +24,12 @@ set_option linter.style.longLine false
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result
 
+-- TODO: see `aeneas-config.yml` tweak.
+@[trait_default]
+def assert_fields_are_eq_trait_default {Self : Type} (_ : core.cmp.Eq Self) :
+    Self → Result Unit :=
+  fun _ => ok ()
+
 namespace curve25519_dalek
 
 /- [core::result::{core::result::Result<T, E>}::map]:
@@ -485,7 +491,7 @@ theorem U8.Insts.SubtleConstantTimeEq.ct_eq_spec
    lines 442:4-442:66
    Name pattern: [subtle::ConditionallySelectable::conditional_assign]
    Conditionally assign: returns conditional_select(a, b, choice) -/
-@[rust_fun "subtle::ConditionallySelectable::conditional_assign"]
+@[trait_default, rust_fun "subtle::ConditionallySelectable::conditional_assign"]
 def subtle.ConditionallySelectable.conditional_assign.default
   {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable
   Self) :
@@ -516,7 +522,7 @@ theorem subtle.ConditionallySelectable.conditional_assign.default_spec
    subtle-2.6.1/src/lib.rs', lines 469:4-469:67
    Name pattern: [subtle::ConditionallySelectable::conditional_swap]
    Conditionally swap a and b if choice(1); otherwise leave them unchanged -/
-@[rust_fun "subtle::ConditionallySelectable::conditional_swap"]
+@[trait_default, rust_fun "subtle::ConditionallySelectable::conditional_swap"]
 def subtle.ConditionallySelectable.conditional_swap.default
   {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable
   Self) :
@@ -789,7 +795,7 @@ theorem scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne_spec
   constructor
   · -- Forward: `!decide (c.val = 1#u8) = true → self.bytes ≠ other.bytes`
     intro h
-    simp only at h   -- h : decide (c.val = 1#u8) = false
+    simp only [Bool.not_eq_true'] at h   -- h : decide (c.val = 1#u8) = false
     intro heq                           -- heq : self.bytes = other.bytes
     -- Bridge slice equality from array equality, then derive contradiction
     have hs : s = s1 := by grind [Subtype.ext]
@@ -808,7 +814,7 @@ theorem scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne_spec
       apply hne
       have hc : c = Choice.one := key.mp h_d
       have hs : s = s1 := c_post.mp hc
-      grind [Subtype.ext]
+      grind [Subtype.ext, Array.to_slice]
 
 /- [curve25519_dalek::scalar::{core::cmp::Eq
    for curve25519_dalek::scalar::Scalar}

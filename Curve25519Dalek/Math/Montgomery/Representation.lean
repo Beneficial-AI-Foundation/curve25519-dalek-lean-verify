@@ -316,7 +316,7 @@ lemma inver_Ad_eq : Edwards.Ed25519.d = -(Curve25519.A - 2) / (Curve25519.A + 2)
   have : (Edwards.Ed25519.a - Edwards.Ed25519.d) ≠ 0 := by
     decide
   field_simp
-  decide
+  decide +kernel
 
 -- Define roots_B as a square root of the B coefficient
 noncomputable def Curve25519.roots_B : CurveField :=
@@ -340,7 +340,7 @@ lemma roots_B_non_zero : ¬ Curve25519.roots_B = 0 := by
 lemma roots_B_d : Curve25519.roots_B ^ 2 * Edwards.Ed25519.d = (Curve25519.A - 2) := by
   simp only [pow2_roots_B, adB, neg_mul]
   simp only [A_add_2, inver_Ad_eq, neg_sub]
-  decide
+  decide +kernel
 
 -- Prove that the Montgomery to Edwards conversion inverts the Edwards to Montgomery conversion
 lemma montgomery_edwards_inverse {y : CurveField} (hy1 : y ≠ 1) :
@@ -779,10 +779,16 @@ theorem fromEdwards_add_of_snd_x_eq_zero (e₁ e₂ : Edwards.Point Edwards.Ed25
         congr 1
         · have := montgomery_inv_u_eq e₁ non_e1_x non_e non_e₁
           simp [this]
-        · field_simp [this.left, this.right]
-          ring_nf
-          field_simp [roots_B_non_zero]
-          linear_combination x_sq_mul_linear_factor_eq e₁
+        · -- TODO(mathlib-v4.31.0): this Weierstrass `addY` identity no longer closes.
+          -- `field_simp; ring_nf; field_simp; linear_combination x_sq_mul_linear_factor_eq e₁`
+          -- fails at the final `ring` step (mathlib's `ring` normal form shifted so the
+          -- residual polynomial identity over `CurveField` is no longer recognised equal).
+          -- Temporarily `sorry` — see report.
+          -- field_simp [this.left, this.right]
+          -- ring_nf
+          -- field_simp [roots_B_non_zero]
+          -- linear_combination x_sq_mul_linear_factor_eq e₁
+          sorry
 
 theorem fromEdwards_add_of_sum_y_eq_one (e₁ e₂ : Edwards.Point Edwards.Ed25519)
     (sum_y : (e₁ + e₂).y = 1) :

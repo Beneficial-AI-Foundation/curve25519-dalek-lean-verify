@@ -318,7 +318,7 @@ lemma sqrt_m1_not_square : ¬ IsSquare sqrt_m1 := by
     intro h_eq
     have h_two : (2 : ZMod p) = 0 := by
       have := congrArg (fun z : ZMod p => z + 1) h_eq
-      have h_zero : (0 : ZMod p) = 2 := by simpa using this
+      have h_zero : (0 : ZMod p) = 2 := by linear_combination this
       exact h_zero.symm
     have h_dvd : p ∣ 2 := (ZMod.natCast_eq_zero_iff 2 p).mp h_two
     norm_num [p] at h_dvd

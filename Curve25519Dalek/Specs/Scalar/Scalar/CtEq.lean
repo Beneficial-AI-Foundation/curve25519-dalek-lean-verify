@@ -28,7 +28,7 @@ theorem ct_eq_spec (self other : scalar.Scalar) :
   unfold ct_eq
   step*
   constructor
-  · grind [Subtype.ext]
+  · grind [Subtype.ext, Array.val_to_slice]
   · grind
 
 end curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq

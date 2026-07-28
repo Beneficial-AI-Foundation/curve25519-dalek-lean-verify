@@ -101,8 +101,7 @@ theorem mul_by_pow_2_loop_spec
     -- Apply IH at (proj, i2) with remaining counter n
     have h_i2_le : i2.val ≤ k.val - 1 := by scalar_tac
     have h_new_rem : k.val - 1 - i2.val = n := by scalar_tac
-    let* ⟨ result, result_post ⟩ ← ih
-    obtain ⟨h_on, hX, hY, hZ, hpt⟩ := result_post
+    let* ⟨ result, h_on, hX, hY, hZ, hpt ⟩ ← ih
     exact ⟨hX, hY, hZ, h_on, hpt⟩
 
 /-- **Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2`**
@@ -119,7 +118,7 @@ theorem mul_by_pow_2_spec (self : EdwardsPoint) (k : U32)
   unfold mul_by_pow_2
   let* ⟨ hk2 ⟩ ← massert_spec
   let* ⟨ s, s_post1, s_post2, s_post3 ⟩ ← as_projective_spec
-  let* ⟨ s1, s1_post ⟩ ← mul_by_pow_2_loop_spec
+  let* ⟨ s1, h_s1_on, h_s1_X, h_s1_Y, h_s1_Z, h_s1_point ⟩ ← mul_by_pow_2_loop_spec
   -- P₀: reference point for loop invariant
   · exact self.toPoint
   -- s.OnCurve: inherit from self.OnCurve via s_post1/2/3
@@ -141,7 +140,6 @@ theorem mul_by_pow_2_spec (self : EdwardsPoint) (k : U32)
     rw [dif_pos hself]
     simp only [ProjectivePoint.toPoint', s_post1, s_post2, s_post3, EdwardsPoint.toPoint']
   -- Main goal: apply final double + as_extended using existential specs
-  obtain ⟨h_s1_on, h_s1_X, h_s1_Y, h_s1_Z, h_s1_point⟩ := s1_post
   obtain ⟨cp, hcp_run, hcp_valid, hcp_eq⟩ :=
     double_spec_core s1 h_s1_on h_s1_X h_s1_Y h_s1_Z
   simp only [hcp_run]

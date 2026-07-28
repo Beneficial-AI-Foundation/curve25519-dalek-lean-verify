@@ -32,5 +32,6 @@ theorem index_mut_spec (self : backend.serial.u64.scalar.Scalar52) (_index : Std
       result.2 = Aeneas.Std.Array.set self _index ⦄ := by
   unfold index_mut
   step*
+  simp_all [getElem!_pos]
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64

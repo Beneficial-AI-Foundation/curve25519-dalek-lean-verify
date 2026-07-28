@@ -35,6 +35,6 @@ theorem montgomery_mul_spec (m m' : Scalar52)
   unfold montgomery_mul
   step*
   refine ⟨?_, w_post2, w_post3⟩
-  simpa [a1_post1, eq_comm] using w_post1
+  rw [a1_post1] at w_post1; exact w_post1.symm
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

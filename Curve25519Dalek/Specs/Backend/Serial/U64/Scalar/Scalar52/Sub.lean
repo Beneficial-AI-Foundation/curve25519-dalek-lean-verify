@@ -5,7 +5,7 @@ Authors: Oliver Butterley
 -/
 import Aeneas
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ConditionalAddL
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
@@ -102,7 +102,9 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
     have hi4_ok : i2.val + i3.val < 2 ^ 64 := by omega
     step as ⟨i4, hi4⟩  -- i2 + i3
     step as ⟨borrow1, hborrow1⟩  -- wrapping_sub
-    step as ⟨_, index_mut_back, h_imb, _⟩  -- index_mut
+    step as ⟨imb, index_mut_back, h_imb⟩  -- index_mut
+    obtain ⟨idx_v, idx_f⟩ := imb
+    simp only [] at index_mut_back h_imb
     step as ⟨i5, hi5_1, hi5_2⟩  -- borrow1 &&& mask
     step as ⟨i6, hi6⟩  -- i + 1
     -- Set up the recursive call hypotheses
@@ -120,7 +122,10 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
       intro j hj
       simp only [hi6] at hj
       by_cases hjc : j = i.val
-      · grind
+      · rw [hjc, show (Aeneas.Std.Array.set difference i i5) =
+          Aeneas.Std.Array.set difference (i.val)#usize i5 from rfl,
+          Array.set_of_eq difference i5 i.val (by scalar_tac)]
+        exact hi5_bound
       · have hj' : j < i.val := by omega
         have hne := Array.set_of_ne difference i5 j i (by agrind) (by agrind) (by omega)
         simp only [Array.getElem!_Nat_eq, Array.set_val_eq] at hne ⊢
@@ -147,9 +152,9 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
         simp only [UScalar.size] at this
         exact this
       have hi1_val : i1.val = a[i.val]!.val := by
-        simp only [hi1, UScalar.val, Array.getElem!_Nat_eq]
+        rw [hi1, Array.getElem!_Nat_eq, getElem!_pos _ _ (by scalar_tac)]
       have hi2_val : i2.val = b[i.val]!.val := by
-        simp only [hi2, UScalar.val, Array.getElem!_Nat_eq]
+        rw [hi2, Array.getElem!_Nat_eq, getElem!_pos _ _ (by scalar_tac)]
       have hi4_val : i4.val = b[i.val]!.val + i3.val := by
         simp only [hi4, hi2_val]
       have hi3_eq : i3.val = borrow.val / 2^63 := by
@@ -160,11 +165,12 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
       have hdiff'_lt : ∀ j < i.val,
           (Aeneas.Std.Array.set difference i i5)[j]!.val = difference[j]!.val := by
         intro j hj
-        have h := Array.set_of_ne difference i5 j i (by agrind) (by agrind) (by omega)
-        grind [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.val]
+        rw [Array.set_of_ne' difference i5 j i (by scalar_tac) (by omega),
+          Array.getElem_eq_getElem! difference j (by scalar_tac)]
       have hdiff'_eq : (Aeneas.Std.Array.set difference i i5)[i.val]!.val = i5.val := by
-        have h := Array.set_of_eq difference i5 i (by agrind)
-        grind [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.val]
+        rw [show (Aeneas.Std.Array.set difference i i5) =
+          Aeneas.Std.Array.set difference (i.val)#usize i5 from rfl,
+          Array.set_of_eq difference i5 i.val (by scalar_tac)]
       have hdiff'_partial : ∑ j ∈ Finset.range i.val, 2^(52*j) *
                           (Aeneas.Std.Array.set difference i i5)[j]!.val
                           = ∑ j ∈ Finset.range i.val, 2^(52*j) * difference[j]!.val := by
@@ -243,15 +249,16 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
     rw [← h_imb] at hdiff1 hdiff1_rest hinv1
     -- New aeneas `do` elaborator (PR #963) uncurries the (Scalar52 × U64) result,
     -- so we now have one binder per tuple component followed by the two conjuncts.
-    step as ⟨res_arr, res_carry, hres1, hres2⟩
-    refine ⟨hres1, ?_⟩
-    exact hres2
+    step as ⟨res_arr, hres1, hres2⟩
+    exact ⟨hres1, hres2⟩
   case isFalse hge =>
     refine ⟨by grind [Array.getElem!_Nat_eq], ?_⟩
     unfold Scalar52_partial_as_Nat Scalar52_as_Nat at *
     -- New aeneas elaborator no longer auto-applies `Array.getElem!_Nat_eq`.
     simp only [Array.getElem!_Nat_eq] at *
-    grind
+    have hi5 : (i : ℕ) = 5 := by scalar_tac
+    rw [hi5] at hinv
+    exact hinv
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
@@ -293,7 +300,10 @@ theorem sub_spec (a b : Array U64 5#usize)
   step as ⟨i1, hi1_eq, _⟩  -- borrow >>> 63
   have : i1.val ≤ 1 := by simp only [*, Nat.shiftRight_eq_div_pow]; grind
   step as ⟨i2, hi2⟩  -- cast to U8
-  have hi2_eq_i1 : i2.val = i1.val := by simp only [UScalar.val]; grind
+  have hi2_eq_i1 : i2.val = i1.val := by
+    rw [hi2, UScalar.cast_val_eq]
+    have h256 : (2:ℕ) ^ UScalarTy.U8.numBits = 256 := by decide
+    rw [h256]; omega
   -- Helper: Choice.one.val = 1
   have : Choice.one.val.val = 1 := by rfl
   -- Helper: Choice.zero.val = 0

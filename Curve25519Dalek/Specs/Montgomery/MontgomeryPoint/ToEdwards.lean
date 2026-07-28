@@ -111,7 +111,6 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
     apply Finset.sum_congr rfl
     intro i hi
     have h_limb := fe2_post1 i (Finset.mem_range.mp hi)
-    simp only at h_limb
     rw [h_limb]
     ring
   have h_ONE : Field51_as_Nat one = 1 := by grind only
@@ -127,7 +126,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       simp only [Array.getElem!_Nat_eq]
     have h_i1_eq : i1.val = y_bytes[31]!.val := by
       have h := congrArg UScalar.val i1_post
-      rw [← coerce_eq]; exact h
+      rw [← coerce_eq, getElem!_pos _ _ (by simp [y_bytes.property])]; exact h
     have h_i1_lt : i1.val < 128 := by
       grind only
     have h_i2_lo : i2.val % 128 = i1.val := by
@@ -160,15 +159,19 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
       have h_idx : (↑(31#usize) : ℕ) = 31 := by decide
       rw [h_idx]
-      rw [congrArg UScalar.val (List.getElem!_set (↑y_bytes : List U8) 31 i2
-        (by simp [y_bytes.property]))]
+      rw [congrArg UScalar.val (show ((↑y_bytes : List U8).set 31 i2)[31]! = i2 from by
+        rw [getElem!_pos _ _ (by simp [y_bytes.property])]; exact List.getElem_set_self ..)]
       have h_eq : ∑ j ∈ Finset.range 31, 2^(8*j) *
               UScalar.val ((↑y_bytes : List U8).set 31 i2)[j]! =
           ∑ j ∈ Finset.range 31, 2^(8*j) *
-              UScalar.val (↑y_bytes : List U8)[j]! :=
-        Finset.sum_congr rfl (fun j hj => congrArg (2^(8*j) * ·)
-          (congrArg UScalar.val (List.getElem!_set_ne (↑y_bytes : List U8) 31 j i2
-            (Or.inr (Or.inr (Or.inr (Finset.mem_range.mp hj)))))))
+              UScalar.val (↑y_bytes : List U8)[j]! := by
+        refine Finset.sum_congr rfl (fun j hj => ?_)
+        have hjlt : j < 31 := Finset.mem_range.mp hj
+        have hset : ((↑y_bytes : List U8).set 31 i2)[j]! = (↑y_bytes : List U8)[j]! := by
+          rw [getElem!_pos _ _ (by simp [y_bytes.property]; omega),
+              getElem!_pos _ _ (by simp [y_bytes.property]; omega),
+              List.getElem_set_ne (by omega)]
+        rw [hset]
       grind only
     rw [h_set_eq, h_orig_eq]
     set S := ∑ j ∈ Finset.range 31, 2^(8*j) * (y_bytes.val[j]!).val

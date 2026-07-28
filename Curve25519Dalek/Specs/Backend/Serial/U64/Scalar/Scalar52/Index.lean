@@ -29,5 +29,6 @@ theorem index_spec (self : backend.serial.u64.scalar.Scalar52) (_index : Std.Usi
       result = self.val[_index.val]! ⦄ := by
   unfold index
   step*
+  simp_all [getElem!_pos]
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64

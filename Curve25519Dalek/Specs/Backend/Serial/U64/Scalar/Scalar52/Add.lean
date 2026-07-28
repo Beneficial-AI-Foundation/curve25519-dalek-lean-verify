@@ -3,7 +3,7 @@ Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang, Oliver Butterley, Hoang Le Truong
 -/
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
@@ -33,34 +33,25 @@ private theorem next_spec (range : core.ops.range.Range Usize) :
           opt = some range.start ∧
           range'.start.val = range.start.val + 1 ∧
           range'.end = range.end) := by
-  simp only [core.iter.range.IteratorRange.next]
-  simp only [liftFun2, liftFun1, core.clone.impls.CloneUsize.clone, bind_tc_ok, not_lt]
-  have h_lt_iff :
-      (core.cmp.impls.PartialOrdUsize.lt range.start range.end = true) =
-      (range.start.val < range.end.val) := by
-    simp [core.cmp.impls.PartialOrdUsize.lt]
-  simp only [h_lt_iff]
+  simp only [core.iter.range.IteratorRange.next,
+    show core.iter.range.StepUsize.partialOrdInst.lt range.start range.end
+      = ok (decide (range.start.val < range.end.val)) from rfl,
+    show core.iter.range.StepUsize.cloneInst.clone range.start = ok range.start from rfl,
+    bind_tc_ok]
   by_cases hlt : range.start.val < range.end.val
-  · rw [if_pos hlt]
-    have hbound : range.start.val + 1 ≤ Usize.max := by
-      have := range.end.hBounds; scalar_tac
-    refine ⟨some range.start, {range with start := ⟨range.start.val + 1, by scalar_tac⟩},
-            ?_, ?_, ?_⟩
-    · simp only [core.iter.range.StepUsize.forward_checked, bind_tc_ok]
-      have hca := Usize.checked_add_bv_spec range.start 1#usize
-      rcases heq : Usize.checked_add range.start 1#usize with _ | z
-      · rw [heq] at hca; scalar_tac
-      · simp only
-        rw [heq] at hca
-        obtain ⟨_, hval, _⟩ := hca
-        have hzval : z.val = range.start.val + 1 := by scalar_tac
-        congr 4
-        exact UScalar.eq_of_val_eq hzval
-    · intro h; omega
-    · intro _; exact ⟨rfl, rfl, rfl⟩
-  · rw [if_neg hlt]
+  · rw [if_pos (by simp [hlt])]
+    simp only [core.iter.range.StepUsize, core.iter.range.UScalarStep,
+      core.iter.range.UScalarStep.forward_checked,
+      show range.start.val + (1#usize).val ≤ UScalar.max UScalarTy.Usize from by scalar_tac,
+      ↓reduceDIte, bind_tc_ok]
+    refine ⟨_, _, rfl, ?_, ?_⟩
+    · intro h; exact absurd hlt h
+    · intro _; refine ⟨rfl, ?_, rfl⟩; simp [UScalar.ofNatCore_val_eq]
+  · rw [if_neg (by simp [hlt])]
     exact ⟨none, range, rfl, fun _ => ⟨rfl, rfl⟩, fun h => absurd h hlt⟩
 
+set_option maxHeartbeats 1000000 in
+-- Heavier elaboration after the v4.31.0 toolchain/Aeneas update.
 /-- **Spec theorem for the inner loop `add_loop` of `Scalar52::add`**
 • The function always succeeds (no panic) provided the loop preconditions hold
 • Every output limb is `< 2 ^ 52`
@@ -107,11 +98,40 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
   | some val =>
     simp only [step_simps]
     step*
+    · -- Overflow check for i3 = i1 + i2 (i1 + i2 ≤ U64.max)
+      have hvlt : val.val < 5 := by agrind
+      have hla : (↑a : List U64).length = 5 := by simp
+      have hlb : (↑b : List U64).length = 5 := by simp
+      have h1 := ha val (by scalar_tac)
+      have h2 := hb val (by scalar_tac)
+      rw [i1_post, i2_post,
+        show (↑a : List U64)[val.val] = a[val.val]! from by
+          rw [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+            List.getElem?_eq_getElem (by omega), Option.getD_some],
+        show (↑b : List U64)[val.val] = b[val.val]! from by
+          rw [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+            List.getElem?_eq_getElem (by omega), Option.getD_some]]
+      scalar_tac
     · -- Overflow check for carry1 (i3 + i4 ≤ U64.max)
-      have : carry.val >>> 52 ≤ 1 := by have := hcarry' i (by agrind); omega
-      simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
-        UScalar.ofNatCore_val_eq, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv] at *; agrind
-    rename_i y y1
+      have hvlt : val.val < 5 := by agrind
+      have hla : (↑a : List U64).length = 5 := by simp
+      have hlb : (↑b : List U64).length = 5 := by simp
+      have h1 := ha val (by scalar_tac)
+      have h2 := hb val (by scalar_tac)
+      have hc : carry.val >>> 52 ≤ 1 := by have := hcarry' i (by agrind); omega
+      rw [i3_post, i4_post1, i1_post, i2_post,
+        show (↑a : List U64)[val.val] = a[val.val]! from by
+          rw [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+            List.getElem?_eq_getElem (by omega), Option.getD_some],
+        show (↑b : List U64)[val.val] = b[val.val]! from by
+          rw [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+            List.getElem?_eq_getElem (by omega), Option.getD_some]]
+      scalar_tac
+    -- aeneas#963: the `index_mut` result is now an unsplit pair `x`; split it to expose the
+    -- write-back closure `y`, then bind the masked limb `i5`.
+    obtain ⟨xv, y⟩ := x
+    simp only [] at x_post1 x_post2 ⊢
+    step as ⟨i5, i5_post⟩
     -- Recursive WP obligation: apply IH (add_loop_spec) and transfer postcondition
     -- Establish facts about iter1 from h_some_branch
     have h_lt : i.val < 5 := by agrind
@@ -130,12 +150,21 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
         List.Vector.length_val, Nat.lt_add_one, getElem!_pos, gt_iff_lt] at *; grind
     have hcarry1' : ∀ j < 5, carry1.val < 2 ^ 53 := by
       intro j hj
-      have : carry.val >>> 52 ≤ 1 := by have := hcarry' val (by agrind); omega
-      have := ha val (by agrind)
-      have := hb val (by agrind)
-      simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
-        UScalar.ofNatCore_val_eq, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, UScalar.val_and,
-        gt_iff_lt] at *; agrind
+      have hvlt : val.val < 5 := by agrind
+      have hla : (↑a : List U64).length = 5 := by simp
+      have hlb : (↑b : List U64).length = 5 := by simp
+      have hc : carry.val >>> 52 ≤ 1 := by have := hcarry' val (by agrind); omega
+      have hi1b : i1.val < 2 ^ 52 := by
+        rw [i1_post, show (↑a : List U64)[val.val] = a[val.val]! from by
+          rw [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+            List.getElem?_eq_getElem (by omega), Option.getD_some]]
+        exact ha val (by scalar_tac)
+      have hi2b : i2.val < 2 ^ 52 := by
+        rw [i2_post, show (↑b : List U64)[val.val] = b[val.val]! from by
+          rw [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+            List.getElem?_eq_getElem (by omega), Option.getD_some]]
+        exact hb val (by scalar_tac)
+      rw [carry1_post, i3_post, i4_post1]; omega
     have hsum1 : ∀ j < 5, (y i5)[j]!.val < 2 ^ 52 := by
       intro j hj
       by_cases hc : j = val
@@ -143,15 +172,14 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
         have := Array.set_of_eq sum i5 val (by agrind)
         simp only [Array.getElem!_Nat_eq, Array.set_val_eq, gt_iff_lt] at this ⊢
         simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-          getElem!_pos, List.getElem!_eq_getElem?_getD, UScalarTy.U64_numBits_eq,
+          getElem!_pos, UScalarTy.U64_numBits_eq,
           Bvify.U64.UScalar_bv, UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod,
-          UScalar.ofNat_self_val, Array.set_val_eq, List.length_set, List.getElem_set_self,
-          getElem?_pos, Option.getD_some]
+          UScalar.ofNat_self_val, Array.set_val_eq, List.length_set, List.getElem_set_self]
         agrind
       · have := Array.set_of_ne sum i5 j val (by agrind) (by agrind) (by agrind)
         have := hsum j (by agrind)
         simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-          getElem!_pos, List.getElem!_eq_getElem?_getD, UScalarTy.U64_numBits_eq,
+          getElem!_pos, UScalarTy.U64_numBits_eq,
           Bvify.U64.UScalar_bv, UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod,
           UScalar.ofNat_self_val, Array.set_val_eq, List.length_set, gt_iff_lt]; agrind
     have hsum'1 : ∀ j < 5, iter1.start.val ≤ j → (y i5)[j]!.val = 0 := by
@@ -178,16 +206,24 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     · -- ∀ j < val.val, sum''[j]!.val = sum[j]!.val
       intro j hj
       have h1 := hQ2 j (by grind)
-      rw [x_post1] at h1
+      rw [x_post2] at h1
       have h2 := congrArg UScalar.val (Array.set_of_ne' sum i5 j val (by agrind) (by grind))
       rw [Array.getElem_eq_getElem! sum j (by agrind)] at h2
       simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Array.set_val_eq] at h1 h2
       rw[h1, h2]
     · -- Sum equality
       have hc1val : carry1.val = a[val]!.val + b[val]!.val + carry.val / 2 ^ 52 := by
-        set_option maxRecDepth 1000 in
-        simp only [List.getElem!_eq_getElem?_getD, Array.getElem!_Usize_eq,
-          carry1_post, i3_post, i1_post, i2_post, i4_post1]; omega
+        have hvlt : val.val < 5 := by agrind
+        have hla : (↑a : List U64).length = 5 := by simp
+        have hlb : (↑b : List U64).length = 5 := by simp
+        rw [carry1_post, i3_post, i4_post1, i1_post, i2_post,
+          show (↑a : List U64)[val.val] = a[val.val]! from by
+            rw [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+              List.getElem?_eq_getElem (by omega), Option.getD_some],
+          show (↑b : List U64)[val.val] = b[val.val]! from by
+            rw [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+              List.getElem?_eq_getElem (by omega), Option.getD_some]]
+        simp only [Array.getElem!_Usize_eq, Array.getElem!_Nat_eq, Nat.shiftRight_eq_div_pow]
       have hsum''i : sum''[val]!.val = carry1.val % 2 ^ 52 := by
         have h1 := hQ2 val.val (by grind)
         -- h1: sum''[val.val]!.val = (y i5)[val.val]!.val
@@ -199,7 +235,7 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
           omega
         simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Array.set_val_eq] at h1 h2
         simp only [Array.getElem!_Usize_eq, List.getElem!_eq_getElem?_getD]
-        rw[h1, x_post1 ]
+        rw[h1, x_post2 ]
         clear *- h2 h3
         grind
       have hfin : ∑ j ∈ Finset.Ico (i.val + 1) 5, 2 ^ (52 * j) * sum''[j]!.val =
@@ -262,7 +298,8 @@ theorem add_spec (a b : Scalar52)
     have : Scalar52_as_Nat sum = Scalar52_as_Nat a + Scalar52_as_Nat b := calc
       ∑ i ∈ Finset.Ico 0 5, 2 ^ (52 * i) * sum[i]!.val
       _ = ∑ i ∈ Finset.Ico 0 5, 2 ^ (52 * i) * (a[i]!.val + b[i]!.val) := by assumption
-      _ = ∑ i ∈ Finset.Ico 0 5, (2 ^ (52 * i) * a[i]!.val + 2 ^ (52 * i) * b[i]!.val) := by grind
+      _ = ∑ i ∈ Finset.Ico 0 5, (2 ^ (52 * i) * a[i]!.val + 2 ^ (52 * i) * b[i]!.val) := by
+          simp only [mul_add]
       _ = _ := by simp [Scalar52_as_Nat, Finset.sum_add_distrib]
     omega
   · agrind [constants.L_spec]
