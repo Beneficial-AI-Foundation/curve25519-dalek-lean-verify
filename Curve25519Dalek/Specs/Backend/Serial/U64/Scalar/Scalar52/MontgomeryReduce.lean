@@ -105,11 +105,11 @@ private theorem part1_spec_tail (sum i5 : U128) (p : U64)
 private theorem part1_spec (sum : U128)
     (h_bound : sum.val + (2 ^ 52 - 1) * (constants.L[0]!).val ≤ U128.max) :
     montgomery_reduce.part1 sum ⦃ result =>
-    let (carry, p) := result
-    p.val = (sum.val * constants.LFACTOR) % (2 ^ 52) ∧
-    carry.val = (sum.val + p.val * (constants.L[0]!).val) / (2 ^ 52) ∧
-    carry.val < 2 ^ 77 ∧
-    p.val < 2 ^ 52 ⦄ := by
+      let (carry, p) := result
+      p.val = (sum.val * constants.LFACTOR) % (2 ^ 52) ∧
+      carry.val = (sum.val + p.val * (constants.L[0]!).val) / (2 ^ 52) ∧
+      carry.val < 2 ^ 77 ∧
+      p.val < 2 ^ 52 ⦄ := by
   unfold montgomery_reduce.part1
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   have h_L_len : constants.L.val.length = 5 := by
@@ -152,12 +152,12 @@ private theorem part1_spec (sum : U128)
 
 @[step]
 private theorem part2_spec (sum : U128) :
-  montgomery_reduce.part2 sum ⦃ result =>
-  let (carry, w) := result
-  w.val = sum.val % (2 ^ 52) ∧
-  carry.val = sum.val / (2 ^ 52) ∧
-  carry.val < 2 ^ 76 ∧
-  w.val < 2 ^ 52 ⦄ := by -- 2^128 / 2^52 = 2^76
+    montgomery_reduce.part2 sum ⦃ result =>
+      let (carry, w) := result
+      w.val = sum.val % (2 ^ 52) ∧
+      carry.val = sum.val / (2 ^ 52) ∧
+      carry.val < 2 ^ 76 ∧
+      w.val < 2 ^ 52 ⦄ := by -- 2^128 / 2^52 = 2^76
   unfold montgomery_reduce.part2
   -- Rust: let w = (sum as u64) & ((1u64 << 52) - 1);
   step as ⟨w_cast, hw_cast⟩     -- Cast sum to u64

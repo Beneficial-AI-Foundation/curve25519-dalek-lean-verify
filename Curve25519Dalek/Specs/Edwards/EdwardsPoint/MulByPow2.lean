@@ -49,10 +49,10 @@ theorem mul_by_pow_2_loop_spec
     (hs_point : s.toPoint' hs_on = 2 ^ i.val • P₀) :
     mul_by_pow_2_loop k s i ⦃ (result : ProjectivePoint) =>
       ∃ h_on : result.OnCurve,
-        (∀ j < 5, result.X[j]!.val < 2 ^ 53) ∧
-        (∀ j < 5, result.Y[j]!.val < 2 ^ 53) ∧
-        result.Z.IsValid ∧
-        result.toPoint' h_on = 2 ^ (k.val - 1) • P₀ ⦄ := by
+      (∀ j < 5, result.X[j]!.val < 2 ^ 53) ∧
+      (∀ j < 5, result.Y[j]!.val < 2 ^ 53) ∧
+      result.Z.IsValid ∧
+      result.toPoint' h_on = 2 ^ (k.val - 1) • P₀ ⦄ := by
   induction h_rem : (k.val - 1 - i.val) generalizing i s with
   | zero =>
     -- i.val = k.val - 1, loop returns ok s

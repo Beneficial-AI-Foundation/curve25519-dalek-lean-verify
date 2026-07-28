@@ -665,11 +665,11 @@ theorem from_bytes_wide_hi0_xfer_spec
     (index_mut_back : U64 → Scalar52) :
     from_bytes_wide_hi0_xfer words1 mask i19 i21 index_mut_back
       ⦃ i22 i24 i26 i28 set_back =>
-        i22 = i21 &&& mask ∧
-        i24.val = (i19.val >>> 4) &&& mask.val ∧
-        i26 = words1.val[5]! ∧
-        i28.val = (i19.val >>> 56) ||| ((i26.val <<< 8) % U64.size) ∧
-        set_back = Std.Array.set (index_mut_back i24) 1#usize ⦄ := by
+      i22 = i21 &&& mask ∧
+      i24.val = (i19.val >>> 4) &&& mask.val ∧
+      i26 = words1.val[5]! ∧
+      i28.val = (i19.val >>> 56) ||| ((i26.val <<< 8) % U64.size) ∧
+      set_back = Std.Array.set (index_mut_back i24) 1#usize ⦄ := by
   unfold from_bytes_wide_hi0_xfer
   dsimp only [Insts.CoreOpsIndexIndexMutUsizeU64.index_mut, Array.index_mut_usize,
               bind_assoc_eq, bind_tc_ok]

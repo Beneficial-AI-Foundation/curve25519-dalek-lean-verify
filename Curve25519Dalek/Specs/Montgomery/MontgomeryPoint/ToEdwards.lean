@@ -55,7 +55,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       (∀ ep, result = some ep →
         ∃ Z_inv,
           field.FieldElement51.invert ep.Z = ok Z_inv ∧
-          let u := U8x32_as_Nat mp % 2^255
+      let u := U8x32_as_Nat mp % 2^255
           let y := Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p
           (y * ((u + 1) % p)) % p = ((u + p - 1) % p) % p ∧
           ep.IsValid ) ⦄ := by

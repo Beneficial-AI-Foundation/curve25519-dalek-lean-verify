@@ -271,7 +271,7 @@ theorem to_montgomery_spec (self : EdwardsPoint)
         u % p = 0 ∧ (∀ n : ℕ, fromEdwards (n • self.toPoint) = 0)
       else
         ((u * Z) % p = (u * Y + (Z + Y)) % p) ∧
-        abs_montgomery (fromEdwards self.toPoint) = MontgomeryPoint.mkPoint mp ⦄ := by
+      abs_montgomery (fromEdwards self.toPoint) = MontgomeryPoint.mkPoint mp ⦄ := by
   unfold to_montgomery
   (step*; try grind)
   · have h_arith : (let Y := Field51_as_Nat self.Y; let Z := Field51_as_Nat self.Z;
