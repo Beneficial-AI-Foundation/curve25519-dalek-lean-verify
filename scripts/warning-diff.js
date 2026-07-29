@@ -250,8 +250,8 @@ if (process.env.GITHUB_OUTPUT) {
     }
 
     // Write body to a file for the comment action
-    fs.writeFileSync(path.join(REPO_ROOT, '.warning-diff-comment.md'), body)
-    fs.appendFileSync(outputFile, `comment_body_path=.warning-diff-comment.md\n`)
+    fs.writeFileSync(path.join(REPO_ROOT, 'warning-diff-comment.md'), body)
+    fs.appendFileSync(outputFile, `comment_body_path=warning-diff-comment.md\n`)
   }
 }
 
