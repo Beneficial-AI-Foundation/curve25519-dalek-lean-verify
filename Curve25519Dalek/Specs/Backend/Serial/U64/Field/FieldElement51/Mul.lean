@@ -22,8 +22,6 @@ The function is decomposed into 3 helper functions, each with a fold theorem and
 Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
-set_option linter.hashCommand false
-#setup_aeneas_simps
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field

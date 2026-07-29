@@ -452,9 +452,9 @@
       "rust_name": "zeroize::{impl zeroize::Zeroize for Z}::zeroize",
       "is_local": false,
       "source": {
-        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
-        "begin_line": 301,
-        "end_line": 301
+        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.9.0/src/lib.rs",
+        "begin_line": 274,
+        "end_line": 274
       },
       "is_opaque": true,
       "can_fail": true,
@@ -469,9 +469,9 @@
       "rust_name": "zeroize::{impl zeroize::Zeroize for [Z; N]}::zeroize",
       "is_local": false,
       "source": {
-        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
-        "begin_line": 373,
-        "end_line": 373
+        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.9.0/src/lib.rs",
+        "begin_line": 346,
+        "end_line": 346
       },
       "is_opaque": true,
       "can_fail": true,
@@ -486,9 +486,9 @@
       "rust_name": "zeroize::{impl zeroize::Zeroize for alloc::vec::Vec<Z>}::zeroize",
       "is_local": false,
       "source": {
-        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
-        "begin_line": 551,
-        "end_line": 551
+        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.9.0/src/lib.rs",
+        "begin_line": 528,
+        "end_line": 528
       },
       "is_opaque": true,
       "can_fail": true,
@@ -6120,9 +6120,9 @@
       "rust_name": "zeroize::Zeroize",
       "is_local": false,
       "source": {
-        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
-        "begin_line": 272,
-        "end_line": 272
+        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.9.0/src/lib.rs",
+        "begin_line": 245,
+        "end_line": 245
       }
     },
     {
@@ -6132,9 +6132,9 @@
       "rust_name": "zeroize::DefaultIsZeroes",
       "is_local": false,
       "source": {
-        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
-        "begin_line": 282,
-        "end_line": 282
+        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.9.0/src/lib.rs",
+        "begin_line": 255,
+        "end_line": 255
       }
     },
     {
@@ -6263,9 +6263,9 @@
       "rust_name": "zeroize::{impl zeroize::Zeroize for Z}",
       "is_local": false,
       "source": {
-        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
-        "begin_line": 297,
-        "end_line": 299
+        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.9.0/src/lib.rs",
+        "begin_line": 270,
+        "end_line": 272
       },
       "impl_trait_def_id": 7,
       "impl_trait_rust_name": "zeroize::Zeroize",
@@ -6278,9 +6278,9 @@
       "rust_name": "zeroize::{impl zeroize::DefaultIsZeroes for u64}",
       "is_local": false,
       "source": {
-        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
-        "begin_line": 309,
-        "end_line": 309
+        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.9.0/src/lib.rs",
+        "begin_line": 282,
+        "end_line": 282
       },
       "impl_trait_def_id": 35,
       "impl_trait_rust_name": "zeroize::DefaultIsZeroes",
@@ -6293,9 +6293,9 @@
       "rust_name": "zeroize::{impl zeroize::DefaultIsZeroes for bool}",
       "is_local": false,
       "source": {
-        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
-        "begin_line": 309,
-        "end_line": 309
+        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.9.0/src/lib.rs",
+        "begin_line": 282,
+        "end_line": 282
       },
       "impl_trait_def_id": 35,
       "impl_trait_rust_name": "zeroize::DefaultIsZeroes",
@@ -6308,9 +6308,9 @@
       "rust_name": "zeroize::{impl zeroize::DefaultIsZeroes for u8}",
       "is_local": false,
       "source": {
-        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
-        "begin_line": 309,
-        "end_line": 309
+        "file": "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.9.0/src/lib.rs",
+        "begin_line": 282,
+        "end_line": 282
       },
       "impl_trait_def_id": 35,
       "impl_trait_rust_name": "zeroize::DefaultIsZeroes",

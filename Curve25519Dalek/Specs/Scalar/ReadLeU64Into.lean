@@ -38,9 +38,6 @@ where `X64_as_Nat` is the 4-limb `u64` interpretation from `AsRadix2wLoop.lean`.
 Source: "curve25519-dalek/src/scalar.rs"
 -/
 
--- `#setup_aeneas_simps` triggers the hash-command linter; suppress it for this file.
-set_option linter.hashCommand false
-#setup_aeneas_simps
 attribute [-simp] Int.reducePow Nat.reducePow
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

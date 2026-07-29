@@ -80,12 +80,8 @@ Source: "curve25519-dalek/src/scalar.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.scalar.Scalar
 
--- `#setup_aeneas_simps` uses a `#` command which triggers the hashCommand linter;
--- suppressed intentionally.
-set_option linter.hashCommand false
 -- R = 2^260 in the Montgomery domain; prevents kernel exponentiation explosion.
 set_option exponentiation.threshold 260
-#setup_aeneas_simps
 attribute [-simp] Int.reducePow Nat.reducePow
 
 /-! ## Auxiliary Element-Access Predicates

@@ -31,8 +31,6 @@ Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-set_option linter.hashCommand false -- #setup_aeneas_simps unavoidably triggers this linter
-#setup_aeneas_simps
 attribute [-simp] Int.reducePow Nat.reducePow
 namespace curve25519_dalek.scalar.Scalar.as_radix_16
 
@@ -249,7 +247,7 @@ private theorem as_radix_16_loop0_spec_strong
       rw [Array.getElem!_Nat_eq, getElem!_pos _ _ (by simpa using hi')]; simp [h]
     have ha_even : a[2 * i.val]! = i4 := by
       have h6_ne_3 : i3.val ≠ i6.val := by omega
-      simp_all
+      simp_all [h_upd2 (2 * i.val) (by omega)]
     have ha_odd : a[2 * i.val + 1]! = i7 := by
       simp_all
     have ha_pref : ∀ j < 2 * i.val, (a[j]! : I8).val = (output[j]!).val := by
@@ -469,8 +467,8 @@ private lemma inv_step_loop1
     by_cases h1 : j = i
     · subst h1
       simp only [show j ≠ j + 1 from by omega, ite_false, add_zero]
-      simp
-      grind
+      simp only [if_true]
+      rw [ha_curr]; ring
     · by_cases h2 : j = i + 1
       · subst h2
         simp only [show i + 1 ≠ i from by omega, ite_false, if_true]
@@ -594,7 +592,9 @@ private theorem as_radix_16_loop1_spec_strong
     have h_i4_val : i4.val = i1.val - carry.val * 16 := by
       simp_all
     have h_i7_val : i7.val = (output[i.val + 1]!).val + carry.val := by
-      simp_all
+      have hi6v : i6.val = (output1[i5.val]!).val := by
+        rw [hi6, Array.getElem!_Nat_eq, getElem!_pos _ _ (by simpa using h_i5_lt)]
+      rw [hi7, hi6v, h_upd1 i5.val (by omega), hi5_val]
     have ha_curr_eq : a[i.val]! = i4 := by
       have hne : i5.val ≠ i.val := by omega
       have h2 := h_upd2 i.val (by rw [hi5_val]; omega)

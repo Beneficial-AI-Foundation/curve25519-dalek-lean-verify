@@ -23,9 +23,6 @@ elliptic curve addition).
 Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 -/
 
--- Required for the #setup_aeneas_simps macro below
-set_option linter.hashCommand false
-#setup_aeneas_simps
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51

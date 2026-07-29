@@ -17,9 +17,6 @@ but aren't available upstream.
 This file is for theorems which depend only on Defs.lean,
 not on Funs.lean or Types.lean. -/
 
--- Linter doesn't recognize this Aeneas macro
-set_option linter.hashCommand false
-#setup_aeneas_simps
 
 open Aeneas.Std Result
 

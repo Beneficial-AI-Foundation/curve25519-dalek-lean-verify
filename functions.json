@@ -1906,7 +1906,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem eq_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint) :\n    eq self other ⦃ (b : Bool) =>\n      b = true ↔\n        self.y_plus_x.to_bytes = other.y_plus_x.to_bytes ∧\n        self.y_minus_x.to_bytes = other.y_minus_x.to_bytes ∧\n        self.xy2d.to_bytes = other.xy2d.to_bytes ⦄ := by ...",
+   "theorem eq_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint) :\n    eq self other ⦃ (b : Bool) =>\n      b = true ↔\n      self.y_plus_x.to_bytes = other.y_plus_x.to_bytes ∧\n      self.y_minus_x.to_bytes = other.y_minus_x.to_bytes ∧\n      self.xy2d.to_bytes = other.xy2d.to_bytes ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Eq.lean",
    "spec_docstring":
@@ -5835,7 +5835,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_by_pow_2_loop_spec\n    (k : U32) (s : ProjectivePoint) (i : U32)\n    (hk : k.val > 0) (hi : i.val ≤ k.val - 1)\n    (hs_on : s.OnCurve)\n    (hs_X : ∀ j < 5, s.X[j]!.val < 2 ^ 53)\n    (hs_Y : ∀ j < 5, s.Y[j]!.val < 2 ^ 53)\n    (hs_Z : s.Z.IsValid)\n    (P₀ : Point Ed25519)\n    (hs_point : s.toPoint' hs_on = 2 ^ i.val • P₀) :\n    mul_by_pow_2_loop k s i ⦃ (result : ProjectivePoint) =>\n      ∃ h_on : result.OnCurve,\n        (∀ j < 5, result.X[j]!.val < 2 ^ 53) ∧\n        (∀ j < 5, result.Y[j]!.val < 2 ^ 53) ∧\n        result.Z.IsValid ∧\n        result.toPoint' h_on = 2 ^ (k.val - 1) • P₀ ⦄ := by ...",
+   "theorem mul_by_pow_2_loop_spec\n    (k : U32) (s : ProjectivePoint) (i : U32)\n    (hk : k.val > 0) (hi : i.val ≤ k.val - 1)\n    (hs_on : s.OnCurve)\n    (hs_X : ∀ j < 5, s.X[j]!.val < 2 ^ 53)\n    (hs_Y : ∀ j < 5, s.Y[j]!.val < 2 ^ 53)\n    (hs_Z : s.Z.IsValid)\n    (P₀ : Point Ed25519)\n    (hs_point : s.toPoint' hs_on = 2 ^ i.val • P₀) :\n    mul_by_pow_2_loop k s i ⦃ (result : ProjectivePoint) =>\n      ∃ h_on : result.OnCurve,\n      (∀ j < 5, result.X[j]!.val < 2 ^ 53) ∧\n      (∀ j < 5, result.Y[j]!.val < 2 ^ 53) ∧\n      result.Z.IsValid ∧\n      result.toPoint' h_on = 2 ^ (k.val - 1) • P₀ ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean",
    "spec_docstring":
    "/-- Loop spec for `mul_by_pow_2_loop`: repeatedly doubles `s` via\n`ProjectivePoint.double` + `CompletedPoint.as_projective` from counter `i` up to `k - 1`.\n\nLoop invariant at entry: `s.toPoint' hs_on = 2^i • P₀` for a reference point `P₀`.\nAt exit (counter `k - 1`), `result.toPoint' h_on = 2^(k-1) • P₀`.\n\nUses the weaker bounds `X, Y < 2^53` + `Z.IsValid` rather than `IsValid`'s `< 2^52`:\nthe initial `s` (from `EdwardsPoint.as_projective`) has only `< 2^53`, but each loop\niteration's `CompletedPoint.as_projective` produces `ProjectivePoint.IsValid` whose\n`< 2^52` bounds imply the weaker ones. So the invariant is self-sustaining. -/",
@@ -5901,7 +5901,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_montgomery_spec (self : EdwardsPoint)\n    (hvalid : self.IsValid)\n    (h_Y_bounds : ∀ i < 5, self.Y[i]!.val < 2 ^ 53)\n    (h_Z_bounds : ∀ i < 5, self.Z[i]!.val < 2 ^ 53) :\n    to_montgomery self ⦃ (mp : montgomery.MontgomeryPoint) =>\n      let Y := Field51_as_Nat self.Y\n      let Z := Field51_as_Nat self.Z\n      let u := U8x32_as_Nat mp\n      if Z % p = Y % p then\n        u % p = 0 ∧ (∀ n : ℕ, fromEdwards (n • self.toPoint) = 0)\n      else\n        ((u * Z) % p = (u * Y + (Z + Y)) % p) ∧\n        abs_montgomery (fromEdwards self.toPoint) = MontgomeryPoint.mkPoint mp ⦄ := by ...",
+   "theorem to_montgomery_spec (self : EdwardsPoint)\n    (hvalid : self.IsValid)\n    (h_Y_bounds : ∀ i < 5, self.Y[i]!.val < 2 ^ 53)\n    (h_Z_bounds : ∀ i < 5, self.Z[i]!.val < 2 ^ 53) :\n    to_montgomery self ⦃ (mp : montgomery.MontgomeryPoint) =>\n      let Y := Field51_as_Nat self.Y\n      let Z := Field51_as_Nat self.Z\n      let u := U8x32_as_Nat mp\n      if Z % p = Y % p then\n        u % p = 0 ∧ (∀ n : ℕ, fromEdwards (n • self.toPoint) = 0)\n      else\n        ((u * Z) % p = (u * Y + (Z + Y)) % p) ∧\n      abs_montgomery (fromEdwards self.toPoint) = MontgomeryPoint.mkPoint mp ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean",
    "spec_docstring":
    "/-- **Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::to_montgomery`**\n• The function always succeeds (no panic) for any valid input Edwards point\n• In the degenerate case `Z ≡ Y (mod p)`, the output u-coordinate satisfies\n  `u ≡ 0 (mod p)`\n• In the same degenerate case, `fromEdwards (n • self.toPoint) = 0` for every natural number `n`\n• In the generic case `Z ≢ Y (mod p)`, the output u-coordinate satisfies\n  `u * Z ≡ u * Y + (Z + Y) (mod p)`, equivalently `u ≡ (Z + Y) / (Z - Y) (mod p)`\n• In the generic case, `MontgomeryPoint.mkPoint mp` equals\n  `abs_montgomery (fromEdwards self.toPoint)`\n-/",
@@ -7021,7 +7021,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :\n    to_edwards mp sign ⦃ (result : Option edwards.EdwardsPoint) =>\n      (∀ ep, result = some ep →\n        ∃ Z_inv,\n          field.FieldElement51.invert ep.Z = ok Z_inv ∧\n          let u := U8x32_as_Nat mp % 2^255\n          let y := Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p\n          (y * ((u + 1) % p)) % p = ((u + p - 1) % p) % p ∧\n          ep.IsValid ) ⦄ := by ...",
+   "theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :\n    to_edwards mp sign ⦃ (result : Option edwards.EdwardsPoint) =>\n      (∀ ep, result = some ep →\n        ∃ Z_inv,\n          field.FieldElement51.invert ep.Z = ok Z_inv ∧\n      let u := U8x32_as_Nat mp % 2^255\n          let y := Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p\n          (y * ((u + 1) % p)) % p = ((u + p - 1) % p) % p ∧\n          ep.IsValid ) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean",
    "spec_docstring":

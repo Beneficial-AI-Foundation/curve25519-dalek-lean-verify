@@ -25,9 +25,9 @@ Source: "curve25519-dalek/src/scalar.rs"
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
--- `#setup_aeneas_simps` triggers the hash-command linter; suppress it for this file.
+-- Allow the `#decompose` Aeneas macro.
 set_option linter.hashCommand false
-#setup_aeneas_simps
+
 attribute [-simp] Int.reducePow Nat.reducePow
 
 namespace curve25519_dalek.scalar.Scalar

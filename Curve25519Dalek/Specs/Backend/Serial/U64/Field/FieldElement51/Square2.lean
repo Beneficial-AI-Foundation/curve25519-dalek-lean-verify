@@ -18,8 +18,6 @@ Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
-set_option linter.hashCommand false
-#setup_aeneas_simps
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
