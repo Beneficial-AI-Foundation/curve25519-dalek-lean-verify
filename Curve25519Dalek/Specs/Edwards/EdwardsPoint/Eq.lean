@@ -31,7 +31,6 @@ open curve25519_dalek.backend.serial.u64.field
 namespace curve25519_dalek
 
 /-- If `c.val = 1`, then `c = Choice.one` (by proof irrelevance on the `valid` field). -/
-@[simp]
 theorem Choice.eq_one (c : subtle.Choice) : c.val = 1#u8 → c = Choice.one := by
   intro h; cases c; simp_all only [Choice.one]
 

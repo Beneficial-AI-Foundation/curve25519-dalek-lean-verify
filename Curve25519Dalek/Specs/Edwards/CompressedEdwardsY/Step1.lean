@@ -151,11 +151,12 @@ theorem step_1_spec (repr : CompressedEdwardsY) :
     · by_cases hv : Field51_as_Nat v % p = 0
       · -- Case 2: sq_case2 gives flag = 0, contradiction
         exfalso
-        have ⟨hf0, _⟩ := sq_case2 ⟨hu, hv⟩
+        have ⟨hf0, _⟩ := sq_case2 hu hv
         rw [hf0] at h_flag; exact absurd h_flag (by decide)
       · by_cases hex : ∃ x : Nat, (x ^ 2 * (Field51_as_Nat v % p)) % p = Field51_as_Nat u % p
         · -- Case 3: sq_case3 gives r² * v ≡ u [MOD p]
-          have ⟨_, hr_eq⟩ := sq_case3 ⟨hu, hv, hex⟩
+          obtain ⟨xw, hxw⟩ := hex
+          have ⟨_, hr_eq⟩ := sq_case3 hu hv xw hxw
           -- Lift to CurveField
           change (Field51_as_Nat X : CurveField) ^ 2 * (Field51_as_Nat v : CurveField) =
             (Field51_as_Nat u : CurveField)
@@ -165,7 +166,7 @@ theorem step_1_spec (repr : CompressedEdwardsY) :
           exact h
         · -- Case 4: sq_case4 gives flag = 0, contradiction
           exfalso
-          have ⟨hf0, _⟩ := sq_case4 ⟨hu, hv, hex⟩
+          have ⟨hf0, _⟩ := sq_case4 hu hv hex
           rw [hf0] at h_flag; exact absurd h_flag (by decide)
   -- Discharge the 8 postconditions
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
@@ -203,8 +204,7 @@ theorem step_1_spec (repr : CompressedEdwardsY) :
           have hu0 : u.toField = 0 := hx'.symm
           exact hu ((toField_zero _).mp hu0)
         · -- ∃ x_nat witness via ZMod.val
-          refine (sq_case3 ⟨hu, hv, ?_⟩).1
-          refine ⟨x'.val, ?_⟩
+          refine (sq_case3 hu hv x'.val ?_).1
           -- Need: (x'.val² * (F51 v % p)) % p = F51 u % p
           -- Lift to ZMod: equivalent to x'² * v.toField = u.toField
           have h_cf : ((x'.val ^ 2 * (Field51_as_Nat v % p) : Nat) : CurveField) =

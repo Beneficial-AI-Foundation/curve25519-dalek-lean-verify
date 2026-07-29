@@ -101,7 +101,7 @@ async function getOpamEnv(switchName: string): Promise<Record<string, string>> {
 }
 
 const OCAML_DEPS = [
-  "ppx_deriving", "visitors", "easy_logging", "zarith", "yojson",
+  "ppx_deriving", "ppx_deriving_yojson", "visitors", "easy_logging", "zarith", "yojson",
   "core_unix", "odoc", "ocamlgraph", "menhir", "ocamlformat",
   "unionFind", "domainslib", "progress",
 ];

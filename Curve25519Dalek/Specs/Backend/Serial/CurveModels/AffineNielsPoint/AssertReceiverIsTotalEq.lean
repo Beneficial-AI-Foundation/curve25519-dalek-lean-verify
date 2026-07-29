@@ -24,15 +24,15 @@ namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Co
 /-- **Spec theorem**
 
 Specification for
-`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::assert_receiver_is_total_eq`.
+`curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::assert_fields_are_eq`.
 • No panic (always returns successfully)
 • The result is `()`
 • This is the `Eq`-trait totality assertion for `AffineNielsPoint` -/
 @[step]
-theorem assert_receiver_is_total_eq_spec
+theorem assert_fields_are_eq_spec
     (self : backend.serial.curve_models.AffineNielsPoint) :
-    assert_receiver_is_total_eq self ⦃ (result : Unit) => result = () ⦄ := by
-  unfold assert_receiver_is_total_eq
+    assert_fields_are_eq self ⦃ (result : Unit) => result = () ⦄ := by
+  unfold assert_fields_are_eq
   simp
 
 end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpEq

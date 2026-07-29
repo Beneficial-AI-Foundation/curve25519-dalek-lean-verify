@@ -5,7 +5,7 @@ Authors: Markus Dablander, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_montgomery`
@@ -23,7 +23,7 @@ namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 /-- TODO: can the argument be made smoother where this is used and remove this? -/
 theorem set_getElem!_eq (l : List U128) (a : U128) (i : ℕ) (h : i < l.length) :
     (l.set i (a))[i]! = a := by
-  simp_all only [List.getElem!_set]
+  rw [getElem!_pos _ _ (by simpa using h)]; exact List.getElem_set_self ..
 
 /-- Strange that this result is required, how can the argument be made smoother? -/
 theorem zero_array (i : ℕ) (hi : i < 9) :
@@ -52,8 +52,7 @@ theorem from_montgomery_loop_spec (self : Scalar52) (limbs : Array U128 9#usize)
     · by_cases hc : i = j
       · rw [result_post3 j (by simp_all), a_post, i2_post, i1_post, ← hc]
         simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-        apply set_getElem!_eq
-        simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq]; agrind
+        grind [Array.getElem!_Nat_eq, Array.val_getElem!_eq', set_getElem!_eq]
       · exact result_post1 j hj (by omega)
     · rw [result_post2 j hj hj']
       have : i ≠ j := by agrind

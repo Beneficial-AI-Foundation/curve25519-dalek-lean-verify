@@ -20,6 +20,7 @@ export interface AeneasConfig {
   charon: {
     preset: string;
     package?: string;
+    pinned_deps: Record<string, string>;
     cargo_args: string[];
   };
   aeneas_args: {
@@ -75,6 +76,7 @@ export function loadConfig(root?: string): { config: AeneasConfig; root: string 
   // Apply defaults
   config.charon = config.charon ?? {} as AeneasConfig["charon"];
   config.charon.preset = config.charon.preset ?? "aeneas";
+  config.charon.pinned_deps = config.charon.pinned_deps ?? {};
   config.charon.cargo_args = config.charon.cargo_args ?? [];
   config.aeneas_args = config.aeneas_args ?? {} as AeneasConfig["aeneas_args"];
   config.aeneas_args.options = config.aeneas_args.options ?? [];

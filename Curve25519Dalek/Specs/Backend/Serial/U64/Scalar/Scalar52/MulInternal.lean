@@ -5,7 +5,7 @@ Authors: Oliver Butterley, Liao Zhang
 -/
 import Aeneas
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 
@@ -24,7 +24,7 @@ attribute [-simp] Int.reducePow Nat.reducePow
 
 /-! ## Spec for `mul_internal` -/
 
-set_option maxHeartbeats 400000 in -- heavy simp
+set_option maxHeartbeats 2000000 in -- heavy simp
 /-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::mul_internal`**
 • The result represents the product of the two input field elements
 • Requires that each input limb is at most 62 bits to prevent overflow -/
@@ -37,12 +37,25 @@ theorem mul_internal_spec (a b : Array U64 5#usize)
   unfold mul_internal
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   step*
+  all_goals (try (
+    simp only [← getElem!_pos, *] at *
+    have a0 := ha 0 (by omega)
+    have a1 := ha 1 (by omega)
+    have a2 := ha 2 (by omega)
+    have a3 := ha 3 (by omega)
+    have a4 := ha 4 (by omega)
+    have hb0 := hb 0 (by omega)
+    have hb1 := hb 1 (by omega)
+    have hb2 := hb 2 (by omega)
+    have hb3 := hb 3 (by omega)
+    have hb4 := hb 4 (by omega)
+    scalar_tac +nonLin))
   constructor
   · simp only [Scalar52_wide_as_Nat, Array.getElem!_Nat_eq, Array.set_val_eq, Array.repeat_val,
     UScalar.ofNatCore_val_eq, List.reduceReplicate, List.set_cons_zero, List.set_cons_succ,
     List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton,
     mul_zero, pow_zero, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
-    getElem?_pos, List.getElem_cons_zero, Option.getD_some, List.Vector.length_val, getElem!_pos,
+    getElem?_pos, List.getElem_cons_zero, Option.getD_some, List.Vector.length_val,
     one_mul, mul_one, Nat.one_lt_ofNat, List.getElem_cons_succ, Nat.reduceMul, Nat.reduceLT,
     Nat.lt_add_one, Scalar52_as_Nat, result_post, z8_post, z7_post, z6_post, z5_post, z4_post,
     z3_post, z2_post, z1_post, i2_post, i_post, i1_post, i7_post, i4_post, i3_post, i6_post,

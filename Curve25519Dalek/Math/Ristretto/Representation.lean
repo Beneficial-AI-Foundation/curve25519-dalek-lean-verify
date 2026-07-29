@@ -879,7 +879,7 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
     -- IsSquare for compression argument
     have h_u1_sq : IsSquare (compress_u1 P) := by
       have : compress_u1 P = 1 - P.y ^ 2 := by unfold compress_u1; ring
-      simpa only [this] using heven
+      rw [this]; exact heven
     have h_arg_sq : IsSquare (compress_u1 P * compress_u2 P ^ 2) :=
       h_u1_sq.mul ⟨compress_u2 P, (sq _)⟩
     -- Compression invsqrt: I² * (u1 * u2²) = 1

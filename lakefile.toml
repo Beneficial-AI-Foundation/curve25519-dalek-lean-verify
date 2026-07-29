@@ -8,6 +8,7 @@ pp.unicode.fun = true # pretty-prints `fun a ↦ b`
 autoImplicit = false
 relaxedAutoImplicit = false
 linter.mathlibStandardSet = true
+linter.style.header = false
 maxSynthPendingDepth = 3
 maxRecDepth = 10000
 
@@ -15,12 +16,12 @@ maxRecDepth = 10000
 name = "aeneas"
 git = "https://github.com/AeneasVerif/aeneas.git"
 subDir = "backends/lean"
-rev = "1b39931d"
+rev = "6e167c9b"
 
 [[require]]
 name = "PrimeCert"
 git = "https://github.com/b-mehta/PrimeCert.git"
-rev = "15fd61770c9a893af0f5cb7893ea98b7d0bf8d52"
+rev = "f699a3e5d3efb381b9ddfb61a1ca51be25f456bd"
 
 [[lean_lib]]
 name = "Curve25519Dalek"

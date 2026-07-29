@@ -18,10 +18,6 @@ The field element is represented in radix 2^51 form with five u64 limbs.
 Source: "curve25519-dalek/src/field.rs"
 -/
 
--- Allow kernel reduction of the large numerical exponent `p - 2 = 2^255 - 21`
--- (and `p - 1` from Fermat's Little Theorem) when typechecking the proof below.
-set_option exponentiation.threshold 100000
-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
@@ -63,6 +59,7 @@ theorem invert_spec (r : backend.serial.u64.field.FieldElement51)
   step with pow22501_spec as ⟨ t19, t3, ht19_mod, ht3_mod, ht19b, ht3b ⟩
   step with pow2k_spec as ⟨ t20, ht20, ht20b ⟩
   step with mul_spec as ⟨ res, hres, hresb ⟩
+  rw [pow22501_exp_def] at ht19_mod
   -- Chain: t20 ≡ r^((2^250-1)*32), res ≡ r^((2^250-1)*32 + 11) = r^(p-2)
   -- The exponent (2^250-1)*2^5 + 11 = 2^255-21 = p-2 is verified by kernel reduction.
   have hpow : Field51_as_Nat res ≡ Field51_as_Nat r ^ (p - 2) [MOD p] :=

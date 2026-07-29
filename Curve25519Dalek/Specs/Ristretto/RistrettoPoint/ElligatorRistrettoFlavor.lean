@@ -1124,12 +1124,12 @@ theorem elligator_ristretto_flavor_spec (r_0 : FieldElement51) (h_r_0_valid : r_
       result.IsValid ∧
       result.toPoint = (elligator_ristretto_flavor_pure r_0.toField).val ⦄ := by
   unfold elligator_ristretto_flavor
-  let* ⟨ i, i_post1, i_post2, i_post3 ⟩ ← SQRT_M1_spec
-  let* ⟨ d, d_post1, d_post2 ⟩ ← EDWARDS_D_spec
-  let* ⟨ one_minus_d_sq, one_minus_d_sq_post1, one_minus_d_sq_post2 ⟩ ←
-    ONE_MINUS_EDWARDS_D_SQUARED_spec
   let* ⟨ d_minus_one_sq, d_minus_one_sq_post1, d_minus_one_sq_post2 ⟩ ←
     EDWARDS_D_MINUS_ONE_SQUARED_spec
+  let* ⟨ one_minus_d_sq, one_minus_d_sq_post1, one_minus_d_sq_post2 ⟩ ←
+    ONE_MINUS_EDWARDS_D_SQUARED_spec
+  let* ⟨ d, d_post1, d_post2 ⟩ ← EDWARDS_D_spec
+  let* ⟨ i, i_post1, i_post2, i_post3 ⟩ ← SQRT_M1_spec
   let* ⟨ c, c_post1, c_post2 ⟩ ← MINUS_ONE_spec
   let* ⟨ one, one_post1, one_post2 ⟩ ← ONE_spec
   let* ⟨ r_0_sq, r_0_sq_post1, r_0_sq_post2 ⟩ ← square_spec
@@ -1265,9 +1265,9 @@ theorem elligator_ristretto_flavor_spec (r_0 : FieldElement51) (h_r_0_valid : r_
       rfl
     have h_sqrt_posts : ElligatorSqrtRatioPosts N_s D x := {
       zero_case := N_post_x
-      d_zero_case := N_post1_D
-      square_case := N_post2_D
-      nonsquare_case := N_post3_D
+      d_zero_case := fun ⟨h1, h2⟩ => N_post1_D h1 h2
+      square_case := fun ⟨h1, h2, h3⟩ => N_post2_D h1 h2 h3.choose h3.choose_spec
+      nonsquare_case := fun ⟨h1, h2, h3⟩ => N_post3_D h1 h2 h3
     }
     have h_s_prime_posts :
         ElligatorSPrimePosts r_0 s_prime s_prime_neg s_prime1 x s_prime_is_pos := {
@@ -1358,9 +1358,9 @@ theorem elligator_ristretto_flavor_spec (r_0 : FieldElement51) (h_r_0_valid : r_
     rw [i_post1]; rfl
   have h_sqrt_posts : ElligatorSqrtRatioPosts N_s D x := {
     zero_case := N_post_x
-    d_zero_case := N_post1_D
-    square_case := N_post2_D
-    nonsquare_case := N_post3_D
+    d_zero_case := fun ⟨h1, h2⟩ => N_post1_D h1 h2
+    square_case := fun ⟨h1, h2, h3⟩ => N_post2_D h1 h2 h3.choose h3.choose_spec
+    nonsquare_case := fun ⟨h1, h2, h3⟩ => N_post3_D h1 h2 h3
   }
   have h_s_prime_posts : ElligatorSPrimePosts r_0 s_prime s_prime_neg s_prime1 x s_prime_is_pos := {
     mul_eq := s_prime_post1

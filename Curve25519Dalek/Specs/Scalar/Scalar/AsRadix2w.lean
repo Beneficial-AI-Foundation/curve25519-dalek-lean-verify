@@ -5,7 +5,7 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Specs.Scalar.Scalar.ConditionalSelect
 import Curve25519Dalek.Specs.Scalar.ReadLeU64Into
 import Curve25519Dalek.Specs.Scalar.Scalar.AsRadix16
@@ -25,9 +25,9 @@ Source: "curve25519-dalek/src/scalar.rs"
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
--- `#setup_aeneas_simps` triggers the hash-command linter; suppress it for this file.
+-- Allow the `#decompose` Aeneas macro.
 set_option linter.hashCommand false
-#setup_aeneas_simps
+
 attribute [-simp] Int.reducePow Nat.reducePow
 
 namespace curve25519_dalek.scalar.Scalar
@@ -387,9 +387,9 @@ private lemma I8x64_update_get (arr : Array Std.I8 64#usize) (j : Usize)
   constructor
   · intro k hk
     simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-    exact List.getElem!_set_ne arr.val j.val k v (Or.inl (Ne.symm hk))
+    simp [hk]
   · simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-    exact List.getElem!_set arr.val j.val v (by scalar_tac)
+    grind [List.getElem_set_self, arr.property]
 
 private lemma bounds_step_2w
     (digits a : Array Std.I8 64#usize) (i w : ℕ)
@@ -609,7 +609,8 @@ private theorem as_radix_2w_loop_body_spec
     step as ⟨bit_buf1, hbit_buf1⟩
     have hbuf1_val : bit_buf1.val = scalar64x4[u64_idx.val]!.val / 2 ^ bit_idx.val := by
       simp only [hbit_buf1, hlimb]
-      scalar_tac
+      rw [List.Inhabited_getElem_eq_getElem! (↑scalar64x4 : List U64) (↑u64_idx) (by scalar_tac),
+        ← Array.getElem!_Nat_eq, Nat.shiftRight_eq_div_pow]
     have h_buf_cond :
             (bit_buf1.val = scalar64x4[(w.val * i.val) / 64]!.val / 2 ^ ((w.val * i.val) % 64) ∧
             ((w.val * i.val) % 64 + w.val ≤ 64 ∨ (w.val * i.val) / 64 = 3)) ∨
@@ -648,7 +649,9 @@ private theorem as_radix_2w_loop_body_spec
       step as ⟨limb, hlimb⟩
       step as ⟨bit_buf2, hbit_buf2⟩
       have hbuf2_val : bit_buf2.val = scalar64x4[u64_idx.val]!.val / 2 ^ bit_idx.val := by
-        simp only [hbit_buf2, hlimb]; scalar_tac
+        simp only [hbit_buf2, hlimb, h_last, UScalar.ofNatCore_val_eq]
+        rw [List.Inhabited_getElem_eq_getElem! (↑scalar64x4 : List U64) 3 (by scalar_tac),
+          ← Array.getElem!_Nat_eq, Nat.shiftRight_eq_div_pow]
       have h_buf_cond :
               (bit_buf2.val = scalar64x4[(w.val * i.val) / 64]!.val / 2 ^ ((w.val * i.val) % 64) ∧
               ((w.val * i.val) % 64 + w.val ≤ 64 ∨ (w.val * i.val) / 64 = 3)) ∨
@@ -691,11 +694,16 @@ private theorem as_radix_2w_loop_body_spec
       have hidx_val : idx.val = u64_idx.val + 1 := by scalar_tac
       have hshift_val : shift_amt.val = 64 - bit_idx.val := by scalar_tac
       have hs1_val : s1.val = scalar64x4[u64_idx.val]!.val / 2 ^ bit_idx.val := by
-        simp only [hs1, hlimb1]; scalar_tac
+        simp only [hs1, hlimb1]
+        rw [List.Inhabited_getElem_eq_getElem! (↑scalar64x4 : List U64) (↑u64_idx) (by scalar_tac),
+          ← Array.getElem!_Nat_eq, Nat.shiftRight_eq_div_pow]
       have hs2_val : s2.val =
         (scalar64x4[u64_idx.val + 1]!.val * 2 ^ (64 - bit_idx.val)) % 2 ^ 64 := by
         simp only [hs2, hlimb2, hidx_val, Nat.shiftLeft_eq, hshift_val]
         simp only [Array.getElem!_Nat_eq]
+        rw [List.Inhabited_getElem_eq_getElem! (↑scalar64x4 : List U64) (↑u64_idx + 1)
+          (by scalar_tac)]
+        congr 1
         scalar_tac
       set bit_buf3 := s1 ||| s2 with hbit_buf3_def
       have h_window : (bit_buf3 &&& window_mask).val =
@@ -1056,7 +1064,7 @@ private lemma final_carry_is_zero (w K N : ℕ)
       subst hK; interval_cases w <;> simp_all
     have h1 : (2 : ℤ) ^ (w * K) ≥ (2 : ℤ) ^ 258 := by
       have := Nat.pow_le_pow_right (by norm_num : 1 ≤ 2) hwK
-      grind
+      set_option exponentiation.threshold 512 in exact_mod_cast this
     rw [pow_mul] at h1
     have h2 : (2 : ℤ) ^ 258 = 4 * (2 : ℤ) ^ 256 := by grind
     grind
@@ -1283,6 +1291,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
     step with read_le_u64_into_spec s res1 res1.length (by simp) (by grind)
     step
     step
+    case h => scalar_tac
     step
     step
     step
@@ -1299,6 +1308,8 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, U64.ofNat_bv, BitVec.reduceHShiftLeft,
       Nat.reduceShiftLeft, Nat.reduceAdd, Nat.add_one_sub_one, Nat.one_le_ofNat, Nat.reduceDiv]
       scalar_tac
+    · rw [window_mask_post1, radix_post1, Nat.shiftLeft_eq, one_mul,
+        Nat.mod_eq_of_lt (by scalar_tac)]
     · have hi1 : i1.val = 255 + w.val := by scalar_tac
       rw [hi1]
       exact X64_as_Nat_lt_pow_w_digits_count _ w.val hw_ge5 h_hi
@@ -1312,6 +1323,22 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
     step
     step
     step
+    case hmin =>
+      have hi1 : (↑i1 : ℕ) = 255 + ↑w := by scalar_tac
+      have hdc : (↑digits_count : ℕ) < 64 := by rw [digits_count_post, hi1]; scalar_tac
+      have hi3 : (↑i3 : ℤ) = 0 := by
+        rw [i3_post, List.Inhabited_getElem_eq_getElem! (↑digits1 : List I8) (↑digits_count)
+          (by scalar_tac), ← Array.getElem!_Nat_eq]
+        exact_mod_cast carry_post4 (↑digits_count) digits_count_post.ge hdc
+      scalar_tac
+    case hmax =>
+      have hi1 : (↑i1 : ℕ) = 255 + ↑w := by scalar_tac
+      have hdc : (↑digits_count : ℕ) < 64 := by rw [digits_count_post, hi1]; scalar_tac
+      have hi3 : (↑i3 : ℤ) = 0 := by
+        rw [i3_post, List.Inhabited_getElem_eq_getElem! (↑digits1 : List I8) (↑digits_count)
+          (by scalar_tac), ← Array.getElem!_Nat_eq]
+        exact_mod_cast carry_post4 (↑digits_count) digits_count_post.ge hdc
+      scalar_tac
     step as ⟨res, hres, hres32⟩
     have hw8 : w.val = 8 := by grind
     have hK_lt : digits_count.val < 64 := by
@@ -1323,7 +1350,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       tsub_zero, List.length_replicate, Nat.reduceMul, Array.val_to_slice,
       UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, U64.ofNat_bv, BitVec.reduceHShiftLeft,
       Nat.reduceShiftLeft, Nat.reduceAdd, Nat.add_one_sub_one, Nat.one_le_ofNat,
-      Nat.reduceDiv, zero_add]
+      Nat.reduceDiv]
     have h_nat_eq : X64_as_Nat (hres1 s2) = U8x32_as_Nat self.bytes :=
       X64_as_Nat_eq_U8x32_as_Nat self s2 (res1, hres1)
         ⟨hres1_post1, hres1_post2, hres1_post3⟩ (by simpa [s_post] using s2_post2)
@@ -1337,9 +1364,11 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
     · rw [congrArg IScalar.val hres32]
       rw [i2_post, i3_post] at i4_post
       rw [i4_post]
-      simp only [Array.getElem!_Nat_eq, add_right_inj]
-      exact UScalar.hcast_inBounds_spec IScalarTy.I8 carry
-        (by simp only [IScalar.max]; scalar_tac)
+      simp only [Array.getElem!_Nat_eq]
+      rw [List.Inhabited_getElem_eq_getElem! (↑digits1 : List I8) (↑digits_count)
+        (by scalar_tac), add_right_inj, UScalar.hcast_val_eq]
+      simp only [Int.bmod]
+      scalar_tac
     · intro j hj
       rw [congrArg IScalar.val (hres j hj)]
   · -- Case w ∈ {5, 6, 7}: general radix-2^w algorithm
@@ -1465,7 +1494,10 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       have hi4_lt : i4.val < i1.val / w.val := by
         simp_all
         omega
-      grind [show -(2 ^ (w.val - 1) : ℤ) ≥ -128 from by interval_cases w.val <;> norm_num]
+      have hbound : -(2 ^ (w.val - 1) : ℤ) ≥ -128 := by
+        have h : (2:ℤ) ^ (w.val - 1) ≤ 2 ^ 6 := pow_le_pow_right₀ (by norm_num) (by omega)
+        omega
+      grind
     · have hi3_zero : i3.val = 0 := by
         simp_all only [Array.getElem!_Nat_eq, ge_iff_le, UScalar.le_equiv,
         UScalar.ofNatCore_val_eq, Nat.not_eq, ne_eq,
@@ -1483,11 +1515,11 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       have hi4_lt : i4.val < digits_count.val := by
         simp_all
         omega
-      grind [show (2 ^ (w.val - 1) : ℤ) ≤ 64 from by interval_cases w.val <;> norm_num]
-    step as ⟨res, hres, hres32⟩
-    · simp_all
-      have := digits_count_le_64 w.val hw_ge5 h_hi
+      have hbound : (2 ^ (w.val - 1) : ℤ) ≤ 64 := by
+        have h : (2:ℤ) ^ (w.val - 1) ≤ 2 ^ 6 := pow_le_pow_right₀ (by norm_num) (by omega)
+        omega
       grind
+    step as ⟨res, hres, hres32⟩
     have h_nat_eq : X64_as_Nat (hres1 s2) = U8x32_as_Nat self.bytes :=
       X64_as_Nat_eq_U8x32_as_Nat self s2 (res1, hres1)
         ⟨hres1_post1, hres1_post2, hres1_post3⟩ (by simpa [s_post] using s2_post2)
@@ -1524,6 +1556,13 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
             simp only [carry_is_zero, Nat.zero_shiftLeft, Nat.zero_mod] at i2_post1
             simp only [i2_post1, CharP.cast_eq_zero]
           simp only [hi3_zero, add_zero]
+          have hb : (↑i4 : ℕ) < (↑digits1 : List I8).length := by
+            have hle := digits_count_le_64 w.val hw_ge5 h_hi
+            rw [hi1_eq] at hjlt
+            have : (↑digits1 : List I8).length = 64 := by simp
+            omega
+          exact congrArg IScalar.val
+            (List.Inhabited_getElem_eq_getElem! (↑digits1 : List I8) (↑i4) hb)
         · simp only [mul_eq_mul_left_iff, pow_eq_zero_iff',
           OfNat.ofNat_ne_zero, ne_eq, false_and, or_false]
           have := hres j hjne

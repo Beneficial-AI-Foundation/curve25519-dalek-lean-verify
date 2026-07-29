@@ -5,7 +5,7 @@ Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Specs.Scalar.Scalar.IsCanonical
 
 /-!
@@ -48,9 +48,9 @@ theorem from_canonical_bytes_spec (bytes : Array U8 32#usize) :
   step as ⟨f, hf⟩
   step as ⟨_, _, hg⟩
   refine ⟨fun hb ↦ ⟨?_, ?_⟩, ?_⟩
-  · rw [ha, high_bit_zero_of_lt_L bytes hb] at he
-    simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos,
-      UScalarTy.U8_numBits_eq, Bvify.U8.UScalar_bv, iff_true, and_true]; bv_tac
+  · rw [ha, List.Inhabited_getElem_eq_getElem! bytes.val 31 (by scalar_tac),
+      high_bit_zero_of_lt_L bytes hb] at he
+    simp_all only [UScalarTy.U8_numBits_eq, Bvify.U8.UScalar_bv, iff_true, and_true]; bv_tac
   · simp_all
   · intro _
     rw [hg]

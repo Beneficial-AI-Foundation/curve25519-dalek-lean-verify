@@ -37,4 +37,4 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           number: ${{ steps.pr.outputs.number }}
-          path: warning-diff-comment/.warning-diff-comment.md
+          path: warning-diff-comment/warning-diff-comment.md

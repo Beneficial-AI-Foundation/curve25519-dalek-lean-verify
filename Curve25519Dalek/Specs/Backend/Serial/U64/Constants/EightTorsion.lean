@@ -44,26 +44,23 @@ theorem EIGHT_TORSION_spec :
   unfold EIGHT_TORSION EIGHT_TORSION_INNER_DOC_HIDDEN
   step*
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
-  · simp only [Array.make, List.getElem_cons_succ, List.getElem_cons_zero, *]; decide
+  · simp only [Array.make, List.getElem_cons_succ, List.getElem_cons_zero, *]; decide +kernel
   · -- 4 • P.toPoint ≠ 0
     simp only [Array.make, List.getElem_cons_succ, List.getElem_cons_zero, *]
-    change 4 • _root_.Edwards.eightTorsionGen ≠ 0
-    exact _root_.Edwards.four_nsmul_gen_ne_zero
+    convert _root_.Edwards.four_nsmul_gen_ne_zero using 2; decide +kernel
   · -- 8 • P.toPoint = 0
     simp only [Array.make, List.getElem_cons_succ, List.getElem_cons_zero, *]
-    change 8 • _root_.Edwards.eightTorsionGen = 0
-    exact _root_.Edwards.eight_nsmul_gen_eq_zero
+    convert _root_.Edwards.eight_nsmul_gen_eq_zero using 2; decide +kernel
   · -- ∀ i, result.val[i].IsValid
     intro i; fin_cases i
     all_goals
     · simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ, List.getElem_cons_zero, *]
-      decide
+      decide +kernel
   · -- ∀ i, result.val[i].toPoint = (i : ℕ) • P.toPoint
-    intro i;
-    have h := _root_.Edwards.nsmul_eightTorsionGen_eq ⟨i, by omega⟩
-    fin_cases i
-    all_goals
-    · simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ, List.getElem_cons_zero, *]
-      exact h.symm
+    intro i
+    fin_cases i <;>
+      simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ,
+        List.getElem_cons_zero, *] <;>
+      exact eightTorsion_eq_nsmul _ _ ⟨_, by decide⟩ (by decide +kernel) (by decide +kernel)
 
 end curve25519_dalek.backend.serial.u64.constants

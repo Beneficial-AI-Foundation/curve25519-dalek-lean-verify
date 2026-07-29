@@ -316,7 +316,7 @@ lemma inver_Ad_eq : Edwards.Ed25519.d = -(Curve25519.A - 2) / (Curve25519.A + 2)
   have : (Edwards.Ed25519.a - Edwards.Ed25519.d) ≠ 0 := by
     decide
   field_simp
-  decide
+  decide +kernel
 
 -- Define roots_B as a square root of the B coefficient
 noncomputable def Curve25519.roots_B : CurveField :=
@@ -340,7 +340,7 @@ lemma roots_B_non_zero : ¬ Curve25519.roots_B = 0 := by
 lemma roots_B_d : Curve25519.roots_B ^ 2 * Edwards.Ed25519.d = (Curve25519.A - 2) := by
   simp only [pow2_roots_B, adB, neg_mul]
   simp only [A_add_2, inver_Ad_eq, neg_sub]
-  decide
+  decide +kernel
 
 -- Prove that the Montgomery to Edwards conversion inverts the Edwards to Montgomery conversion
 lemma montgomery_edwards_inverse {y : CurveField} (hy1 : y ≠ 1) :
@@ -603,8 +603,8 @@ theorem neg_fromEdwards (e : Edwards.Point Edwards.Ed25519) :
     simp only [↓reduceDIte, neg_eq_zero, mul_neg]
     by_cases hx : e.x = 0
     · simp only [hx, ↓reduceDIte, T_point, MontgomeryCurveCurve25519]
-      change WeierstrassCurve.Affine.Point.some 0 0 T_point._proof_1
-        = -WeierstrassCurve.Affine.Point.some 0 0 T_point._proof_1
+      change WeierstrassCurve.Affine.Point.some 0 0 _
+        = -WeierstrassCurve.Affine.Point.some 0 0 _
       rw [WeierstrassCurve.Affine.Point.neg_some]
       congr 1
     · simp only [hx, ↓reduceDIte, MontgomeryCurveCurve25519]
@@ -768,21 +768,25 @@ theorem fromEdwards_add_of_snd_x_eq_zero (e₁ e₂ : Edwards.Point Edwards.Ed25
             zero_mul, neg_zero, div_one, ne_eq]
           agrind
         unfold fromEdwards
-        simp [T_point]
-        simp only [WeierstrassCurve.Affine.Point.add_def, WeierstrassCurve.Affine.Point.add]
-        simp [MontgomeryCurveCurve25519, hsum_y]
-        simp [Edwards.add_y, Edwards.add_x, zero_e2_x, e2y, non_e₁, non_e1_x]
+        simp only [T_point, WeierstrassCurve.Affine.Point.add_def,
+          WeierstrassCurve.Affine.Point.add, hsum_y, ↓reduceDIte, MontgomeryCurveCurve25519,
+          WeierstrassCurve.Affine.negY, zero_mul, sub_zero, WeierstrassCurve.Affine.addX, add_zero]
+        simp only [Edwards.add_x, e2y, mul_neg, mul_one, zero_e2_x, mul_zero, add_zero, zero_mul,
+          neg_zero, div_one, neg_eq_zero, non_e1_x, ↓reduceDIte, Edwards.add_y, sub_zero,
+          sub_neg_eq_add, non_e₁, dite_eq_ite]
         have non_one : -1 ≠ (1 : CurveField) := by decide
-        simp [non_one]
+        simp only [non_one, ↓reduceIte, div_eq_zero_iff, neg_zero, mul_eq_zero, sub_zero]
         have : ¬ (1 + e₁.y = 0 ∨ 1 - e₁.y = 0) := by grind
-        simp_all
+        simp_all only [ne_eq, not_or, or_self, or_false, false_and, ↓reduceDIte, div_eq_zero_iff,
+          not_false_eq_true, WeierstrassCurve.Affine.slope_of_X_ne, sub_zero]
         congr 1
         · have := montgomery_inv_u_eq e₁ non_e1_x non_e non_e₁
           simp [this]
-        · field_simp [this.left, this.right]
-          ring_nf
-          field_simp [roots_B_non_zero]
-          linear_combination x_sq_mul_linear_factor_eq e₁
+        · have hB : Curve25519.roots_B ≠ 0 := roots_B_non_zero
+          rw [WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negY,
+            WeierstrassCurve.Affine.negAddY, WeierstrassCurve.Affine.addX]
+          field_simp [this.left, this.right, hB]
+          linear_combination Curve25519.roots_B * x_sq_mul_linear_factor_eq e₁
 
 theorem fromEdwards_add_of_sum_y_eq_one (e₁ e₂ : Edwards.Point Edwards.Ed25519)
     (sum_y : (e₁ + e₂).y = 1) :

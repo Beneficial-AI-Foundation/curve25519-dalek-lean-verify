@@ -7,7 +7,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.ExternallyVerified
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 
@@ -84,10 +84,7 @@ theorem compress_spec (self : AffinePoint) (hself : self.IsValid) :
       apply Subtype.ext
       simp only [Array.set_val_eq]
       have h31 : (↑(31#usize) : ℕ) = 31 := by decide
-      rw [h31]; apply List.ext_getElem (by simp [s.property])
-      intro i hi1 _; by_cases h : i = 31
-      · subst h; simp [s.property]
-      · grind
+      simp only [h31, List.set_getElem_self]
     rw [hs1_eq]
     simp only [toField, ZMod.val_natCast]; exact h_s_eq
   · -- c.val = 1: 1 <<< 7 = 128, XOR sets bit 7 of byte 31
@@ -107,7 +104,9 @@ theorem compress_spec (self : AffinePoint) (hself : self.IsValid) :
     -- i3.val = i2.val + 128 (XOR with 128 when bit 7 is 0)
     have h_i1_val : i1.val = 128 := by rw [i1_post1]; scalar_tac
     have h_i3_val : i3.val = i2.val + 128 := by
-      have h_lt' : i2.val < 128 := by rw [i2_post]; exact h_b31_lt
+      have h_lt' : i2.val < 128 := by
+        rw [i2_post, ← getElem!_pos (↑s : List U8) 31 (by simp [s.property])]
+        exact h_b31_lt
       have h_i1_eq : i1 = 128#u8 := UScalar.eq_of_val_eq h_i1_val
       rw [i3_post1, h_i1_eq]
       simp only [UScalar.val_xor, UScalar.ofNatCore_val_eq]
@@ -140,16 +139,19 @@ theorem compress_spec (self : AffinePoint) (hself : self.IsValid) :
       rw [Finset.sum_range_succ, show (8:Nat) * 31 = 248 from by norm_num]
       simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
       have h_idx : (↑(31#usize) : ℕ) = 31 := by decide
-      rw [h_idx, congrArg UScalar.val (List.getElem!_set (↑s : List U8) 31 i3
-        (by simp [s.property]))]
+      rw [h_idx, getElem!_pos ((↑s : List U8).set 31 i3) 31 (by simp [s.property]),
+        List.getElem_set_self (by simp [s.property])]
       have h_eq : ∑ j ∈ Finset.range 31, 2^(8*j) *
               UScalar.val ((↑s : List U8).set 31 i3)[j]! =
           ∑ j ∈ Finset.range 31, 2^(8*j) *
-              UScalar.val (↑s : List U8)[j]! :=
-        Finset.sum_congr rfl (fun j hj => congrArg (2^(8*j) * ·)
-          (congrArg UScalar.val (List.getElem!_set_ne (↑s : List U8) 31 j i3
-            (Or.inr (Or.inr (Or.inr (Finset.mem_range.mp hj)))))))
-      grind only
+              UScalar.val (↑s : List U8)[j]! := by
+        apply Finset.sum_congr rfl
+        intro j hj
+        have hjlt : j < 31 := Finset.mem_range.mp hj
+        rw [getElem!_pos ((↑s : List U8).set 31 i3) j (by simp [s.property]; omega),
+          getElem!_pos (↑s : List U8) j (by simp [s.property]; omega),
+          List.getElem_set_ne (by omega)]
+      rw [h_eq]
     -- Combine: s.set 31 i3 adds 2^248 * 128 = 2^255 to U8x32_as_Nat s
     rw [s1_post, h_set, h_i3_val, i2_post, h_orig];
     grind [Array.getElem!_Nat_eq]

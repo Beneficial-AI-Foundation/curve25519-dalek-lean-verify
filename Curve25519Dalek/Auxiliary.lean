@@ -17,9 +17,6 @@ but aren't available upstream.
 This file is for theorems which depend only on Defs.lean,
 not on Funs.lean or Types.lean. -/
 
--- Linter doesn't recognize this Aeneas macro
-set_option linter.hashCommand false
-#setup_aeneas_simps
 
 open Aeneas.Std Result
 
@@ -47,7 +44,7 @@ theorem Aeneas.Std.U64.shiftRight_51 (x : U64) : x.val >>> 51 = x.val / 2^51 := 
 
 theorem Array.val_getElem!_eq' (bs : Array U64 5#usize) (i : Nat) (h : i < bs.length) :
     (bs.val)[i]! = bs[i] := by
-  simpa [Subtype.val] using getElem!_pos bs.val i _
+  exact getElem!_pos bs.val i h
 
 /-- Setting the j part of an array doesn't change the i part if i ≠ j -/
 @[simp]
@@ -55,14 +52,14 @@ theorem Array.set_of_ne (bs : Array U64 5#usize) (a : U64) (i j : Nat) (hi : i <
     (hj : j < bs.length) (h : i ≠ j) :
     (bs.set j#usize a)[i]! = bs[i] := by
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
-  exact List.getElem!_set_ne bs j i a (by omega)
+  simp [h]
 
 /-- Setting the j part of an array doesn't change the i part if i ≠ j -/
 theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64)
     (i : Nat) (j : Usize) (hi : i < bs.length) (h : i ≠ j) :
     (bs.set j a)[i]! = bs[i] := by
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
-  exact List.getElem!_set_ne bs j i a (by omega)
+  simp [h]
 
 /-- Convert GetElem (Nat index) to getElem! for Aeneas Array -/
 theorem Array.getElem_eq_getElem! (bs : Array U64 5#usize) (i : Nat) (hi : i < bs.length) :
@@ -87,9 +84,8 @@ theorem Array.set_of_ne_getElem! (bs : Array U64 5#usize)
 /-- Setting the j part of an array gives exactly the i part if i = j -/
 theorem Array.set_of_eq (bs : Array U64 5#usize) (a : U64) (i : Nat) (hi : i < bs.length) :
     (bs.set i#usize a)[i]! = a := by
-  grind only [usr Subtype.property, = getElem?_pos,
-    = Array.set_val_eq, = UScalar.ofNatCore_val_eq,
-    = List.getElem_set]
+  rw [Array.getElem!_Nat_eq, Array.set_val_eq, getElem!_pos _ i (by simpa using hi)]
+  simp
 
 /-- If two `FieldElement51`s agree pointwise at every limb (as `U64`s), they are equal.
 Used to lift per-limb val/term equality back to the `FieldElement51` level. -/

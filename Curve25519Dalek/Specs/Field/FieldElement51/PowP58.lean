@@ -50,6 +50,7 @@ theorem pow_p58_spec (self : FieldElement51) (h_bounds : ∀ i, i < 5 → (self[
   step with pow22501_spec as ⟨ t19, _, ht19_mod, _, ht19b, _ ⟩
   step with pow2k_spec as ⟨ t20, ht20, ht20b ⟩
   step with mul_spec as ⟨ res, hres, hresb ⟩
+  rw [pow22501_exp_def] at ht19_mod
   have exp_r : Field51_as_Nat self ≡ (Field51_as_Nat self) ^ 1 [MOD p] := by rw [pow_one]
   have exp_t20 := chain_pow2k ht19_mod ht20
   rw [pow_p58_exp_def]

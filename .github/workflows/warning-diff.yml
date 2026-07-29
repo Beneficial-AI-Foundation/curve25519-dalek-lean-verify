@@ -44,7 +44,7 @@ jobs:
         with:
           name: warning-diff-comment
           path: |
-            .warning-diff-comment.md
+            warning-diff-comment.md
             pr-number.txt
           if-no-files-found: ignore
           retention-days: 1

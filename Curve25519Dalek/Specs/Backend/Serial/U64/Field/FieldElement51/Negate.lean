@@ -30,15 +30,30 @@ theorem negate_spec (self : FieldElement51) (h : ∀ i < 5, self[i]!.val < 2 ^ 5
       ∀ i < 5, neg[i]!.val < 2 ^ 52 ⦄ := by
   unfold negate
   step*
-  constructor
-  · have : 16 * p =
-      36028797018963664 * 2 ^ 0 +
-      36028797018963952 * 2 ^ 51 +
-      36028797018963952 * 2 ^ 102 +
-      36028797018963952 * 2 ^ 153 +
-      36028797018963952 * 2 ^ 204 := by simp [p]
-    simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make]
-    grind
-  · assumption
+  · have := h 0 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac)] at this
+    rw [i_post]; scalar_tac
+  · have := h 1 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 1 (by scalar_tac)] at this
+    rw [i2_post]; scalar_tac
+  · have := h 2 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 2 (by scalar_tac)] at this
+    rw [i4_post]; scalar_tac
+  · have := h 3 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 3 (by scalar_tac)] at this
+    rw [i6_post]; scalar_tac
+  · have := h 4 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 4 (by scalar_tac)] at this
+    rw [i8_post]; scalar_tac
+  · constructor
+    · have : 16 * p =
+        36028797018963664 * 2 ^ 0 +
+        36028797018963952 * 2 ^ 51 +
+        36028797018963952 * 2 ^ 102 +
+        36028797018963952 * 2 ^ 153 +
+        36028797018963952 * 2 ^ 204 := by simp [p]
+      simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make]
+      grind
+    · assumption
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

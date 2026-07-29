@@ -105,11 +105,11 @@ private theorem part1_spec_tail (sum i5 : U128) (p : U64)
 private theorem part1_spec (sum : U128)
     (h_bound : sum.val + (2 ^ 52 - 1) * (constants.L[0]!).val ≤ U128.max) :
     montgomery_reduce.part1 sum ⦃ result =>
-    let (carry, p) := result
-    p.val = (sum.val * constants.LFACTOR) % (2 ^ 52) ∧
-    carry.val = (sum.val + p.val * (constants.L[0]!).val) / (2 ^ 52) ∧
-    carry.val < 2 ^ 77 ∧
-    p.val < 2 ^ 52 ⦄ := by
+      let (carry, p) := result
+      p.val = (sum.val * constants.LFACTOR) % (2 ^ 52) ∧
+      carry.val = (sum.val + p.val * (constants.L[0]!).val) / (2 ^ 52) ∧
+      carry.val < 2 ^ 77 ∧
+      p.val < 2 ^ 52 ⦄ := by
   unfold montgomery_reduce.part1
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   have h_L_len : constants.L.val.length = 5 := by
@@ -144,20 +144,20 @@ private theorem part1_spec (sum : U128)
   have h_add_safe' : sum.val + i5.val ≤ U128.max := by
     rw [i5_post, i4_post]
     convert h_add_safe using 2
-    simp only [Array.getElem!_Nat_eq]
+    grind [Array.getElem!_Nat_eq, Array.val_getElem!_eq']
   have h_i5_eq : i5.val = p.val * (constants.L[0]!).val := by
     rw [i5_post, i4_post]
-    simp only [Array.getElem!_Nat_eq]
+    grind [Array.getElem!_Nat_eq, Array.val_getElem!_eq']
   exact part1_spec_tail sum i5 p h_p_val h_p_bound h_add_safe' h_i5_eq
 
 @[step]
 private theorem part2_spec (sum : U128) :
-  montgomery_reduce.part2 sum ⦃ result =>
-  let (carry, w) := result
-  w.val = sum.val % (2 ^ 52) ∧
-  carry.val = sum.val / (2 ^ 52) ∧
-  carry.val < 2 ^ 76 ∧
-  w.val < 2 ^ 52 ⦄ := by -- 2^128 / 2^52 = 2^76
+    montgomery_reduce.part2 sum ⦃ result =>
+      let (carry, w) := result
+      w.val = sum.val % (2 ^ 52) ∧
+      carry.val = sum.val / (2 ^ 52) ∧
+      carry.val < 2 ^ 76 ∧
+      w.val < 2 ^ 52 ⦄ := by -- 2^128 / 2^52 = 2^76
   unfold montgomery_reduce.part2
   -- Rust: let w = (sum as u64) & ((1u64 << 52) - 1);
   step as ⟨w_cast, hw_cast⟩     -- Cast sum to u64
@@ -329,6 +329,11 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   try simp only [step_simps]
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ carry0, n0, h_result0 ⟩ ← part1_spec
+  case h_bound =>
+    obtain ⟨_, _, _, _, hmax, h_prod⟩ := mont_reduce_consts
+    have hi := h_bounds 0 (by omega)
+    rw [i_post, hmax]
+    grind [Array.getElem!_Nat_eq, Array.val_getElem!_eq']
   obtain ⟨h_n0_val, h_carry0_val, h_carry0_bound, h_n0_bound⟩ := h_result0
   -- Shared bound library (proved once, reused by all rows)
   -- Import shared constants (proved in separate lemma to avoid kernel depth)
@@ -591,8 +596,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     i17_post, i18_post, i19_post, i20_post, i21_post, i22_post, i23_post, i24_post,
     i25_post, i26_post, i27_post, i28_post, i29_post, i30_post, i31_post, i32_post,
     i33_post, i34_post, i35_post, i36_post, i37_post, i38_post, i39_post, i40_post,
-    i41_post, i42_post, i43_post, i44_post, i45_post, i46_post, i47_post, i48_post, i49_post,
-    ← Array.getElem!_Nat_eq
+    i41_post, i42_post, i43_post, i44_post, i45_post, i46_post, i47_post, i48_post, i49_post
   ] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
   have h_wide : (↑(Scalar52_wide_as_Nat a) : ℤ) =
       ↑a[0]!.val + ↑a[1]!.val * (2 ^ 52 : ℤ) + ↑a[2]!.val * (2 ^ 52) ^ 2 +
@@ -634,6 +638,17 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   have h_core : (↑(Scalar52_wide_as_Nat a) : ℤ) + C * ↑L =
       ↑(Scalar52_as_Nat inter_arr) * ↑R := by
     rw [h_wide, h_L_expand, h_inter, h_R]
+    have hA : ∀ (k : ℕ) (h : k < (↑a : List U128).length), (↑a : List U128)[k] = a[k]! :=
+      fun k h => by
+        rw [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, List.getElem?_eq_getElem h,
+          Option.getD_some]
+    have hL : ∀ (k : ℕ) (h : k < (↑constants.L : List U64).length),
+        (↑constants.L : List U64)[k] = constants.L[k]! :=
+      fun k h => by
+        rw [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, List.getElem?_eq_getElem h,
+          Option.getD_some]
+    push_cast at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
+    simp only [hA, hL] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
     exact montgomery_core_eq eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
   have h_C_nn : (0 : ℤ) ≤ C := by
     unfold C; grind => lia

@@ -44,7 +44,13 @@ lemma chain_pow2k {r a b e k m : ℕ}
 
 namespace curve25519_dalek.field.FieldElement51
 
-set_option exponentiation.threshold 100000
+/-- The exponent `2^250 - 1` computed by `pow22501`. -/
+@[irreducible]
+def pow22501_exp : Nat := 2 ^ 250 - 1
+
+theorem pow22501_exp_def : pow22501_exp = 2 ^ 250 - 1 := by
+  unfold pow22501_exp; rfl
+
 
 /-- **Spec theorem for `curve25519_dalek::field::FieldElement51::pow22501`**
 • No panic (always returns (r1, r2) successfully)
@@ -60,7 +66,7 @@ theorem pow22501_spec (self : backend.serial.u64.field.FieldElement51)
         backend.serial.u64.field.FieldElement51) =>
       let r1 := result.1
       let r2 := result.2
-      Field51_as_Nat r1 % p = (Field51_as_Nat self ^ (2 ^ 250 - 1)) % p ∧
+      Field51_as_Nat r1 % p = (Field51_as_Nat self ^ pow22501_exp) % p ∧
       Field51_as_Nat r2 % p = (Field51_as_Nat self ^ 11) % p ∧
       (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧
       (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄ := by
@@ -113,6 +119,7 @@ theorem pow22501_spec (self : backend.serial.u64.field.FieldElement51)
   have exp_t17 := chain_mul exp_t16 exp_t15 ht17
   have exp_t18 := chain_pow2k exp_t17 ht18
   have exp_t19 := chain_mul exp_t18 exp_t13 ht19
+  rw [pow22501_exp_def]
   exact ⟨exp_t19, exp_t3, ht19b, ht3b⟩
 
 end curve25519_dalek.field.FieldElement51

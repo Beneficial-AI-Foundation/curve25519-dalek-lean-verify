@@ -5,9 +5,10 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.TypesAux
 import Curve25519Dalek.Specs.Scalar.Scalar.Unpack
+import Curve25519Dalek.Specs.Scalar.Scalar.Eq
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.AsMontgomery
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryInvert
@@ -79,12 +80,8 @@ Source: "curve25519-dalek/src/scalar.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.scalar.Scalar
 
--- `#setup_aeneas_simps` uses a `#` command which triggers the hashCommand linter;
--- suppressed intentionally.
-set_option linter.hashCommand false
 -- R = 2^260 in the Montgomery domain; prevents kernel exponentiation explosion.
 set_option exponentiation.threshold 260
-#setup_aeneas_simps
 attribute [-simp] Int.reducePow Nat.reducePow
 
 /-! ## Auxiliary Element-Access Predicates
@@ -256,7 +253,7 @@ private theorem batch_invert_loop0_spec_strong
     simp only [alloc.vec.Vec.index_mut_slice_index]
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
-    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back⟩
+    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back, hidx⟩
     step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
@@ -312,8 +309,7 @@ private theorem batch_invert_loop0_spec_strong
     have h_scratch_old : ∀ j, j ≠ i.val →
         (Slice.set scratch i acc).val[j]? = scratch.val[j]? := by
       intro j hj
-      simp
-      grind
+      simp only [Slice.set_val_eq, List.getElem?_set_ne hj.symm]
     have h_inp_elem : (Slice.set inputs i input1).val[i.val]? = some input1 := by
       simp only [Slice.set_val_eq]
       exact List.getElem?_set_self (h_inputs_len ▸ hi_lt)
@@ -342,7 +338,6 @@ private theorem batch_invert_loop0_spec_strong
         h_inp_orig h_inp_rest
     have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := acc1_post2
     have hacc1_lt : Scalar52_as_Nat acc1 < L := acc1_post3
-    have hidx : index_mut_back = inputs.set i := (Prod.mk.inj h_index_mut_back).2
     simp only [hidx, h_vec_back]
     exact spec_mono
       (batch_invert_loop0_spec_strong
@@ -551,7 +546,7 @@ private theorem batch_invert_loop1_spec_strong
     have hk_lt : i1.val < n.val := by omega
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
-    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back⟩
+    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back, hidx⟩
     have h_input_mont : U8x32_as_Nat input.bytes ≡ vals i1.val * R [MOD L] := by
       apply h_inp_mont i1.val (by omega)
       have hlen : i1.val < inputs.val.length := h_inputs_len ▸ hk_lt
@@ -626,7 +621,7 @@ private theorem batch_invert_loop1_spec_strong
         (Slice.set inputs i1 input1).val[j]? = inputs.val[j]? := by
       intro j hj
       simp only [Slice.set_val_eq]
-      exact List.getElem?_set_neq inputs.val i1.val j input1 (Or.inl (Ne.symm hj))
+      exact List.getElem?_set_ne (Ne.symm hj)
     have h_inp_inv' : ∀ j, i1.val ≤ j → j < n.val →
         SliceScalarAt (Slice.set inputs i1 input1) j
           (fun b => U8x32_as_Nat b * vals j ≡ P [MOD L]) :=
@@ -643,7 +638,6 @@ private theorem batch_invert_loop1_spec_strong
           (fun b => U8x32_as_Nat b < L) :=
       inp_lt_prefix_step inputs _ i1.val L
         (fun j hj => h_inp_mont_lt j (by omega)) h_inp_rest
-    have hidx : index_mut_back = inputs.set i1 := (Prod.mk.inj h_index_mut_back).2
     simp only [hidx]
     exact spec_mono
       (batch_invert_loop1_spec_strong
@@ -797,7 +791,7 @@ private theorem batch_invert_loop0_bounds_strong
     simp only [alloc.vec.Vec.index_mut_slice_index]
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
-    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back⟩
+    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back, hidx⟩
     step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
@@ -835,8 +829,7 @@ private theorem batch_invert_loop0_bounds_strong
     have h_scratch_old : ∀ j, j ≠ i.val →
         (Slice.set scratch i acc).val[j]? = scratch.val[j]? := by
       intro j hj
-      simp
-      grind
+      simp only [Slice.set_val_eq, List.getElem?_set_ne hj.symm]
     have h_scratch_bounds' : ∀ j < i1.val,
         Vec52At (Slice.set scratch i acc) j
           (fun x => (∀ k < 5, x[k]!.val < 2 ^ 52) ∧ Scalar52_as_Nat x < L) := by
@@ -849,7 +842,6 @@ private theorem batch_invert_loop0_bounds_strong
         exact (Option.some.inj hx) ▸ ⟨h_acc_limbs, h_acc_lt⟩
     have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := acc1_post2
     have hacc1_lt : Scalar52_as_Nat acc1 < L := acc1_post3
-    have hidx : index_mut_back = inputs.set i := (Prod.mk.inj h_index_mut_back).2
     simp only [hidx, h_vec_back]
     exact spec_mono
       (batch_invert_loop0_bounds_strong
@@ -913,7 +905,7 @@ private theorem batch_invert_loop0_acc_bounds_strong
     simp only [alloc.vec.Vec.index_mut_slice_index]
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
-    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back⟩
+    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back, hidx⟩
     step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
@@ -947,7 +939,6 @@ private theorem batch_invert_loop0_acc_bounds_strong
       simp [List.length_set, h_scratch_len]
     have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := acc1_post2
     have hacc1_lt : Scalar52_as_Nat acc1 < L := acc1_post3
-    have hidx : index_mut_back = inputs.set i := (Prod.mk.inj h_index_mut_back).2
     simp only [hidx, h_vec_back]
     exact spec_mono
       (batch_invert_loop0_acc_bounds_strong
@@ -1007,7 +998,7 @@ private theorem batch_invert_loop0_inputs_lt_strong
     simp only [alloc.vec.Vec.index_mut_slice_index]
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
-    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back⟩
+    step with Slice.index_mut_usize_spec as ⟨input, index_mut_back, h_index_mut_back, hidx⟩
     step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
@@ -1056,7 +1047,6 @@ private theorem batch_invert_loop0_inputs_lt_strong
         exact (Option.some.inj hx) ▸ input1_post2
     have hacc1_limbs : ∀ j < 5, acc1[j]!.val < 2 ^ 52 := acc1_post2
     have hacc1_lt : Scalar52_as_Nat acc1 < L := acc1_post3
-    have hidx : index_mut_back = inputs.set i := (Prod.mk.inj h_index_mut_back).2
     simp only [hidx, h_vec_back]
     exact spec_mono
       (batch_invert_loop0_inputs_lt_strong
@@ -1163,11 +1153,14 @@ theorem batch_invert_spec
       hinp1_mont_lt_pre, hscratch1_limbs_pre⟩
   step
   step
+  case hEq =>
+    exact spec_mono (Insts.CoreCmpPartialEqScalar.eq_spec s1 ZERO)
+      (fun r hr => Iff.trans hr ⟨Scalar_ext s1 ZERO, fun h => h ▸ rfl⟩)
   step
   · rw [b_post]
     intro h_eq
     have h_zero : U8x32_as_Nat s1.bytes = 0 :=
-      (U8x32_as_Nat_eq_zero_iff_ZERO s1).mpr (Scalar_ext s1 ZERO h_eq)
+      (U8x32_as_Nat_eq_zero_iff_ZERO s1).mpr h_eq
     have h_cong : (0 : ℕ) ≡ R * PrefixProd vals (Slice.len inputs).val [MOD L] := by
       have h := s1_post1.trans hacc1_inv
       rw [h_zero] at h

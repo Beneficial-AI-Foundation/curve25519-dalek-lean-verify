@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Alessandro D'Angelo, Liao Zhang
 -/
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Tactics
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 
@@ -39,6 +39,8 @@ private theorem bounds_add {a b : Nat} (ha : a < 2 ^ 126) (hb : b < 2 ^ 126) :
     a + b < 2^127 := by
   nlinarith [ha,hb]
 
+set_option maxHeartbeats 2000000 in
+-- Heavier elaboration after the v4.31.0 toolchain/Aeneas update.
 /-- **Spec theorem for `curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal`**
 • Does not error and hence returns a result
 • The result represents the square of the input field element
@@ -51,13 +53,21 @@ theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i
       (∀ i < 9, result[i]!.val < 2 ^ 127) ⦄ := by
   unfold square_internal backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   step*
+  all_goals (try (
+    simp only [Array.make, ← getElem!_pos, *] at *
+    have b0 := ha 0 (by omega)
+    have b1 := ha 1 (by omega)
+    have b2 := ha 2 (by omega)
+    have b3 := ha 3 (by omega)
+    have b4 := ha 4 (by omega)
+    scalar_tac +nonLin))
   · -- Main Proof
-    unfold Array.make at *
+    simp only [Array.make] at *
     simp only [Scalar52_wide_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
       Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
       List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos, getElem?_pos,
       List.getElem_cons_zero, Option.getD_some, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-      getElem!_pos, one_mul, mul_one, Nat.one_lt_ofNat, List.getElem_cons_succ, Nat.reduceMul,
+      one_mul, mul_one, Nat.one_lt_ofNat, List.getElem_cons_succ, Nat.reduceMul,
       Nat.reduceLT, Nat.lt_add_one, Scalar52_as_Nat, i8_post, i_post, i10_post, i9_post, i1_post,
       i2_post, i13_post, i11_post, i4_post, i12_post, i17_post, i14_post, i6_post, i16_post,
       i15_post, i3_post, i23_post, i21_post, i19_post, i18_post, i20_post, i22_post, i27_post,
@@ -71,10 +81,8 @@ theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i
       interval_cases i
       all_goals
         simp only [List.getElem?_cons_zero, List.getElem?_cons_succ, Option.getD_some,
-          List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos,
-          gt_iff_lt, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
-          List.getElem_cons_zero, List.getElem_cons_succ, Nat.one_lt_ofNat, Nat.reduceLT,
-          Nat.lt_add_one, i_post, i1_post, i2_post, i3_post, i4_post, i5_post, i6_post,
+          gt_iff_lt, List.getElem_cons_zero, List.getElem_cons_succ,
+          i_post, i1_post, i2_post, i3_post, i4_post, i5_post, i6_post,
           i7_post, i8_post, i9_post, i10_post, i11_post, i12_post, i13_post, i14_post,
           i15_post, i16_post, i17_post, i18_post, i19_post, i20_post, i21_post, i22_post,
           i23_post, i24_post, i25_post, i26_post, i27_post, i28_post, i29_post, i30_post,

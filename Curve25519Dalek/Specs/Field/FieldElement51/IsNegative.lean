@@ -55,7 +55,7 @@ theorem is_negative_spec (self : backend.serial.u64.field.FieldElement51) :
   step as ⟨b0⟩
   step as ⟨i1, h_i1⟩
   unfold subtle.Choice.Insts.CoreConvertFromU8.from
-  simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos,
+  simp_all only [UScalar.ofNatCore_val_eq,
     UScalar.val_and, Nat.and_one_is_mod, UScalarTy.U8_numBits_eq, Bvify.U8.UScalar_bv, U8.ofNat_bv]
   have : i1.val < 2 := by
     rw [h_i1]

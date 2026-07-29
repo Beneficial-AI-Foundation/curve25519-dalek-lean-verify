@@ -48,9 +48,9 @@ theorem eq_spec
     (self other : backend.serial.curve_models.AffineNielsPoint) :
     eq self other ⦃ (b : Bool) =>
       b = true ↔
-        self.y_plus_x.to_bytes = other.y_plus_x.to_bytes ∧
-        self.y_minus_x.to_bytes = other.y_minus_x.to_bytes ∧
-        self.xy2d.to_bytes = other.xy2d.to_bytes ⦄ := by
+      self.y_plus_x.to_bytes = other.y_plus_x.to_bytes ∧
+      self.y_minus_x.to_bytes = other.y_minus_x.to_bytes ∧
+      self.xy2d.to_bytes = other.xy2d.to_bytes ⦄ := by
   unfold eq
   let* ⟨ b, b_post ⟩ ← u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec
   spec_split

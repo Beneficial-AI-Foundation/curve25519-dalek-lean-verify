@@ -45,13 +45,13 @@ theorem ED25519_BASEPOINT_POINT_spec :
   unfold ED25519_BASEPOINT_POINT
   step*
   set ep := ({ X := fe, Y := fe1, Z := fe2, T := fe3 } : edwards.EdwardsPoint)
-  have h_valid : ep.IsValid := by simp only [ep, *]; decide
-  have h_bp : ep.toPoint = _root_.Edwards.basepoint := by simp only [ep, *]; decide
+  have h_valid : ep.IsValid := by simp only [ep, *]; decide +kernel
+  have h_bp : ep.toPoint = _root_.Edwards.basepoint := by simp only [ep, *]; decide +kernel
   rw [h_bp]
   refine ⟨h_valid, ?_, ?_, ?_, ?_, rfl⟩
   · exact _root_.Edwards.basepoint_order_L
   · exact _root_.Edwards.basepoint_ne_zero
   · exact _root_.Edwards.four_nsmul_basepoint_ne_zero
-  · simp only [*]; decide
+  · simp only [*]; decide +kernel
 
 end curve25519_dalek.backend.serial.u64.constants

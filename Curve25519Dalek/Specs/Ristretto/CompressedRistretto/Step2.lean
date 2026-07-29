@@ -367,8 +367,9 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     have h_nz : Field51_as_Nat v_u2_sqr % p ≠ 0 := by
       intro h_zero; exact absurd h_ok1 (by rw [(ok1_post3 h_zero).1]; decide)
     have h_ex : ∃ z : Nat, (z ^ 2 * (Field51_as_Nat v_u2_sqr % p)) % p = 1 := by
-      by_contra h_nex; exact absurd h_ok1 (by rw [(ok1_post5 ⟨h_nz, h_nex⟩).1]; decide)
-    have h_sq := (ok1_post4 ⟨h_nz, h_ex⟩).2
+      by_contra h_nex; exact absurd h_ok1 (by rw [(ok1_post5 h_nz h_nex).1]; decide)
+    obtain ⟨z, hz⟩ := h_ex
+    have h_sq := (ok1_post4 h_nz z hz).2
     rw [← h_v_u2_sqr_field]; unfold FieldElement51.toField
     have h := lift_mod_eq ((Field51_as_Nat I % p) ^ 2 * (Field51_as_Nat v_u2_sqr % p)) 1
       (by rw [show (1 : Nat) % p = 1 from by decide]; exact h_sq)
@@ -424,8 +425,8 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     obtain ⟨h_sq, h_W_ne, h_neg_fwd, h_y_ne_fwd, h_coords⟩ := h_fwd
     have h_ok1 : ok1.val = 1#u8 := by
       have h_nz := h_ne_bridge.mpr h_W_ne
-      have h_ex := h_sq_bridge.mpr ⟨h_nz, h_sq⟩
-      exact (ok1_post4 ⟨h_nz, h_ex⟩).1
+      obtain ⟨z, hz⟩ := h_sq_bridge.mpr ⟨h_nz, h_sq⟩
+      exact (ok1_post4 h_nz z hz).1
     have hI := hI_sq_W h_ok1
     have ⟨h_Px, h_Py⟩ := h_coords I.toField hI
     have hx1_eq_Px : x1.toField = P.x := by rw [hx1_abs, hx_simp]; exact h_Px.symm
@@ -482,12 +483,13 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
         intro h_zero; exact absurd h_ok (by rw [(ok1_post3 h_zero).1]; decide)
       have h_ex : ∃ x : Nat, (x ^ 2 * (Field51_as_Nat v_u2_sqr % p)) % p = 1 := by
         by_contra h_nex
-        exact absurd h_ok (by rw [(ok1_post5 ⟨h_nz, h_nex⟩).1]; decide)
+        exact absurd h_ok (by rw [(ok1_post5 h_nz h_nex).1]; decide)
       exact ⟨h_ne_bridge.mp h_nz, (h_sq_bridge.mp h_ex).2⟩
     · -- ← direction
       intro ⟨h_ne, h_sq⟩
       have h_nz : Field51_as_Nat v_u2_sqr % p ≠ 0 := h_ne_bridge.mpr h_ne
-      exact (ok1_post4 ⟨h_nz, h_sq_bridge.mpr ⟨h_nz, h_sq⟩⟩).1
+      obtain ⟨z, hz⟩ := h_sq_bridge.mpr ⟨h_nz, h_sq⟩
+      exact (ok1_post4 h_nz z hz).1
   · -- Goal 2: c ↔ math.is_negative t.toField
     simp only [c_post, math.is_negative, FieldElement51.toField, ZMod.val_natCast, beq_iff_eq]
   · -- Goal 3: c1 ↔ y.toField = 0
@@ -500,7 +502,7 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     · intro h_success
       exact h_decompress_of_step2_success P h_success
   · -- Goal 5: ok1=1 ∧ c=0 ∧ c1=0 → RistrettoPoint.IsValid pt
-    intro ⟨h_ok1, _, _⟩
+    intro h_ok1 _ _
     have hI := hI_sq_W h_ok1
     unfold RistrettoPoint.IsValid
     refine ⟨?_, ?_⟩

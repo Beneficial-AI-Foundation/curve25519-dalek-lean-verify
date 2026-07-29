@@ -469,11 +469,11 @@ private theorem conditional_negate_sq
     field51_as_Nat_conditional_assign r1 x r2 r_is_negative r2_post
   by_cases h : r_is_negative.val = 1#u8
   · have hr2x : Field51_as_Nat r2 = Field51_as_Nat x := by
-      simpa only [h] using hr2
+      simpa only [h, if_true] using hr2
     rw [hr2x]
     exact (nat_sq_of_add_modeq_zero x_post_1).symm
   · have hr2r1 : Field51_as_Nat r2 = Field51_as_Nat r1 := by
-      simpa only [h] using hr2
+      simpa only [h, if_false] using hr2
     rw [hr2r1]
 
 /-- After `conditional_negate`, the result `r2` is always non-negative (even mod p). -/
@@ -488,12 +488,12 @@ private theorem conditional_negate_nonneg
     field51_as_Nat_conditional_assign r1 x r2 r_is_negative r2_post
   by_cases h : r_is_negative.val = 1#u8
   · have hr2x : Field51_as_Nat r2 = Field51_as_Nat x := by
-      simpa only [h] using hr2
+      simpa only [h, if_true] using hr2
     rw [hr2x]
     exact nonneg_of_neg_mod_p (Field51_as_Nat r1) (Field51_as_Nat x)
       ((modEq_zero_iff _ _).mp x_post_1) (r_is_negative_post.mp h)
   · have hr2r1 : Field51_as_Nat r2 = Field51_as_Nat r1 := by
-      simpa only [h] using hr2
+      simpa only [h, if_false] using hr2
     rw [hr2r1]
     have := Nat.mod_two_eq_zero_or_one (Field51_as_Nat r1 % p)
     have := mt r_is_negative_post.mpr h
@@ -1271,7 +1271,6 @@ private theorem solve_second_choice_false_choice3_false
       · rcases h with h | h
         · have := h.mul_right (Field51_as_Nat u)
           have := eq_check.trans this
-          simp only at this
           have r2_eq_sq := conditional_negate_sq r1 r_neg r2 r_is_negative
             (by simpa only [r1_eq_r] using r_neg_post1) r2_post
           rw [r1_eq_r] at r2_eq_sq
@@ -1427,7 +1426,7 @@ private theorem sqrt_ratio_i_spec'
       have r_prime_sq_v_u : Field51_as_Nat r_prime ^ 2 * Field51_as_Nat v ≡
           Field51_as_Nat u [MOD p] :=
         (check_eq_mod.trans (check_fe6.mul_left _)).trans u_m.symm
-      exact solve_first_choice_true
+      simpa only [sqrt_ratio_i_cases, and_imp, exists_imp] using solve_first_choice_true
           check_fe6 r_prime_sq_v_u check_post1 fe6_post1 fe2_post1 r_post1
           r_prime_post1 r1_post r_prime_post2 r_neg_post1 r_neg_post2
           r2_post r_is_negative_post
@@ -1467,7 +1466,8 @@ private theorem sqrt_ratio_i_spec'
             (check_eq_u.mul_left (Field51_as_Nat SQRT_M1_val)).symm.trans
               (check_1.trans u_m.symm)
           simp only [Choice.one, ↓reduceIte] at r1_post
-          exact solve_second_choice_true_choice3_true
+          simpa only [sqrt_ratio_i_cases, and_imp, exists_imp] using
+            solve_second_choice_true_choice3_true
               sqrt_m1_u fe2_post1 r_post1 r_prime_post1 r1_post
               r_prime_post2 r_neg_post2 r2_post r_is_negative_post
         · simp only [choice3, ↓reduceIte, bind_tc_ok, Aeneas.Std.WP.spec_ok]
@@ -1492,7 +1492,8 @@ private theorem sqrt_ratio_i_spec'
           have h_check_ne_u : ¬(check.to_bytes = u.to_bytes) :=
             fun h => choice3 (by rw [correct_sign_sqrt_post.mpr h]; rfl)
           simp only [Choice.one, ↓reduceIte] at r1_post
-          exact solve_second_choice_true_choice3_false
+          simpa only [sqrt_ratio_i_cases, and_imp, exists_imp] using
+            solve_second_choice_true_choice3_false
               u_eq1 rprime_v h_check_ne_u v3_post1 fe2_post1 r_post1
               r_prime_post1 r1_post r_prime_post2 r_neg_post1 r_neg_post2
               r2_post r_is_negative_post
@@ -1520,7 +1521,8 @@ private theorem sqrt_ratio_i_spec'
           have r_sq_v_u := check_eq_r_v.symm.trans check_eq_u
           have h01 : ¬(0#u8 = 1#u8) := by decide
           simp only [Choice.zero, h01, ite_false] at r1_post
-          exact solve_second_choice_false_choice3_true
+          simpa only [sqrt_ratio_i_cases, and_imp, exists_imp] using
+            solve_second_choice_false_choice3_true
               r_sq_v_u fe2_post1 r_post1 r1_post r_post2 r_neg_post1
               r_neg_post2 r2_post r_is_negative_post
         · simp only [choice3, ↓reduceIte, bind_tc_ok, Aeneas.Std.WP.spec_ok]
@@ -1533,7 +1535,8 @@ private theorem sqrt_ratio_i_spec'
             fun h => first_choice (by rw [flipped_sign_sqrt_post.mpr h]; rfl)
           have h_check_ne_fe7 : ¬(check.to_bytes = fe7.to_bytes) :=
             fun h => second_choice (by rw [flipped_sign_sqrt_i_post.mpr h]; rfl)
-          exact solve_second_choice_false_choice3_false
+          simpa only [sqrt_ratio_i_cases, and_imp, exists_imp] using
+            solve_second_choice_false_choice3_false
               check_eq_v check_eq_r_v u_m v3_post1 fe2_post1 r_post1
               fe7_post1 r1_post r_post2 r_neg_post1 r_neg_post2
               r2_post r_is_negative_post

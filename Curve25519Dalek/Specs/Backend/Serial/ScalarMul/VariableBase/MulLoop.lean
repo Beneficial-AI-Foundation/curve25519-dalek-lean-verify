@@ -115,7 +115,9 @@ theorem mul_loop_spec
     have hi1_val : i1.val = i.val - 1 := by scalar_tac
     -- Bounds for i2 := scalar_digits[i1.val] (pulled through i2_post).
     have hi2_bds : -8 ≤ i2.val ∧ i2.val < 8 := by
-      rw [i2_post]; agrind
+      rw [i2_post, List.Inhabited_getElem_eq_getElem! scalar_digits.val i1.val
+          (by scalar_tac : i1.val < scalar_digits.val.length), ← Array.getElem!_Nat_eq]
+      exact h_digits_bds i1.val hi1_lt_63
     have hi2_lo : -8 ≤ i2.val := hi2_bds.1
     have hi2_hi : i2.val ≤ 8 := by omega
     let* ⟨ pnp, pnp_post1, pnp_post2 ⟩ ← window.LookupTable.select_spec (P := P)
@@ -134,7 +136,9 @@ theorem mul_loop_spec
       congr 1
       rw [hi1_val, I8x64_partial_radix16_recurrence scalar_digits i.val hi_pos (by omega)]
       have h_digit : (scalar_digits[i.val - 1]!).val = i2.val := by
-        rw [i2_post, show i.val - 1 = i1.val from hi1_val.symm]; simp
+        rw [i2_post, show i.val - 1 = i1.val from hi1_val.symm, Array.getElem!_Nat_eq,
+          ← List.Inhabited_getElem_eq_getElem! scalar_digits.val i1.val
+            (by scalar_tac : i1.val < scalar_digits.val.length)]
       rw [h_digit]
       push_cast; ring
     have hi1_le : i1.val ≤ 63 := by scalar_tac

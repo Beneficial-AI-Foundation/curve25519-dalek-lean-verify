@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes`
@@ -60,6 +60,8 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-! ## load8_at specification (Nat-level only) -/
 
+set_option maxHeartbeats 1000000 in
+-- Heavier elaboration after the v4.31.0 toolchain/Aeneas update.
 /-- The Nat-level spec for `load8_at`: the result is the little-endian combination of 8 bytes. -/
 @[step]
 theorem load8_at_val_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ input.val.length) :
@@ -69,10 +71,16 @@ theorem load8_at_val_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ inpu
   step*
   simp (discharger := omega) only [*, UScalar.val_or, UScalar.cast_val_eq, u8_val_mod_u64_numBits,
     Nat.shiftLeft_eq, u8_mul_pow_mod_u64]
-  rw [or_bytes_eq_sum _ _ _ _ _ _ _ _ (input.val[i.val]!).hmax (input.val[i.val + 1]!).hmax
-    (input.val[i.val + 2]!).hmax (input.val[i.val + 3]!).hmax (input.val[i.val + 4]!).hmax
-    (input.val[i.val + 5]!).hmax (input.val[i.val + 6]!).hmax (input.val[i.val + 7]!).hmax]
-  simp [Finset.sum_range_succ]
+  rw [or_bytes_eq_sum] <;>
+    [skip; exact UScalar.hmax _; exact UScalar.hmax _; exact UScalar.hmax _; exact UScalar.hmax _;
+     exact UScalar.hmax _; exact UScalar.hmax _; exact UScalar.hmax _; exact UScalar.hmax _]
+  simp only [Finset.sum_range_succ, Finset.sum_range_zero, Nat.zero_add, Nat.mul_zero,
+    Slice.getElem!_Nat_eq]
+  rw [getElem!_pos _ _ (by scalar_tac), getElem!_pos _ _ (by scalar_tac),
+    getElem!_pos _ _ (by scalar_tac), getElem!_pos _ _ (by scalar_tac),
+    getElem!_pos _ _ (by scalar_tac), getElem!_pos _ _ (by scalar_tac),
+    getElem!_pos _ _ (by scalar_tac), getElem!_pos _ _ (by scalar_tac)]
+  ring_nf
 
 /-! ## Bit-slicing identity (pure Nat) -/
 
@@ -133,8 +141,8 @@ private theorem load8_at_eq_shift (bytes : Array U8 32#usize) (i : Nat) (hi : i 
   set middle := ∑ j ∈ Finset.range 8, bytes[i + j]!.val * 2 ^ (8 * j) with hmiddle_def
   set upper :=
     ∑ k ∈ Finset.range (32 - (i + 8)), bytes[i + 8 + k]!.val * 2 ^ (8 * k) with hupper_def
-  have hlow_lt : lower < 2 ^ (8 * i) := by simpa using byte_sum_lt bytes 0 i (by omega)
-  have hmid_lt : middle < 2 ^ 64 := by simpa using byte_sum_lt bytes i 8 hi
+  have hlow_lt : lower < 2 ^ (8 * i) := by simpa [hlower_def] using byte_sum_lt bytes 0 i (by omega)
+  have hmid_lt : middle < 2 ^ 64 := by simpa [hmiddle_def] using byte_sum_lt bytes i 8 hi
   have hsplit :
       U8x32_as_Nat bytes = lower + 2 ^ (8 * i) * middle + 2 ^ (8 * (i + 8)) * upper := by
     have hsum := sum_split_three (fun k => 2 ^ (8 * k) * bytes[k]!.val) i hi

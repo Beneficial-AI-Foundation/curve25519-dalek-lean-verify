@@ -5,7 +5,7 @@ Authors: Markus Dablander, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
@@ -113,6 +113,10 @@ theorem from_bytes_wide_loop_helper
     let* ⟨ i33, i33_post1, i33_post2 ⟩ ← UScalar.or_spec
     let* ⟨ words5, words5_post ⟩ ← Array.update_spec
     let* ⟨ i34, i34_post ⟩ ← Usize.add_spec
+    case hmax =>
+      -- scalar_tac exceeds recursion depth on the large context; discharge directly.
+      have h1 := i1_post; have h2 := hi; have h3 := Usize.cMax_bound_concrete.1
+      change i1.val + 5 ≤ Usize.max; omega
     let* ⟨ i35, i35_post ⟩ ← Array.index_usize_spec
     let* ⟨ i36, i36_post ⟩ ← UScalar.cast.step_spec
     let* ⟨ i37, i37_post ⟩ ← I32.mul_spec
@@ -121,6 +125,9 @@ theorem from_bytes_wide_loop_helper
     let* ⟨ i40, i40_post1, i40_post2 ⟩ ← UScalar.or_spec
     let* ⟨ words6, words6_post ⟩ ← Array.update_spec
     let* ⟨ i41, i41_post ⟩ ← Usize.add_spec
+    case hmax =>
+      have h1 := i1_post; have h2 := hi; have h3 := Usize.cMax_bound_concrete.1
+      change i1.val + 6 ≤ Usize.max; omega
     let* ⟨ i42, i42_post ⟩ ← Array.index_usize_spec
     let* ⟨ i43, i43_post ⟩ ← UScalar.cast.step_spec
     let* ⟨ i44, i44_post ⟩ ← I32.mul_spec
@@ -129,6 +136,9 @@ theorem from_bytes_wide_loop_helper
     let* ⟨ i47, i47_post1, i47_post2 ⟩ ← UScalar.or_spec
     let* ⟨ words7, words7_post ⟩ ← Array.update_spec
     let* ⟨ i48, i48_post ⟩ ← Usize.add_spec
+    case hmax =>
+      have h1 := i1_post; have h2 := hi; have h3 := Usize.cMax_bound_concrete.1
+      change i1.val + 7 ≤ Usize.max; omega
     let* ⟨ i49, i49_post ⟩ ← Array.index_usize_spec
     let* ⟨ i50, i50_post ⟩ ← UScalar.cast.step_spec
     let* ⟨ i51, i51_post ⟩ ← I32.mul_spec
@@ -137,6 +147,9 @@ theorem from_bytes_wide_loop_helper
     let* ⟨ i54, i54_post1, i54_post2 ⟩ ← UScalar.or_spec
     let* ⟨ a, a_post ⟩ ← Array.update_spec
     let* ⟨ i55, i55_post ⟩ ← Usize.add_spec
+    case hmax =>
+      have h2 := hi; have h3 := Usize.cMax_bound_concrete.1
+      change i.val + 1 ≤ Usize.max; omega
     let* ⟨ words', words'_post1, words'_post2, words'_post3 ⟩ ← ih
     · subst a_post
       intro j hj
@@ -171,37 +184,63 @@ theorem from_bytes_wide_loop_helper
           i20_post, i23_post, i28_post, i27_post, i30_post, i35_post, i34_post, i37_post, i42_post,
           i41_post, i44_post, i49_post, i48_post, i51_post]
         -- Eliminate initial zero: words[i] = 0 (from loop invariant)
-        have hzero : (↑(↑words : List.Vector U64 8)[i.val]! : Nat) = 0 := by
-          rw [Array.getElem!_Nat_eq]; agrind
-        rw [← Array.getElem!_Nat_eq]
-        rw [hzero]; simp only [Nat.zero_or]
+        have hi8 : i.val < 8 := by exact_mod_cast hlt
+        have hib : i.val < words.val.length := by rw [words.property]; exact_mod_cast hlt
+        have hi5 : (i5.val : ℕ) = 0 := by
+          rw [i5_post]
+          have h := h_zero i.val (le_refl i.val) hi8
+          rw [Array.getElem!_Nat_eq, ← List.Inhabited_getElem_eq_getElem! words.val i.val hib] at h
+          exact h
+        rw [← i5_post, hi5, Nat.zero_or]
         -- OR to sum, close with ring
         simp only [i1_post]
+        have hbl := bytes.property
+        have h64 : (↑(64#usize) : ℕ) = 64 := rfl
         rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
-          (bytes.val[i.val * 8]!).hmax (bytes.val[i.val * 8 + 1]!).hmax
-          (bytes.val[i.val * 8 + 2]!).hmax (bytes.val[i.val * 8 + 3]!).hmax
-          (bytes.val[i.val * 8 + 4]!).hmax (bytes.val[i.val * 8 + 5]!).hmax
-          (bytes.val[i.val * 8 + 6]!).hmax (bytes.val[i.val * 8 + 7]!).hmax]
+          ((↑bytes)[i.val * 8]'(by omega)).hmax ((↑bytes)[i.val * 8 + 1]'(by omega)).hmax
+          ((↑bytes)[i.val * 8 + 2]'(by omega)).hmax ((↑bytes)[i.val * 8 + 3]'(by omega)).hmax
+          ((↑bytes)[i.val * 8 + 4]'(by omega)).hmax ((↑bytes)[i.val * 8 + 5]'(by omega)).hmax
+          ((↑bytes)[i.val * 8 + 6]'(by omega)).hmax ((↑bytes)[i.val * 8 + 7]'(by omega)).hmax]
         simp only [word_of_bytes_64, Finset.sum_range_succ, Finset.range_zero,
-          Finset.sum_empty, zero_add, Array.getElem!_Nat_eq]; ring_nf
+          Finset.sum_empty, zero_add, Array.getElem!_Nat_eq, Nat.add_zero,
+          show i.val * 8 = 8 * i.val from Nat.mul_comm _ _]
+        rw [List.Inhabited_getElem_eq_getElem! bytes.val (8 * i.val)
+              (by rw [bytes.property]; omega),
+          List.Inhabited_getElem_eq_getElem! bytes.val (8 * i.val + 1)
+              (by rw [bytes.property]; omega),
+          List.Inhabited_getElem_eq_getElem! bytes.val (8 * i.val + 2)
+              (by rw [bytes.property]; omega),
+          List.Inhabited_getElem_eq_getElem! bytes.val (8 * i.val + 3)
+              (by rw [bytes.property]; omega),
+          List.Inhabited_getElem_eq_getElem! bytes.val (8 * i.val + 4)
+              (by rw [bytes.property]; omega),
+          List.Inhabited_getElem_eq_getElem! bytes.val (8 * i.val + 5)
+              (by rw [bytes.property]; omega),
+          List.Inhabited_getElem_eq_getElem! bytes.val (8 * i.val + 6)
+              (by rw [bytes.property]; omega),
+          List.Inhabited_getElem_eq_getElem! bytes.val (8 * i.val + 7)
+              (by rw [bytes.property]; omega)]
+        ring_nf
       · -- j ≠ i: all 8 sets at index i, words[j] unchanged
         have h_ji : j < i.val := by omega
         have hne : Nat.not_eq i.val j := by simp [Nat.not_eq]; omega
         simp only [words7_post, words6_post, words5_post, words4_post,
           words3_post, words2_post, words1_post,
           Array.getElem!_Nat_eq, Array.set_val_eq, List.set_set,
-          List.getElem!_set_ne _ _ _ _ hne]
+          getElem!_def, List.getElem?_set_ne (show i.val ≠ j by omega)]
         have := h_prev j h_ji
-        rw [Array.getElem!_Nat_eq] at this
+        rw [Array.getElem!_Nat_eq, getElem!_def] at this
         exact this
     · -- h_zero for next iteration: a[j] = 0 for j ≥ i+1
       subst a_post; intro j hge hlt
       have hne : j ≠ i.val := by omega
       simp only [words7_post, words6_post, words5_post, words4_post,
         words3_post, words2_post, words1_post,
-        Array.getElem!_Nat_eq, Array.set_val_eq, List.set_set]
-      grind only [usr ScalarTac.IScalar.bounds,
-        = List.getElem!_set_ne, =_ Array.getElem!_Nat_eq]
+        Array.getElem!_Nat_eq, Array.set_val_eq, List.set_set,
+        getElem!_def, List.getElem?_set_ne (show i.val ≠ j by omega)]
+      have := h_zero j (by omega) hlt
+      rw [Array.getElem!_Nat_eq, getElem!_def] at this
+      exact this
     · exact words'_post1 words'_post2 words'_post3
 
 /-- Interpret 8 LE U64 words as a natural number. -/
@@ -415,7 +454,7 @@ theorem from_bytes_wide_lo0_spec (words1 : Array U64 8#usize) :
               bind_assoc_eq, bind_tc_ok]
   let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
   let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
-  exact i1_post
+  simpa using i1_post
 
 /-- Merged stage `lo12` (= old `lo1 + lo2`): extract `lo`'s limbs 0 and 1, prepare the
 merged U64 `i11` for limb 2, and obtain the position-2 setter for `lo`. Returns the
@@ -491,7 +530,8 @@ theorem from_bytes_wide_lo12_spec
   let* ⟨ i10, i10_post1, i10_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ i11, i11_post1, i11_post2 ⟩ ← UScalar.or_spec
   let* ⟨ x2, x2_post ⟩ ← Array.index_usize_spec
-  refine ⟨i4_post, ?_, i9_post, ?_, ?_⟩
+  refine ⟨i4_post.trans (List.Inhabited_getElem_eq_getElem! _ _ (by simp)), ?_,
+    i9_post.trans (List.Inhabited_getElem_eq_getElem! _ _ (by simp)), ?_, ?_⟩
   · rw [i6_post1, UScalar.val_or, i3_post1, i5_post1]
   · rw [i11_post1, UScalar.val_or, i8_post1, i10_post1]
   · have h2 : i2 = i1 &&& mask := by
@@ -573,7 +613,8 @@ theorem from_bytes_wide_lo34_spec
   let* ⟨ i20, i20_post1, i20_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ i21, i21_post1, i21_post2 ⟩ ← UScalar.or_spec
   let* ⟨ x2, x2_post ⟩ ← Array.index_usize_spec
-  refine ⟨i14_post, ?_, i19_post, ?_, ?_⟩
+  refine ⟨i14_post.trans (List.Inhabited_getElem_eq_getElem! _ _ (by simp)), ?_,
+    i19_post.trans (List.Inhabited_getElem_eq_getElem! _ _ (by simp)), ?_, ?_⟩
   · rw [i16_post1, UScalar.val_or, i13_post1, i15_post1]
   · rw [i21_post1, UScalar.val_or, i18_post1, i20_post1]
   · have h12 : i12 = i11 &&& mask := by
@@ -624,11 +665,11 @@ theorem from_bytes_wide_hi0_xfer_spec
     (index_mut_back : U64 → Scalar52) :
     from_bytes_wide_hi0_xfer words1 mask i19 i21 index_mut_back
       ⦃ i22 i24 i26 i28 set_back =>
-        i22 = i21 &&& mask ∧
-        i24.val = (i19.val >>> 4) &&& mask.val ∧
-        i26 = words1.val[5]! ∧
-        i28.val = (i19.val >>> 56) ||| ((i26.val <<< 8) % U64.size) ∧
-        set_back = Std.Array.set (index_mut_back i24) 1#usize ⦄ := by
+      i22 = i21 &&& mask ∧
+      i24.val = (i19.val >>> 4) &&& mask.val ∧
+      i26 = words1.val[5]! ∧
+      i28.val = (i19.val >>> 56) ||| ((i26.val <<< 8) % U64.size) ∧
+      set_back = Std.Array.set (index_mut_back i24) 1#usize ⦄ := by
   unfold from_bytes_wide_hi0_xfer
   dsimp only [Insts.CoreOpsIndexIndexMutUsizeU64.index_mut, Array.index_mut_usize,
               bind_assoc_eq, bind_tc_ok]
@@ -643,7 +684,7 @@ theorem from_bytes_wide_hi0_xfer_spec
   refine ⟨?_, ?_, ?_, ?_⟩
   · apply U64.bv_eq_imp_eq; simp [i22_post2]
   · rw [i24_post1, UScalar.val_and, i23_post1]
-  · exact i26_post
+  · simpa using i26_post
   · rw [i28_post1, UScalar.val_or, i25_post1, i27_post1]
 
 /-- Merged stage `hi12` (= old `hi1 + hi2`): extract `hi`'s limbs 1 and 2, prepare the
@@ -719,7 +760,8 @@ theorem from_bytes_wide_hi12_spec
   let* ⟨ i37, i37_post1, i37_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ i38, i38_post1, i38_post2 ⟩ ← UScalar.or_spec
   let* ⟨ x2, x2_post ⟩ ← Array.index_usize_spec
-  refine ⟨i31_post, ?_, i36_post, ?_, ?_⟩
+  refine ⟨i31_post.trans (List.Inhabited_getElem_eq_getElem! _ _ (by simp)), ?_,
+    i36_post.trans (List.Inhabited_getElem_eq_getElem! _ _ (by simp)), ?_, ?_⟩
   · rw [i33_post1, UScalar.val_or, i30_post1, i32_post1]
   · rw [i38_post1, UScalar.val_or, i35_post1, i37_post1]
   · have h29 : i29 = i28 &&& mask := by
@@ -764,7 +806,6 @@ theorem from_bytes_wide_hi3_spec
   let* ⟨ i39, i39_post1, i39_post2 ⟩ ← UScalar.and_spec
   let* ⟨ i40, i40_post ⟩ ← IScalar.hcast.step_spec
   let* ⟨ ⟩ ← massert_spec
-  · rw [i40_post]; decide
   let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
   have h39 : i39 = i38 &&& mask := by
     apply U64.bv_eq_imp_eq
@@ -818,19 +859,24 @@ theorem from_bytes_wide_spec
   · intro j h hj;
     simp only [Array.getElem!_Nat_eq, Array.repeat_val, UScalar.ofNatCore_val_eq,
       List.reduceReplicate]
-    agrind
+    interval_cases j <;> rfl
   let* ⟨ i, i_post1, i_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ mask, mask_post1, mask_post2 ⟩ ← U64.sub_spec
   -- Step through each merged stage (6 stages total)
-  step as ⟨ i1, index_mut_back, i1_post, set0_eq ⟩
-  step as ⟨ i4, i6, i9, i11, index_mut_back2,
-            i4_post, i6_post, i9_post, i11_post, set12_eq ⟩
-  step as ⟨ i14, i16, i19, i21, index_mut_back4,
-            i14_post, i16_post, i19_post, i21_post, set34_eq ⟩
-  step as ⟨ i22, i24, i26, i28, index_mut_back5, i22_eq, i24_val, i26_post, i28_post ⟩
-  step as ⟨ i31, i33, i36, i38, index_mut_back7,
-            i31_post, i33_post, i36_post, i38_post, set67_eq ⟩
-  step as ⟨ i39, index_mut_back8, i39_eq, set8_eq ⟩
+  step as ⟨ r0, i1_post, set0_eq ⟩
+  obtain ⟨ i1, index_mut_back ⟩ := r0
+  step as ⟨ r12, i4_post, i6_post, i9_post, i11_post, set12_eq ⟩
+  obtain ⟨ i4, i6, i9, i11, index_mut_back2 ⟩ := r12
+  step as ⟨ r34, i14_post, i16_post, i19_post, i21_post, set34_eq ⟩
+  obtain ⟨ i14, i16, i19, i21, index_mut_back4 ⟩ := r34
+  step as ⟨ r5, i22_eq, i24_val, i26_post, i28_post ⟩
+  obtain ⟨ i22, i24, i26, i28, index_mut_back5 ⟩ := r5
+  step as ⟨ r67, i31_post, i33_post, i36_post, i38_post, set67_eq ⟩
+  obtain ⟨ i31, i33, i36, i38, index_mut_back7 ⟩ := r67
+  step as ⟨ r8, i39_eq, set8_eq ⟩
+  obtain ⟨ i39, index_mut_back8 ⟩ := r8
+  -- Reduce projections left by the value-tuple `obtain`s (aeneas#963 step-as uncurrying).
+  dsimp only at *
   -- Top limb of hi: i41 = i36 >>> 20
   let* ⟨ i41, i41_post1, i41_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   -- Setup: mask value + handy facts

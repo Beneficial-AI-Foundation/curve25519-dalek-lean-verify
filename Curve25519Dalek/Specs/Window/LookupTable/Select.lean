@@ -7,7 +7,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Edwards.Curve
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Curve25519Dalek.Specs.Window.LookupTable.From
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.ConditionalAssign
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Identity
@@ -167,9 +167,9 @@ theorem select_loop_spec {P : EdwardsPoint}
       rw [List.getElem!_eq_getElem?_getD, List.getElem?_eq_getElem hlen, Option.getD_some]
       agrind only [= Fin.getElem_fin]
     have ht1_valid : t1.IsValid := by
-      rw [t1_post, ht1_bridge]; exact h_table_valid ⟨i2.val, hi2_lt8⟩
+      rw [t1_post]; exact h_table_valid ⟨i2.val, hi2_lt8⟩
     have ht1_point : t1.toPoint = ((i2.val + 1 : ℕ) : ℤ) • P.toPoint := by
-      rw [t1_post, ht1_bridge]; exact h_table_point ⟨i2.val, hi2_lt8⟩
+      rw [t1_post]; exact h_table_point ⟨i2.val, hi2_lt8⟩
     -- Step 6: t2 ← conditional_assign t t1 c (our point-level wrapper)
     let* ⟨ t2, t2_valid, t2_point ⟩ ←
       ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign_point
@@ -257,8 +257,6 @@ theorem select_spec {P : EdwardsPoint}
   let* ⟨ hx ⟩ ← massert_spec
   let* ⟨ i, i_post ⟩ ← IScalar.cast.step_spec
   let* ⟨ _ ⟩ ← massert_spec
-  · simp only [i_post, IScalar.le_equiv, IScalarTy.I8_numBits_eq, IScalarTy.I16_numBits_eq,
-      Nat.reduceLeDiff, IScalar.val_mod_pow_greater_numBits]; agrind
   let* ⟨ i1, i1_post ⟩ ← IScalar.cast.step_spec
   -- Bridge: casting I8 → I16 preserves val.
   have hi1_val : i1.val = x.val := by
@@ -280,7 +278,7 @@ theorem select_spec {P : EdwardsPoint}
   have hi3_val : i3.val = x.val + xmask.val := by rw [i3_post, hi2_val]
   have hxabs_val : xabs.val = x.val.natAbs := by
     have hxabs_bv_toInt : xabs.val = (i3.bv ^^^ xmask.bv).toInt := by
-      change xabs.bv.toInt = _; fcongr 1; exact xabs_post2
+      change xabs.bv.toInt = _; fcongr 1
     rw [hxabs_bv_toInt]
     rcases xmask_post2 with hm | hm
     · -- xmask.val = -1, so x.val < 0, and xmask.bv = allOnes 16.

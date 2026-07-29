@@ -233,7 +233,7 @@ theorem differential_add_and_double_spec
       set W := Field51_as_Nat P.W with HW
       have : Field51_as_Nat fe = (Curve25519.A + 2) / 4 := by
         rw [fe_post1]
-        decide
+        decide +kernel
       rw [this]
       have : (4 : CurveField) ≠ 0 := by decide
       have : (U + W) ^ 2 - (U - W) ^ 2 = (4 * U * W : CurveField) := by ring_nf
@@ -337,7 +337,7 @@ theorem differential_add_and_double_spec
         field_simp
         have : Field51_as_Nat fe = (Curve25519.A + 2) / 4 := by
           rw [fe_post1]
-          decide
+          decide +kernel
         rw [this]
         clear *- DBL
         set U := Field51_as_Nat P.U with HU
@@ -413,10 +413,18 @@ theorem differential_add_and_double_spec
     have ADD_neq_0 : P_a + Q_a ≠ 0 := by grind
     constructor
     · constructor
-      · simp_lists
-        grind
-      · simp_lists
-        grind
+      · simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow]
+        clear *- t14_post2
+        intro i hi
+        have := t14_post2 i hi
+        apply lt_trans this
+        simp only [Nat.reducePow, Nat.reduceLT]
+      · simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow]
+        clear *- t16_post2
+        intro i hi
+        have := t16_post2 i hi
+        apply lt_trans this
+        simp only [Nat.reducePow, Nat.reduceLT]
       · simp only [ne_eq]
         unfold FieldElement51.toField
         apply non_t16
@@ -452,7 +460,7 @@ theorem differential_add_and_double_spec
           simp only [← this]
           ring_nf
       · constructor
-        · exact DBL_ADD_E
+        · exact fun Pa Qa h1 h2 h3 => DBL_ADD_E Pa Qa ⟨h1, h2, h3⟩
         · use P_a
           use Q_a
           simp only [get_u_P, get_u_Q, heq_pmq, and_true]

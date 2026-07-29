@@ -59,9 +59,9 @@ private lemma Array_PNP_8_update_spec (arr : Array ProjectiveNielsPoint 8#usize)
   constructor
   · intro k hk
     simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-    exact List.getElem!_set_ne arr.val j.val k v (Or.inl (Ne.symm hk))
+    simp [hk]
   · simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-    exact List.getElem!_set arr.val j.val v (by scalar_tac)
+    rw [List.getElem!_eq_getElem?_getD, List.getElem?_set_self (by simpa using hbound)]; rfl
 
 /-- Loop spec for `from_loop`: given a `points` array whose prefix `[0, iter.start.val]`
 (i.e. `iter.start.val + 1` entries) already holds `[P, 2P, ..., (iter.start.val + 1)P]` as
@@ -127,10 +127,10 @@ theorem from_loop_spec
       change j.val < _; omega
     -- pnp.IsValid and pnp.toPoint = (j+1)•P from the prefix invariant.
     have hpnp_valid : pnp.IsValid := by
-      rw [pnp_post, hpnp_bridge]
+      rw [pnp_post]
       exact h_prefix_valid ⟨j.val, hj_lt8⟩ hjFin
     have hpnp_point : pnp.toPoint = (j.val + 1) • P.toPoint := by
-      rw [pnp_post, hpnp_bridge]
+      rw [pnp_post]
       exact h_prefix_point ⟨j.val, hj_lt8⟩ hjFin
     let* ⟨ cp, cp_post1, cp_post2 ⟩ ←
       Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add_spec

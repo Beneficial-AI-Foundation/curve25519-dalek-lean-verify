@@ -187,6 +187,7 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
   let* ⟨ y16, y16_post1, y16_post2, y16_post3 ⟩ ← square_multiply_spec
   let* ⟨ y17, y17_post1, y17_post2, y17_post3 ⟩ ← square_multiply_spec
   let* ⟨ i8, i8_post ⟩ ← Usize.add_spec
+  case hmax => scalar_tac
   let* ⟨ y18, y18_post1, y18_post2, y18_post3 ⟩ ← square_multiply_spec
   let* ⟨ y19, y19_post1, y19_post2, y19_post3 ⟩ ← square_multiply_spec
   let* ⟨ y20, y20_post1, y20_post2, y20_post3 ⟩ ← square_multiply_spec
@@ -197,6 +198,7 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
   let* ⟨ y25, y25_post1, y25_post2, y25_post3 ⟩ ← square_multiply_spec
   let* ⟨ y26, y26_post2, y26_post3, y26_post1 ⟩ ← square_multiply_spec
   let* ⟨ i9, i9_post ⟩ ← Usize.add_spec
+  case hmax => scalar_tac
   let* ⟨ u', u'_post1, u'_post2, u'_post3 ⟩ ← square_multiply_spec
   refine ⟨ ?_, u'_post2, u'_post3  ⟩
   generalize h_uZ : (Scalar52_as_Nat u : ZMod L) = uZ

@@ -344,7 +344,8 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
         have h_val := congrArg ZMod.val h_zmod
         rw [ZMod.val_natCast, ZMod.val_one'' (by decide : p ≠ 1)] at h_val
         exact h_val
-      have h_post := (__post4 ⟨h_ne_nat, h_qr⟩).2
+      obtain ⟨z, hz⟩ := h_qr
+      have h_post := (__post4 h_ne_nat z hz).2
       -- Lift Nat % p equation to ZMod
       have hmm : ∀ a, (a % p) ≡ a [MOD p] := fun a => by
         exact Nat.mod_eq_of_lt (Nat.mod_lt a (by decide))
@@ -360,9 +361,9 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
       have h_rm_sq := lift_rm_sq ristretto_magic ristretto_magic_post1
       -- Affine ↔ projective bridge for P
       have hpx' : P.x = self.X.toField / self.Z.toField := by
-        simpa only [hP_def] using hpx
+        simpa only [hP_def, RistrettoPoint.toPoint] using hpx
       have hpy' : P.y = self.Y.toField / self.Z.toField := by
-        simpa only [hP_def] using hpy
+        simpa only [hP_def, RistrettoPoint.toPoint] using hpy
       -- Key link: compress_u1 P * compress_u2 P² = u1_u2_sq / Z⁶
       have h_aff : compress_u1 P * compress_u2 P ^ 2 =
           u1_u2_sq.toField / self.Z.toField ^ 6 := by
@@ -553,7 +554,6 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
   refine ⟨?goal1, ?goal2⟩
   case goal2 =>
     -- Main Goal 2: compress_pure self.toPoint = U8x32_as_Nat a
-    change compress_pure self.toPoint = U8x32_as_Nat a
     simpa only [compress_pure] using ((congrArg ZMod.val h_key).symm.trans h_a_eq.symm)
   case goal1 =>
     -- Main Goal 1: CompressedRistretto.IsValid

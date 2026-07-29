@@ -5,7 +5,7 @@ Authors: Markus Dablander, Hoang Le Truong, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::mul`
 
@@ -22,8 +22,6 @@ The function is decomposed into 3 helper functions, each with a fold theorem and
 Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
-set_option linter.hashCommand false
-#setup_aeneas_simps
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field
@@ -522,28 +520,62 @@ theorem mul_product_stage_spec (self _rhs : Array U64 5#usize)
   simp only [step_simps]
   -- Index rhs limbs
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
+  have b_i : (↑i:ℕ) < 2^54 := by
+    have := hrhs 1 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 1 (by scalar_tac)] at this; rwa [i_post]
   let* ⟨ b1_19, b1_19_post ⟩ ← U64.mul_spec
+  have b_b1 : (↑b1_19:ℕ) < 2^59 := by rw [b1_19_post]; omega
   let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
+  have b_i1 : (↑i1:ℕ) < 2^54 := by
+    have := hrhs 2 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 2 (by scalar_tac)] at this; rwa [i1_post]
   let* ⟨ b2_19, b2_19_post ⟩ ← U64.mul_spec
+  have b_b2 : (↑b2_19:ℕ) < 2^59 := by rw [b2_19_post]; omega
   let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
+  have b_i2 : (↑i2:ℕ) < 2^54 := by
+    have := hrhs 3 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 3 (by scalar_tac)] at this; rwa [i2_post]
   let* ⟨ b3_19, b3_19_post ⟩ ← U64.mul_spec
+  have b_b3 : (↑b3_19:ℕ) < 2^59 := by rw [b3_19_post]; omega
   let* ⟨ i3, i3_post ⟩ ← Array.index_usize_spec
+  have b_i3 : (↑i3:ℕ) < 2^54 := by
+    have := hrhs 4 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 4 (by scalar_tac)] at this; rwa [i3_post]
   let* ⟨ b4_19, b4_19_post ⟩ ← U64.mul_spec
+  have b_b4 : (↑b4_19:ℕ) < 2^59 := by rw [b4_19_post]; omega
   -- Index self limbs
   let* ⟨ i4, i4_post ⟩ ← Array.index_usize_spec
+  have b_i4 : (↑i4:ℕ) < 2^54 := by
+    have := hlhs 0 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac)] at this; rwa [i4_post]
   let* ⟨ i5, i5_post ⟩ ← Array.index_usize_spec
+  have b_i5 : (↑i5:ℕ) < 2^54 := by
+    have := hrhs 0 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac)] at this; rwa [i5_post]
   -- c0 products
   let* ⟨ i6, i6_post ⟩ ← m_spec
   let* ⟨ i7, i7_post ⟩ ← Array.index_usize_spec
+  have b_i7 : (↑i7:ℕ) < 2^54 := by
+    have := hlhs 4 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 4 (by scalar_tac)] at this; rwa [i7_post]
   let* ⟨ i8, i8_post ⟩ ← m_spec
   let* ⟨ i9, i9_post ⟩ ← U128.add_spec
   let* ⟨ i10, i10_post ⟩ ← Array.index_usize_spec
+  have b_i10 : (↑i10:ℕ) < 2^54 := by
+    have := hlhs 3 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 3 (by scalar_tac)] at this; rwa [i10_post]
   let* ⟨ i11, i11_post ⟩ ← m_spec
   let* ⟨ i12, i12_post ⟩ ← U128.add_spec
   let* ⟨ i13, i13_post ⟩ ← Array.index_usize_spec
+  have b_i13 : (↑i13:ℕ) < 2^54 := by
+    have := hlhs 2 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 2 (by scalar_tac)] at this; rwa [i13_post]
   let* ⟨ i14, i14_post ⟩ ← m_spec
   let* ⟨ i15, i15_post ⟩ ← U128.add_spec
   let* ⟨ i16, i16_post ⟩ ← Array.index_usize_spec
+  have b_i16 : (↑i16:ℕ) < 2^54 := by
+    have := hlhs 1 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 1 (by scalar_tac)] at this; rwa [i16_post]
   let* ⟨ i17, i17_post ⟩ ← m_spec
   let* ⟨ c0, c0_post ⟩ ← U128.add_spec
   -- c1 products
@@ -797,6 +829,10 @@ theorem mul_final_reduce_stage_spec (a' : Array U64 5#usize) (carry i54 : U64)
   let* ⟨ i74, i74_post ⟩ ← U64.mul_spec
   let* ⟨ i75, i75_post ⟩ ← Array.index_usize_spec
   let* ⟨ i76, i76_post ⟩ ← U64.add_spec
+  case hmax =>
+    have := ha' 0 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac)] at this
+    rw [i75_post]; scalar_tac
   let* ⟨ out6, out6_post ⟩ ← Array.update_spec
   let* ⟨ i77, i77_post ⟩ ← Array.index_usize_spec
   let* ⟨ i78, i78_post1, i78_post2 ⟩ ← U64.ShiftRight_IScalar_spec
@@ -805,7 +841,9 @@ theorem mul_final_reduce_stage_spec (a' : Array U64 5#usize) (carry i54 : U64)
   have h_i76 : i76.val = a'[0]!.val + 19 * carry.val := by
     simp only [i76_post, h_i75, i74_post]; omega
   have h_i77 : i77.val = a'[0]!.val + 19 * carry.val := by
-    simp [*]; omega
+    have hb : i77.val = out6[0]!.val := by
+      rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac), i77_post]
+    rw [hb, out6_post, Array.set_of_eq _ _ 0 (by agrind)]; exact h_i76
   have h_i78 : i78.val = (a'[0]!.val + 19 * carry.val) / 2 ^ 51 := by
     simp only [i78_post1, Nat.shiftRight_eq_div_pow, h_i77]
   have h_i79 : i79.val = a'[1]!.val := by simp [*]
@@ -865,8 +903,10 @@ theorem mul_spec (self _rhs : Array U64 5#usize) (hself : ∀ i < 5, self[i]!.va
   unfold mul
   -- Fold all three stages
   simp_rw [fold_mul_product_stage, fold_mul_carry_prop_stage, fold_mul_final_reduce_stage]
-  step as ⟨ c0, c1, c2, c3, c4, prod_post ⟩
-  step as ⟨ cp, carry, mask, cp_post ⟩
+  step as ⟨ ct, prod_post ⟩
+  obtain ⟨ c0, c1, c2, c3, c4 ⟩ := ct
+  step as ⟨ cpt, cp_post ⟩
+  obtain ⟨ cp, carry, mask ⟩ := cpt
   step as ⟨ red, red_post1, red_post2, red_post3, red_post4, red_post5, red_post6 ⟩
   -- Product identity mod p
   have a_mul : (c0.val + 2 ^ 51 * c1.val + 2 ^ 102 * c2.val +

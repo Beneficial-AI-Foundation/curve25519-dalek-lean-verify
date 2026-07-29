@@ -5,7 +5,7 @@ Authors: Markus Dablander, Hoang Le Truong, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 
 /-! # Spec theorem for `curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k`
 
@@ -102,8 +102,6 @@ Then `step*` applies the `@[step]` specs automatically.
 Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
-set_option linter.hashCommand false
-#setup_aeneas_simps
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
@@ -465,14 +463,39 @@ theorem square_stage_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2
   simp only [step_simps]
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ a3_19, a3_19_post ⟩ ← U64.mul_spec
+  case hmax =>
+    have := ha 3 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 3 (by scalar_tac)] at this
+    rw [i_post]; scalar_tac
   let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
   let* ⟨ a4_19, a4_19_post ⟩ ← U64.mul_spec
+  case hmax =>
+    have := ha 4 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 4 (by scalar_tac)] at this
+    rw [i1_post]; scalar_tac
   let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
   let* ⟨ i3, i3_post ⟩ ← m_spec
   let* ⟨ i4, i4_post ⟩ ← Array.index_usize_spec
   let* ⟨ i5, i5_post ⟩ ← m_spec
   let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
   let* ⟨ i7, i7_post ⟩ ← m_spec
+  have b_i : (↑i:ℕ) < 2^54 := by
+    have := ha 3 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 3 (by scalar_tac)] at this; rwa [i_post]
+  have b_i1 : (↑i1:ℕ) < 2^54 := by
+    have := ha 4 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 4 (by scalar_tac)] at this; rwa [i1_post]
+  have b_i2 : (↑i2:ℕ) < 2^54 := by
+    have := ha 0 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac)] at this; rwa [i2_post]
+  have b_i4 : (↑i4:ℕ) < 2^54 := by
+    have := ha 1 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 1 (by scalar_tac)] at this; rwa [i4_post]
+  have b_i6 : (↑i6:ℕ) < 2^54 := by
+    have := ha 2 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 2 (by scalar_tac)] at this; rwa [i6_post]
+  have b_a3 : (↑a3_19:ℕ) < 2^59 := by rw [a3_19_post]; omega
+  have b_a4 : (↑a4_19:ℕ) < 2^59 := by rw [a4_19_post]; omega
   let* ⟨ i8, i8_post ⟩ ← U128.add_spec
   let* ⟨ i9, i9_post ⟩ ← U128.mul_spec
   let* ⟨ c0, c0_post ⟩ ← U128.add_spec
@@ -695,6 +718,10 @@ theorem final_reduce_stage_spec (a' : Array U64 5#usize) (carry i34 : U64)
   let* ⟨ i54, i54_post ⟩ ← U64.mul_spec
   let* ⟨ i55, i55_post ⟩ ← Array.index_usize_spec
   let* ⟨ i56, i56_post ⟩ ← U64.add_spec
+  case hmax =>
+    have := ha' 0 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac)] at this
+    rw [i55_post]; scalar_tac
   let* ⟨ a6, a6_post ⟩ ← Array.update_spec
   let* ⟨ i57, i57_post ⟩ ← Array.index_usize_spec
   let* ⟨ i58, i58_post1, i58_post2 ⟩ ← U64.ShiftRight_IScalar_spec
@@ -704,7 +731,9 @@ theorem final_reduce_stage_spec (a' : Array U64 5#usize) (carry i34 : U64)
   have h_i56 : i56.val = a'[0]!.val + 19 * carry.val := by
     simp only [i56_post, h_i55, i54_post]; omega
   have h_i57 : i57.val = a'[0]!.val + 19 * carry.val := by
-    simp [*]; omega
+    have hb : i57.val = a6[0]!.val := by
+      rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac), i57_post]
+    rw [hb, a6_post, Array.set_of_eq _ _ 0 (by agrind)]; exact h_i56
   have h_i58 : i58.val = (a'[0]!.val + 19 * carry.val) / 2 ^ 51 := by
     simp only [i58_post1, Nat.shiftRight_eq_div_pow, h_i57]
   have h_i59 : i59.val = a'[1]!.val := by
@@ -776,8 +805,10 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     -- aeneas#963: postcondition elaborator now uncurries pair patterns, so
     -- `step as` binds each tuple component as a separate hypothesis (the
     -- conjunction becomes the final binder).
-    step as ⟨ sq0, sq1, sq2, sq3, sq4, sq_post ⟩
-    step as ⟨ cp, cp_carry, cp_mask, cp_post ⟩
+    step as ⟨ sqt, sq_post ⟩
+    obtain ⟨ sq0, sq1, sq2, sq3, sq4 ⟩ := sqt
+    step as ⟨ cpt, cp_post ⟩
+    obtain ⟨ cp, cp_carry, cp_mask ⟩ := cpt
     step as ⟨ red, red_post1, red_post2, red_post3, red_post4, red_post5, red_post6 ⟩
     · intro i hi; obtain ⟨h0, h1, h2, h3, h4, _⟩ := cp_post
       interval_cases i <;> exact lt_of_eq_mod _ _ ‹_›

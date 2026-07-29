@@ -44,24 +44,64 @@ theorem sub_spec (a b : Array U64 5#usize)
   unfold sub
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ i1, i1_post ⟩ ← U64.add_spec
+  case hmax =>
+    have h := ha 0 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac)] at h
+    rw [i_post]; scalar_tac
   let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
   let* ⟨ i3, i3_post_1, i3_post_2 ⟩ ← U64.sub_spec
+  case h =>
+    have h := hb 0 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 0 (by scalar_tac)] at h
+    rw [i2_post]; scalar_tac
   let* ⟨ i4, i4_post ⟩ ← Array.index_usize_spec
   let* ⟨ i5, i5_post ⟩ ← U64.add_spec
+  case hmax =>
+    have h := ha 1 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 1 (by scalar_tac)] at h
+    rw [i4_post]; scalar_tac
   let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
   let* ⟨ i7, i7_post_1, i7_post_2 ⟩ ← U64.sub_spec
+  case h =>
+    have h := hb 1 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 1 (by scalar_tac)] at h
+    rw [i6_post]; scalar_tac
   let* ⟨ i8, i8_post ⟩ ← Array.index_usize_spec
   let* ⟨ i9, i9_post ⟩ ← U64.add_spec
+  case hmax =>
+    have h := ha 2 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 2 (by scalar_tac)] at h
+    rw [i8_post]; scalar_tac
   let* ⟨ i10, i10_post ⟩ ← Array.index_usize_spec
   let* ⟨ i11, i11_post_1, i11_post_2 ⟩ ← U64.sub_spec
+  case h =>
+    have h := hb 2 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 2 (by scalar_tac)] at h
+    rw [i10_post]; scalar_tac
   let* ⟨ i12, i12_post ⟩ ← Array.index_usize_spec
   let* ⟨ i13, i13_post ⟩ ← U64.add_spec
+  case hmax =>
+    have h := ha 3 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 3 (by scalar_tac)] at h
+    rw [i12_post]; scalar_tac
   let* ⟨ i14, i14_post ⟩ ← Array.index_usize_spec
   let* ⟨ i15, i15_post_1, i15_post_2 ⟩ ← U64.sub_spec
+  case h =>
+    have h := hb 3 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 3 (by scalar_tac)] at h
+    rw [i14_post]; scalar_tac
   let* ⟨ i16, i16_post ⟩ ← Array.index_usize_spec
   let* ⟨ i17, i17_post ⟩ ← U64.add_spec
+  case hmax =>
+    have h := ha 4 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 4 (by scalar_tac)] at h
+    rw [i16_post]; scalar_tac
   let* ⟨ i18, i18_post ⟩ ← Array.index_usize_spec
   let* ⟨ i19, i19_post_1, i19_post_2 ⟩ ← U64.sub_spec
+  case h =>
+    have h := hb 4 (by omega)
+    rw [Array.getElem!_Nat_eq, getElem!_pos _ 4 (by scalar_tac)] at h
+    rw [i18_post]; scalar_tac
   let* ⟨ res, res_post_1, res_post_2 ⟩ ← reduce_spec
   refine ⟨by assumption, ?_⟩
   -- modular arithmetic property
@@ -80,11 +120,21 @@ theorem sub_spec (a b : Array U64 5#usize)
              show ([i3, i7, i11, i15, i19] : List U64)[2]! = i11 from rfl,
              show ([i3, i7, i11, i15, i19] : List U64)[3]! = i15 from rfl,
              show ([i3, i7, i11, i15, i19] : List U64)[4]! = i19 from rfl]
-  have h0 : i3.val + b[0]!.val = a[0]!.val + 36028797018963664 := by grind
-  have h1 : i7.val + b[1]!.val = a[1]!.val + 36028797018963952 := by grind
-  have h2 : i11.val + b[2]!.val = a[2]!.val + 36028797018963952 := by grind
-  have h3 : i15.val + b[3]!.val = a[3]!.val + 36028797018963952 := by grind
-  have h4 : i19.val + b[4]!.val = a[4]!.val + 36028797018963952 := by grind
+  have h0 : i3.val + b[0]!.val = a[0]!.val + 36028797018963664 := by
+    rw [Array.getElem!_Nat_eq a 0, Array.getElem!_Nat_eq b 0, getElem!_pos _ 0 (by scalar_tac),
+      getElem!_pos _ 0 (by scalar_tac)]; grind
+  have h1 : i7.val + b[1]!.val = a[1]!.val + 36028797018963952 := by
+    rw [Array.getElem!_Nat_eq a 1, Array.getElem!_Nat_eq b 1, getElem!_pos _ 1 (by scalar_tac),
+      getElem!_pos _ 1 (by scalar_tac)]; grind
+  have h2 : i11.val + b[2]!.val = a[2]!.val + 36028797018963952 := by
+    rw [Array.getElem!_Nat_eq a 2, Array.getElem!_Nat_eq b 2, getElem!_pos _ 2 (by scalar_tac),
+      getElem!_pos _ 2 (by scalar_tac)]; grind
+  have h3 : i15.val + b[3]!.val = a[3]!.val + 36028797018963952 := by
+    rw [Array.getElem!_Nat_eq a 3, Array.getElem!_Nat_eq b 3, getElem!_pos _ 3 (by scalar_tac),
+      getElem!_pos _ 3 (by scalar_tac)]; grind
+  have h4 : i19.val + b[4]!.val = a[4]!.val + 36028797018963952 := by
+    rw [Array.getElem!_Nat_eq a 4, Array.getElem!_Nat_eq b 4, getElem!_pos _ 4 (by scalar_tac),
+      getElem!_pos _ 4 (by scalar_tac)]; grind
   -- Normalize Array.getElem! to List.getElem! in hypotheses to match goal
   simp only [Array.getElem!_Nat_eq] at h0 h1 h2 h3 h4
   rw [h0, h1, h2, h3, h4]

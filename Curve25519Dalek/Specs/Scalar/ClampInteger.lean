@@ -5,7 +5,7 @@ Authors: Oliver Butterley
 -/
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Aux
+import Curve25519Dalek.Auxiliary
 import Mathlib.Tactic.IntervalCases
 import Mathlib.Tactic.GCongr
 import Mathlib.Algebra.BigOperators.Ring.Finset
@@ -61,7 +61,7 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
     rw [Finset.sum_range_succ]
     simp only [Nat.reduceMul, List.length_set, List.Vector.length_val, UScalar.ofNatCore_val_eq,
       Nat.lt_add_one, getElem?_pos, List.getElem_set_self, Option.getD_some, Array.set_val_eq,
-      getElem!_pos, UScalar.val_or, ne_eq, OfNat.zero_ne_ofNat, not_false_eq_true,
+      UScalar.val_or, ne_eq, OfNat.zero_ne_ofNat, not_false_eq_true,
       List.getElem_set_ne, UScalar.val_and, i5_post1, i3_post1]
     have : (bytes : List U8)[31].val &&& 127 ||| 64 ≤ 127 := by
       have h : ((bytes : List U8)[31].bv &&& 127 ||| 64) ≤ 127 := by bv_decide
