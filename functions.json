@@ -6423,7 +6423,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem pow22501_spec (self : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (self[i]!).val < 2 ^ 54) :\n    pow22501 self ⦃ (result : backend.serial.u64.field.FieldElement51 ×\n        backend.serial.u64.field.FieldElement51) =>\n      let r1 := result.1\n      let r2 := result.2\n      Field51_as_Nat r1 % p = (Field51_as_Nat self ^ (2 ^ 250 - 1)) % p ∧\n      Field51_as_Nat r2 % p = (Field51_as_Nat self ^ 11) % p ∧\n      (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧\n      (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄ := by ...",
+   "theorem pow22501_spec (self : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (self[i]!).val < 2 ^ 54) :\n    pow22501 self ⦃ (result : backend.serial.u64.field.FieldElement51 ×\n        backend.serial.u64.field.FieldElement51) =>\n      let r1 := result.1\n      let r2 := result.2\n      Field51_as_Nat r1 % p = (Field51_as_Nat self ^ pow22501_exp) % p ∧\n      Field51_as_Nat r2 % p = (Field51_as_Nat self ^ 11) % p ∧\n      (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧\n      (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/Pow22501.lean",
    "spec_docstring":
    "/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::pow22501`**\n• No panic (always returns (r1, r2) successfully)\n• Field51_as_Nat(r1) ≡ Field51_as_Nat(self)^(2^250-1) (mod p)\n• Field51_as_Nat(r2) ≡ Field51_as_Nat(self)^11 (mod p)\n• Each limb of r1 is bounded by 2^52\n• Each limb of r2 is bounded by 2^52\n-/",
