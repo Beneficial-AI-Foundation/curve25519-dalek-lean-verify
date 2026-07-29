@@ -879,12 +879,7 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
     -- IsSquare for compression argument
     have h_u1_sq : IsSquare (compress_u1 P) := by
       have : compress_u1 P = 1 - P.y ^ 2 := by unfold compress_u1; ring
-      -- TODO(mathlib-v4.31.0): `simpa only [this] using heven` no longer closes —
-      -- `heven : IsEven P` used to convert definitionally/by-simp to `IsSquare (1 - P.y^2)`,
-      -- but that bridge broke under v4.31.0. Needs the explicit IsEven ↔ IsSquare lemma.
-      -- Temporarily `sorry`
-      -- simpa only [this] using heven
-      sorry
+      rw [this]; exact heven
     have h_arg_sq : IsSquare (compress_u1 P * compress_u2 P ^ 2) :=
       h_u1_sq.mul ⟨compress_u2 P, (sq _)⟩
     -- Compression invsqrt: I² * (u1 * u2²) = 1
