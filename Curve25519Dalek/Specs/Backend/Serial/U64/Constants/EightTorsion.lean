@@ -57,19 +57,10 @@ theorem EIGHT_TORSION_spec :
     · simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ, List.getElem_cons_zero, *]
       decide +kernel
   · -- ∀ i, result.val[i].toPoint = (i : ℕ) • P.toPoint
-    -- TODO(aeneas-v4.31.0): broken by the toolchain bump. The original `exact h.symm`
-    -- relied on a definitional equality (extracted record `.toPoint` ≡ `eightTorsionPoints i`)
-    -- that no longer holds under v4.31.0 reducibility. `convert h.symm using 2 <;> decide +kernel`
-    -- splits it into the right point-equalities, but the residual
-    -- `record.toPoint = eightTorsionPoints ⟨k,_⟩` is rejected by `decide` as "containing free
-    -- variables" (a fin_cases proof-term artifact) even after cleaning the index. Needs a manual
-    -- bridge (see report). Temporarily `sorry`.
-    -- intro i
-    -- have h := _root_.Edwards.nsmul_eightTorsionGen_eq ⟨i, by omega⟩
-    -- fin_cases i
-    -- all_goals
-    -- · simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ, List.getElem_cons_zero, *]
-    --   exact h.symm
-    sorry
+    intro i
+    fin_cases i <;>
+      simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ,
+        List.getElem_cons_zero, *] <;>
+      exact eightTorsion_eq_nsmul _ _ ⟨_, by decide⟩ (by decide +kernel) (by decide +kernel)
 
 end curve25519_dalek.backend.serial.u64.constants
