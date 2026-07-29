@@ -603,8 +603,8 @@ theorem neg_fromEdwards (e : Edwards.Point Edwards.Ed25519) :
     simp only [↓reduceDIte, neg_eq_zero, mul_neg]
     by_cases hx : e.x = 0
     · simp only [hx, ↓reduceDIte, T_point, MontgomeryCurveCurve25519]
-      change WeierstrassCurve.Affine.Point.some 0 0 T_point._proof_1
-        = -WeierstrassCurve.Affine.Point.some 0 0 T_point._proof_1
+      change WeierstrassCurve.Affine.Point.some 0 0 _
+        = -WeierstrassCurve.Affine.Point.some 0 0 _
       rw [WeierstrassCurve.Affine.Point.neg_some]
       congr 1
     · simp only [hx, ↓reduceDIte, MontgomeryCurveCurve25519]
