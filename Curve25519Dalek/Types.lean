@@ -105,7 +105,7 @@ structure subtle.ConditionallySelectable (Self : Type) where
   conditional_swap : Self → Self → subtle.Choice → Result (Self × Self)
 
 /-- Trait declaration: [zeroize::Zeroize]
-    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 272:0-272:17
+    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.9.0/src/lib.rs', lines 245:0-245:17
     Name pattern: [zeroize::Zeroize]
     Visibility: public -/
 @[rust_trait "zeroize::Zeroize"]
@@ -113,7 +113,7 @@ structure zeroize.Zeroize (Self : Type) where
   zeroize : Self → Result Self
 
 /-- Trait declaration: [zeroize::DefaultIsZeroes]
-    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 282:0-282:49
+    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.9.0/src/lib.rs', lines 255:0-255:49
     Name pattern: [zeroize::DefaultIsZeroes]
     Visibility: public -/
 @[rust_trait "zeroize::DefaultIsZeroes"
