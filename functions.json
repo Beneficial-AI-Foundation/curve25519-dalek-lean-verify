@@ -2663,7 +2663,7 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"visibility": "public",
-   "verified": false,
+   "verified": true,
    "specified": true,
    "spec_statement":
    "theorem EIGHT_TORSION_spec :\n    EIGHT_TORSION ⦃ (result : Array edwards.EdwardsPoint 8#usize) =>\n      let P := result.val[1]\n      P.IsValid ∧ 4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0 ∧\n      (∀ (i : Fin 8), result.val[i].IsValid) ∧\n      (∀ (i : Fin 8), result.val[i].toPoint = (i : ℕ) • P.toPoint) ⦄ := by ...",
