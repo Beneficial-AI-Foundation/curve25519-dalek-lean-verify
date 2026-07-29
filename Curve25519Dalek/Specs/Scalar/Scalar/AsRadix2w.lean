@@ -1064,7 +1064,7 @@ private lemma final_carry_is_zero (w K N : ℕ)
       subst hK; interval_cases w <;> simp_all
     have h1 : (2 : ℤ) ^ (w * K) ≥ (2 : ℤ) ^ 258 := by
       have := Nat.pow_le_pow_right (by norm_num : 1 ≤ 2) hwK
-      exact_mod_cast this
+      set_option exponentiation.threshold 512 in exact_mod_cast this
     rw [pow_mul] at h1
     have h2 : (2 : ℤ) ^ 258 = 4 * (2 : ℤ) ^ 256 := by grind
     grind
