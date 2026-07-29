@@ -80,7 +80,7 @@ theorem load8_at_val_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ inpu
     getElem!_pos _ _ (by scalar_tac), getElem!_pos _ _ (by scalar_tac),
     getElem!_pos _ _ (by scalar_tac), getElem!_pos _ _ (by scalar_tac),
     getElem!_pos _ _ (by scalar_tac), getElem!_pos _ _ (by scalar_tac)]
-  ring
+  ring_nf
 
 /-! ## Bit-slicing identity (pure Nat) -/
 
