@@ -1,5 +1,5 @@
 /**
- * Run the full extraction pipeline: Charon -> Aeneas -> Tweaks.
+ * Run the full extraction pipeline: Pin -> Charon -> Aeneas -> Tweaks.
  *
  * Charon reads start_from / exclude / opaque natively from
  * [package.metadata.charon] in curve25519-dalek/Cargo.toml (Charon PR #1104).
@@ -11,7 +11,7 @@ import path from "node:path";
 import chalk from "chalk";
 import { loadConfig } from "./lib/config.js";
 import { findBinary } from "./lib/paths.js";
-import { runStreaming } from "./lib/shell.js";
+import { run, runStreaming } from "./lib/shell.js";
 import { applyTweaks, warnUnmatchedTweaks } from "./lib/tweaks.js";
 import { syncLeanToolchain } from "./lib/lean-toolchain.js";
 
@@ -39,8 +39,22 @@ async function main(): Promise<void> {
   const destDir = path.join(root, config.aeneas_args.dest);
   const logsDir = path.join(root, ".logs");
 
-  // ── Step 1: Charon ──────────────────────────────────────────────────
-  console.log(chalk.bold("Step 1: Generating LLBC with Charon..."));
+  // ── Step 1: Pin dependencies ────────────────────────────────────────
+  const pinnedDeps = Object.entries(config.charon.pinned_deps);
+  if (pinnedDeps.length > 0) {
+    console.log(chalk.bold("Step 1: Pinning dependency versions..."));
+
+    for (const [name, version] of pinnedDeps) {
+      await run("cargo", ["update", "-p", name, "--precise", version], {
+        cwd: crateDir,
+        label: `  ${name} = ${version}`,
+      });
+    }
+    console.log();
+  }
+
+  // ── Step 2: Charon ──────────────────────────────────────────────────
+  console.log(chalk.bold("Step 2: Generating LLBC with Charon..."));
 
   const charonArgs: string[] = ["cargo"];
 
@@ -69,8 +83,8 @@ async function main(): Promise<void> {
   }
   console.log(chalk.green(`  LLBC generated: ${llbcFile}\n`));
 
-  // ── Step 2: Aeneas ──────────────────────────────────────────────────
-  console.log(chalk.bold("Step 2: Generating Lean files with Aeneas..."));
+  // ── Step 3: Aeneas ──────────────────────────────────────────────────
+  console.log(chalk.bold("Step 3: Generating Lean files with Aeneas..."));
 
   const aeneasArgs: string[] = [
     "-backend", "lean",  // we only ever target the Lean backend
@@ -106,9 +120,9 @@ async function main(): Promise<void> {
 
   console.log(chalk.green(`  Lean files generated in ${config.aeneas_args.dest}/\n`));
 
-  // ── Step 3: Tweaks ──────────────────────────────────────────────────
+  // ── Step 4: Tweaks ──────────────────────────────────────────────────
   if (config.tweaks.substitutions.length > 0 && config.tweaks.files.length > 0) {
-    console.log(chalk.bold("Step 3: Applying tweaks..."));
+    console.log(chalk.bold("Step 4: Applying tweaks..."));
 
     const matchedPerFile: Set<number>[] = [];
     for (const file of config.tweaks.files) {
@@ -125,7 +139,7 @@ async function main(): Promise<void> {
     console.log();
   }
 
-  // ── Step 4: Lean toolchain sync ─────────────────────────────────────
+  // ── Step 5: Lean toolchain sync ─────────────────────────────────────
   syncLeanToolchain(root);
 
   console.log(chalk.green("Done."));
