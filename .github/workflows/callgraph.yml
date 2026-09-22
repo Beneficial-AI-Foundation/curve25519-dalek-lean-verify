@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   generate:
-    uses: Beneficial-AI-Foundation/scip-callgraph/.github/workflows/generate-lean-callgraph.yml@main
+    uses: Beneficial-AI-Foundation/probegraph/.github/workflows/generate-lean-callgraph.yml@main
     with:
       deploy_mode: subpath
       subpath: callgraph
