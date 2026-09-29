@@ -29,12 +29,30 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Read PR number
+      - name: Read PR number and diff flag
         id: pr
-        run: echo "number=$(cat warning-diff-comment/pr-number.txt)" >> "$GITHUB_OUTPUT"
+        run: |
+          PR_NUM=$(cat warning-diff-comment/pr-number.txt)
+          if ! [[ "$PR_NUM" =~ ^[0-9]+$ ]]; then
+            echo "::error::Invalid PR number: $PR_NUM"
+            exit 1
+          fi
+          echo "number=$PR_NUM" >> "$GITHUB_OUTPUT"
+          echo "has_diff=$(cat warning-diff-comment/has-diff.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Post PR comment
+        if: steps.pr.outputs.has_diff == 'true'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           number: ${{ steps.pr.outputs.number }}
           path: warning-diff-comment/warning-diff-comment.md
+
+      # A later push no longer changes any warnings: mark the earlier comment
+      # outdated instead of leaving stale content on the PR.
+      - name: Hide stale PR comment
+        if: steps.pr.outputs.has_diff != 'true'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          number: ${{ steps.pr.outputs.number }}
+          hide: true
+          hide_classify: OUTDATED
