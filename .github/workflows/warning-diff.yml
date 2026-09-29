@@ -34,17 +34,20 @@ jobs:
         id: diff
         run: node scripts/warning-diff.js ${{ github.event.pull_request.base.sha }} ${{ github.sha }}
 
-      - name: Save PR number
-        if: steps.diff.outputs.has_diff == 'true'
-        run: echo "${{ github.event.pull_request.number }}" > pr-number.txt
+      # Always upload, so the comment workflow can also hide a stale comment
+      # when a later push no longer changes any warnings.
+      - name: Save PR number and diff flag
+        run: |
+          echo "${{ github.event.pull_request.number }}" > pr-number.txt
+          echo "${{ steps.diff.outputs.has_diff == 'true' }}" > has-diff.txt
 
       - name: Upload warning diff artifact
-        if: steps.diff.outputs.has_diff == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: warning-diff-comment
           path: |
             warning-diff-comment.md
             pr-number.txt
+            has-diff.txt
           if-no-files-found: ignore
           retention-days: 1
