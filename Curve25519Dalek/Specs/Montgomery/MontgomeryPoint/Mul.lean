@@ -215,7 +215,7 @@ private lemma toField_eq_of_forall_limb_eq
   `MontgomeryPoint.mkPoint result = m • MontgomeryPoint.mkPoint P`
   where `m = (U8x32_as_Nat scalar.bytes) % 2^255`
 -/
-@[step, externally_verified]
+@[step]
 theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar)
     (hP_bound : U8x32_as_Nat P < 2 ^ 255) :
     mul P scalar ⦃ (result : montgomery.MontgomeryPoint) =>
