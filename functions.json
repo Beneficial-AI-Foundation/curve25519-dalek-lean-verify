@@ -5768,11 +5768,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ (result : EdwardsPoint) =>\n      EdwardsPoint.IsValid result ∧\n      (∃ clamped_scalar,\n        h ∣ U8x32_as_Nat clamped_scalar ∧\n        U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n        2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n        result.toPoint = ((U8x32_as_Nat clamped_scalar) • _root_.Edwards.basepoint)) ⦄ := by ...",
+   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ (result : EdwardsPoint) =>\n      EdwardsPoint.IsValid result ∧\n      result.toPoint = U8x32_as_Nat (clampBytes bytes) • _root_.Edwards.basepoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulBaseClamped.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::mul_base_clamped`**\n• The function always succeeds (no panic)\n• The returned `EdwardsPoint` is a valid Edwards point\n• The returned point equals the scalar multiplication of the Edwards basepoint\n  by a clamped scalar derived from the input bytes, divisible by the cofactor\n  `h` and lying in `[2^254, 2^255)`\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::mul_base_clamped`**\n• The function always succeeds (no panic)\n• The returned `EdwardsPoint` is a valid Edwards point\n• The returned point equals the scalar multiplication of the Edwards basepoint\n  by `U8x32_as_Nat (clampBytes bytes)`, the input bytes clamped as in RFC 7748 §5\n  (divisible by the cofactor `h` and in `[2^254, 2^255)`, see `ClampInteger.lean`)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_base_clamped",
@@ -5857,10 +5857,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_clamped_spec (self : EdwardsPoint) (bytes : Array U8 32#usize)\n    (h_self_valid : self.IsValid) :\n    mul_clamped self bytes ⦃ (result : EdwardsPoint) =>\n      result.IsValid ∧\n      (∃ clamped_scalar,\n        h ∣ U8x32_as_Nat clamped_scalar ∧\n        U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n        2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n        result.toPoint = (U8x32_as_Nat clamped_scalar) • self.toPoint) ⦄ := by ...",
+   "theorem mul_clamped_spec (self : EdwardsPoint) (bytes : Array U8 32#usize)\n    (h_self_valid : self.IsValid) :\n    mul_clamped self bytes ⦃ (result : EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = U8x32_as_Nat (clampBytes bytes) • self.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulClamped.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::mul_clamped`**\n• The function always succeeds (no panic) for a valid input EdwardsPoint `self`\n• The result is a valid EdwardsPoint\n• There exists a clamped 32-byte scalar `c` (the bitwise-clamped form of `bytes`)\n  such that `c` is divisible by the cofactor `h = 8`\n• `c < 2^255`\n• `2^254 ≤ c`\n• `result.toPoint = c • self.toPoint`, i.e., scalar multiplication of `self.toPoint`\n  by the natural number `c`\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::mul_clamped`**\n• The function always succeeds (no panic) for a valid input EdwardsPoint `self`\n• The result is a valid EdwardsPoint\n• `result.toPoint = c • self.toPoint` where `c = U8x32_as_Nat (clampBytes bytes)` is the\n  input bytes clamped as in RFC 7748 §5 (divisible by the cofactor `h = 8` and in\n  `[2^254, 2^255)`, see `ClampInteger.lean`)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_clamped",
@@ -6955,11 +6955,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ (result : MontgomeryPoint) =>\n      (∃ clamped_scalar_nat,\n      h ∣ clamped_scalar_nat ∧\n      clamped_scalar_nat < 2 ^ 255 ∧\n      2 ^ 254 ≤ clamped_scalar_nat ∧\n      (if (clamped_scalar_nat • Edwards.basepoint).y = 1 then\n          MontgomeryPoint.mkPoint result = T_point\n        else MontgomeryPoint.mkPoint result =\n          abs_montgomery (clamped_scalar_nat • fromEdwards _root_.Edwards.basepoint))) ⦄ := by ...",
+   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ (result : MontgomeryPoint) =>\n      let n := U8x32_as_Nat (clampBytes bytes)\n      if (n • Edwards.basepoint).y = 1 then\n        MontgomeryPoint.mkPoint result = T_point\n      else\n        MontgomeryPoint.mkPoint result =\n          abs_montgomery (n • fromEdwards _root_.Edwards.basepoint) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBaseClamped.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::mul_base_clamped`**\n• The function always succeeds (no panic)\n• There exists a clamped integer `n` with `h ∣ n` and `2^254 ≤ n < 2^255` such that\n  `mkPoint result = T_point` if `(n • Edwards.basepoint).y = 1`, and\n  `mkPoint result = abs_montgomery (n • fromEdwards basepoint)` otherwise\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::mul_base_clamped`**\n• The function always succeeds (no panic)\n• Let `n = U8x32_as_Nat (clampBytes bytes)`, the input bytes clamped as in RFC 7748 §5\n  (`h ∣ n` and `2^254 ≤ n < 2^255`, see `ClampInteger.lean`). Then\n  `mkPoint result = T_point` if `(n • Edwards.basepoint).y = 1`, and\n  `mkPoint result = abs_montgomery (n • fromEdwards basepoint)` otherwise\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base_clamped",
@@ -6978,11 +6978,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize)\n    (hP_bound : U8x32_as_Nat P < 2 ^ 255) :\n    mul_clamped P bytes ⦃ (result : MontgomeryPoint) =>\n      (∃ clamped_scalar,\n      h ∣ U8x32_as_Nat clamped_scalar ∧\n      U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n      2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n      let m := (U8x32_as_Nat clamped_scalar)\n      MontgomeryPoint.mkPoint result = m • (MontgomeryPoint.mkPoint P)) ⦄ := by ...",
+   "theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize)\n    (hP_bound : U8x32_as_Nat P < 2 ^ 255) :\n    mul_clamped P bytes ⦃ (result : MontgomeryPoint) =>\n      MontgomeryPoint.mkPoint result =\n        U8x32_as_Nat (clampBytes bytes) • MontgomeryPoint.mkPoint P ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulClamped.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped`**\n• The function always succeeds (no panic)\n• There exists a valid clamped scalar satisfying `h ∣ U8x32_as_Nat clamped_scalar`\n  and `2 ^ 254 ≤ U8x32_as_Nat clamped_scalar < 2 ^ 255`\n• The result satisfies `MontgomeryPoint.mkPoint result = m • (MontgomeryPoint.mkPoint P)`\n  where `m = U8x32_as_Nat clamped_scalar`\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped`**\n• The function always succeeds (no panic) when `U8x32_as_Nat P < 2^255`\n• The result satisfies `MontgomeryPoint.mkPoint result = m • (MontgomeryPoint.mkPoint P)`\n  where `m = U8x32_as_Nat (clampBytes bytes)` is the input bytes clamped as in\n  RFC 7748 §5 (`h ∣ m` and `2^254 ≤ m < 2^255`, see `ClampInteger.lean`)\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_clamped",
@@ -10347,10 +10347,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem clamp_integer_spec (bytes : Array U8 32#usize) :\n    clamp_integer bytes ⦃ (result : Array U8 32#usize) =>\n      h ∣ U8x32_as_Nat result ∧\n      U8x32_as_Nat result < 2^255 ∧\n      2^254 ≤ U8x32_as_Nat result ⦄ := by ...",
+   "theorem clamp_integer_spec (bytes : Array U8 32#usize) :\n    clamp_integer bytes ⦃ (result : Array U8 32#usize) =>\n      result = clampBytes bytes ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/ClampInteger.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::scalar::clamp_integer`**\n• The function always succeeds (no panic) for any 32-byte input\n• h divides U8x32_as_Nat result (the result is divisible by the cofactor h = 8)\n• U8x32_as_Nat result < 2^255\n• 2^254 ≤ U8x32_as_Nat result\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::scalar::clamp_integer`**\n• The function always succeeds (no panic) for any 32-byte input\n• The result is `clampBytes bytes`, the clamping of RFC 7748 §5\n• Consequently (see `U8x32_as_Nat_clampBytes`), the result's value is\n  `2^254 + 8 * ((U8x32_as_Nat bytes / 8) % 2^251)`: divisible by `h = 8` and in `[2^254, 2^255)`\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name": "curve25519_dalek::scalar::clamp_integer",
    "lines": "L1415-L1420",
