@@ -29,19 +29,16 @@ namespace curve25519_dalek.edwards.EdwardsPoint
 • The function always succeeds (no panic)
 • The returned `EdwardsPoint` is a valid Edwards point
 • The returned point equals the scalar multiplication of the Edwards basepoint
-  by a clamped scalar derived from the input bytes, divisible by the cofactor
-  `h` and lying in `[2^254, 2^255)`
+  by `U8x32_as_Nat (clampBytes bytes)`, the input bytes clamped as in RFC 7748 §5
+  (divisible by the cofactor `h` and in `[2^254, 2^255)`, see `ClampInteger.lean`)
 -/
 @[step]
 theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
     mul_base_clamped bytes ⦃ (result : EdwardsPoint) =>
       EdwardsPoint.IsValid result ∧
-      (∃ clamped_scalar,
-        h ∣ U8x32_as_Nat clamped_scalar ∧
-        U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧
-        2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧
-        result.toPoint = ((U8x32_as_Nat clamped_scalar) • _root_.Edwards.basepoint)) ⦄ := by
+      result.toPoint = U8x32_as_Nat (clampBytes bytes) • _root_.Edwards.basepoint ⦄ := by
   unfold mul_base_clamped
+  have := U8x32_as_Nat_clampBytes_lt bytes
   step*
 
 end curve25519_dalek.edwards.EdwardsPoint

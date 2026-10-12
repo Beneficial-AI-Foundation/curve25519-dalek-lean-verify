@@ -28,26 +28,20 @@ open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
 /-- **Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::mul_clamped`**
-• The function always succeeds (no panic)
-• There exists a valid clamped scalar satisfying `h ∣ U8x32_as_Nat clamped_scalar`
-  and `2 ^ 254 ≤ U8x32_as_Nat clamped_scalar < 2 ^ 255`
+• The function always succeeds (no panic) when `U8x32_as_Nat P < 2^255`
 • The result satisfies `MontgomeryPoint.mkPoint result = m • (MontgomeryPoint.mkPoint P)`
-  where `m = U8x32_as_Nat clamped_scalar`
+  where `m = U8x32_as_Nat (clampBytes bytes)` is the input bytes clamped as in
+  RFC 7748 §5 (`h ∣ m` and `2^254 ≤ m < 2^255`, see `ClampInteger.lean`)
 -/
 @[step]
 theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize)
     (hP_bound : U8x32_as_Nat P < 2 ^ 255) :
     mul_clamped P bytes ⦃ (result : MontgomeryPoint) =>
-      (∃ clamped_scalar,
-      h ∣ U8x32_as_Nat clamped_scalar ∧
-      U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧
-      2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧
-      let m := (U8x32_as_Nat clamped_scalar)
-      MontgomeryPoint.mkPoint result = m • (MontgomeryPoint.mkPoint P)) ⦄ := by
+      MontgomeryPoint.mkPoint result =
+        U8x32_as_Nat (clampBytes bytes) • MontgomeryPoint.mkPoint P ⦄ := by
   unfold mul_clamped
   step*
-  have := Nat.mod_eq_of_lt a_post2
-  rw [this] at result_post
-  exact ⟨a, a_post1, a_post2, a_post3, result_post⟩
+  subst a_post
+  rwa [Nat.mod_eq_of_lt (U8x32_as_Nat_clampBytes_lt bytes)] at result_post
 
 end curve25519_dalek.montgomery.MontgomeryPoint
