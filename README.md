@@ -1,3 +1,5 @@
+⚠️ The latest development is now happening at https://github.com/Beneficial-AI-Foundation/curve25519-dalek-fork/ (because that's a fork and this repo isn't). When the upstreaming work is finalized this repo will be updated and then archived.
+
 <p align="center">
 <img
  alt="dalek-cryptography logo: a dalek with edwards curves as sparkles coming out of its radar-schnozzley blaster thingies"
