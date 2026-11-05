@@ -362,13 +362,183 @@ theorem zsmul_succ_Ed25519 (n : ℕ) (p : Point Ed25519) :
     simp only [nsmul_Ed25519]
     rw [add_comm_Ed25519]
 
+/-! ### Associativity
+
+The proof is direct. Substitute the inner sums, multiply out the denominators, and write the
+result as a combination of the three curve equations. Singular (`lift`) finds the cofactors,
+and `linear_combination` checks them. Hales and Raya give a formal proof of the group law by
+another route ("Formal Proof of the Group Law for Edwards Elliptic Curves", IJCAR 2020,
+https://doi.org/10.1007/978-3-030-51054-1_15). The certificates come from
+`shared/dalek/lean/DalekSim/Edwards.lean` of
+https://github.com/Beneficial-AI-Foundation/ref-impl-simulation (commit `889b3fd`). -/
+
+section AssocCore
+
+variable {R : Type*} [CommRing R]
+
+/-- Associativity of the x-coordinate, with the denominators multiplied out. The left side is
+`A B`, the right side is `C E`, where `(P + Q) + R` has the x-coordinate `A / E` and
+`P + (Q + R)` has the x-coordinate `C / B`. -/
+theorem assoc_x_core (d x1 y1 x2 y2 x3 y3 : R)
+    (h1 : -x1 ^ 2 + y1 ^ 2 = 1 + d * x1 ^ 2 * y1 ^ 2)
+    (h2 : -x2 ^ 2 + y2 ^ 2 = 1 + d * x2 ^ 2 * y2 ^ 2)
+    (h3 : -x3 ^ 2 + y3 ^ 2 = 1 + d * x3 ^ 2 * y3 ^ 2) :
+    ((x1 * y2 + y1 * x2) * y3 * (1 - d * x1 * x2 * y1 * y2) +
+        (y1 * y2 + x1 * x2) * x3 * (1 + d * x1 * x2 * y1 * y2)) *
+      ((1 + d * x2 * x3 * y2 * y3) * (1 - d * x2 * x3 * y2 * y3) +
+        d * x1 * y1 * (x2 * y3 + y2 * x3) * (y2 * y3 + x2 * x3)) =
+    (x1 * (y2 * y3 + x2 * x3) * (1 + d * x2 * x3 * y2 * y3) +
+        y1 * (x2 * y3 + y2 * x3) * (1 - d * x2 * x3 * y2 * y3)) *
+      ((1 + d * x1 * x2 * y1 * y2) * (1 - d * x1 * x2 * y1 * y2) +
+        d * x3 * y3 * (x1 * y2 + y1 * x2) * (y1 * y2 + x1 * x2)) := by
+  linear_combination (x1*x2^2*x3^2*y2*y3*d-x2*x3^2*y1*y2^2*y3*d-x2^2*x3*y1*y2*y3^2*d
+    +x1*x2*x3*y2^2*y3^2*d+x1*x2^3*x3^3+x2^2*x3^3*y1*y2-x1*x2*x3^3*y2^2-x3^3*y1*y2^3+x2^3*x3^2*y1*y3
+    +x1*x2^2*x3^2*y2*y3-x2*x3^2*y1*y2^2*y3-x1*x3^2*y2^3*y3-x1*x2^3*x3*y3^2-x2^2*x3*y1*y2*y3^2
+    +x1*x2*x3*y2^2*y3^2+x3*y1*y2^3*y3^2-x2^3*y1*y3^3-x1*x2^2*y2*y3^3+x2*y1*y2^2*y3^3+x1*y2^3*y3^3
+    +x1*x2^3*x3+x1*x2*x3^3+x2^2*x3*y1*y2+x3^3*y1*y2-x1*x2*x3*y2^2-x3*y1*y2^3+x2^3*y1*y3
+    +x2*x3^2*y1*y3+x1*x2^2*y2*y3+x1*x3^2*y2*y3-x2*y1*y2^2*y3-x1*y2^3*y3-x1*x2*x3*y3^2-x3*y1*y2*y3^2
+    -x2*y1*y3^3-x1*y2*y3^3+x1*x2*x3+x3*y1*y2+x2*y1*y3+x1*y2*y3) * h1 + (
+    -x1^3*x2^2*x3^2*y1^2*y2*y3*d^2+x1^2*x2*x3^2*y1^3*y2^2*y3*d^2+x1^2*x2^2*x3*y1^3*y2*y3^2*d^2
+    -x1^3*x2*x3*y1^2*y2^2*y3^2*d^2-x1^3*x2*x3^3*y1^2*d-x1^2*x2^2*x3^3*y1*y2*d-x1^2*x3^3*y1^3*y2*d
+    -x1*x2*x3^3*y1^2*y2^2*d-x1^2*x2*x3^2*y1^3*y3*d-x1^3*x3^2*y1^2*y2*y3*d+x1*x2^2*x3^2*y1^2*y2*y3*d
+    +x1^2*x2*x3^2*y1*y2^2*y3*d+x1^3*x2*x3*y1^2*y3^2*d+x1^2*x2^2*x3*y1*y2*y3^2*d
+    +x1^2*x3*y1^3*y2*y3^2*d+x1*x2*x3*y1^2*y2^2*y3^2*d+x1^2*x2*y1^3*y3^3*d+x1^3*y1^2*y2*y3^3*d
+    -x1*x2^2*y1^2*y2*y3^3*d-x1^2*x2*y1*y2^2*y3^3*d-x1^3*x2*x3*y1^2*d-x1^2*x2^2*x3*y1*y2*d
+    -x1^2*x3*y1^3*y2*d-x1*x2*x3*y1^2*y2^2*d-x1^2*x2*y1^3*y3*d-x1^3*y1^2*y2*y3*d
+    +x1*x2^2*y1^2*y2*y3*d+x1^2*x2*y1*y2^2*y3*d-x1^3*x2*x3^3+x1*x2*x3^3*y1^2-x1^2*x3^3*y1*y2
+    +x3^3*y1^3*y2-x1^2*x2*x3^2*y1*y3+x2*x3^2*y1^3*y3-x1^3*x3^2*y2*y3+x1*x3^2*y1^2*y2*y3
+    +x1^3*x2*x3*y3^2-x1*x2*x3*y1^2*y3^2+x1^2*x3*y1*y2*y3^2-x3*y1^3*y2*y3^2+x1^2*x2*y1*y3^3
+    -x2*y1^3*y3^3+x1^3*y2*y3^3-x1*y1^2*y2*y3^3-x1^3*x2*x3-x1*x2*x3^3+x1*x2*x3*y1^2-x1^2*x3*y1*y2
+    -x3^3*y1*y2+x3*y1^3*y2-x1^2*x2*y1*y3-x2*x3^2*y1*y3+x2*y1^3*y3-x1^3*y2*y3-x1*x3^2*y2*y3
+    +x1*y1^2*y2*y3+x1*x2*x3*y3^2+x3*y1*y2*y3^2+x2*y1*y3^3+x1*y2*y3^3-x1*x2*x3-x3*y1*y2-x2*y1*y3
+    -x1*y2*y3) * h2 + (x1^2*x2^4*x3*y1*y2^3*d^2+x1*x2^3*x3*y1^2*y2^4*d^2-x1*x2^4*y1^2*y2^3*y3*d^2
+    -x1^2*x2^3*y1*y2^4*y3*d^2+x1^2*x2^4*x3*y1*y2*d+x1^3*x2^3*x3*y2^2*d-x2^2*x3*y1^3*y2^3*d
+    -x1*x2*x3*y1^2*y2^4*d-x1*x2^4*y1^2*y2*y3*d-x2^3*y1^3*y2^2*y3*d+x1^3*x2^2*y2^3*y3*d
+    +x1^2*x2*y1*y2^4*y3*d+x1*x2^3*x3*y2^2*d+x2^2*x3*y1*y2^3*d+x2^3*y1*y2^2*y3*d
+    +x1*x2^2*y2^3*y3*d) * h3
+
+/-- Associativity of the y-coordinate, with the denominators multiplied out. The left side is
+`A' B'`, the right side is `C' E'`, where `(P + Q) + R` has the y-coordinate `A' / E'` and
+`P + (Q + R)` has the y-coordinate `C' / B'`. -/
+theorem assoc_y_core (d x1 y1 x2 y2 x3 y3 : R)
+    (h1 : -x1 ^ 2 + y1 ^ 2 = 1 + d * x1 ^ 2 * y1 ^ 2)
+    (h2 : -x2 ^ 2 + y2 ^ 2 = 1 + d * x2 ^ 2 * y2 ^ 2)
+    (h3 : -x3 ^ 2 + y3 ^ 2 = 1 + d * x3 ^ 2 * y3 ^ 2) :
+    ((y1 * y2 + x1 * x2) * y3 * (1 + d * x1 * x2 * y1 * y2) +
+        (x1 * y2 + y1 * x2) * x3 * (1 - d * x1 * x2 * y1 * y2)) *
+      ((1 + d * x2 * x3 * y2 * y3) * (1 - d * x2 * x3 * y2 * y3) -
+        d * x1 * y1 * (x2 * y3 + y2 * x3) * (y2 * y3 + x2 * x3)) =
+    (y1 * (y2 * y3 + x2 * x3) * (1 + d * x2 * x3 * y2 * y3) +
+        x1 * (x2 * y3 + y2 * x3) * (1 - d * x2 * x3 * y2 * y3)) *
+      ((1 + d * x1 * x2 * y1 * y2) * (1 - d * x1 * x2 * y1 * y2) -
+        d * x3 * y3 * (x1 * y2 + y1 * x2) * (y1 * y2 + x1 * x2)) := by
+  linear_combination (x2^2*x3^2*y1*y2*y3*d-x1*x2*x3^2*y2^2*y3*d-x1*x2^2*x3*y2*y3^2*d
+    +x2*x3*y1*y2^2*y3^2*d+x2^3*x3^3*y1+x1*x2^2*x3^3*y2-x2*x3^3*y1*y2^2-x1*x3^3*y2^3+x1*x2^3*x3^2*y3
+    +x2^2*x3^2*y1*y2*y3-x1*x2*x3^2*y2^2*y3-x3^2*y1*y2^3*y3-x2^3*x3*y1*y3^2-x1*x2^2*x3*y2*y3^2
+    +x2*x3*y1*y2^2*y3^2+x1*x3*y2^3*y3^2-x1*x2^3*y3^3-x2^2*y1*y2*y3^3+x1*x2*y2^2*y3^3+y1*y2^3*y3^3
+    +x2^3*x3*y1+x2*x3^3*y1+x1*x2^2*x3*y2+x1*x3^3*y2-x2*x3*y1*y2^2-x1*x3*y2^3+x1*x2^3*y3
+    +x1*x2*x3^2*y3+x2^2*y1*y2*y3+x3^2*y1*y2*y3-x1*x2*y2^2*y3-y1*y2^3*y3-x2*x3*y1*y3^2-x1*x3*y2*y3^2
+    -x1*x2*y3^3-y1*y2*y3^3+x2*x3*y1+x1*x3*y2+x1*x2*y3+y1*y2*y3) * h1 + (
+    -x1^2*x2^2*x3^2*y1^3*y2*y3*d^2+x1^3*x2*x3^2*y1^2*y2^2*y3*d^2+x1^3*x2^2*x3*y1^2*y2*y3^2*d^2
+    -x1^2*x2*x3*y1^3*y2^2*y3^2*d^2-x1^2*x2*x3^3*y1^3*d-x1^3*x3^3*y1^2*y2*d+x1*x2^2*x3^3*y1^2*y2*d
+    +x1^2*x2*x3^3*y1*y2^2*d-x1^3*x2*x3^2*y1^2*y3*d-x1^2*x2^2*x3^2*y1*y2*y3*d-x1^2*x3^2*y1^3*y2*y3*d
+    -x1*x2*x3^2*y1^2*y2^2*y3*d+x1^2*x2*x3*y1^3*y3^2*d+x1^3*x3*y1^2*y2*y3^2*d
+    -x1*x2^2*x3*y1^2*y2*y3^2*d-x1^2*x2*x3*y1*y2^2*y3^2*d+x1^3*x2*y1^2*y3^3*d+x1^2*x2^2*y1*y2*y3^3*d
+    +x1^2*y1^3*y2*y3^3*d+x1*x2*y1^2*y2^2*y3^3*d-x1^2*x2*x3*y1^3*d-x1^3*x3*y1^2*y2*d
+    +x1*x2^2*x3*y1^2*y2*d+x1^2*x2*x3*y1*y2^2*d-x1^3*x2*y1^2*y3*d-x1^2*x2^2*y1*y2*y3*d
+    -x1^2*y1^3*y2*y3*d-x1*x2*y1^2*y2^2*y3*d-x1^2*x2*x3^3*y1+x2*x3^3*y1^3-x1^3*x3^3*y2
+    +x1*x3^3*y1^2*y2-x1^3*x2*x3^2*y3+x1*x2*x3^2*y1^2*y3-x1^2*x3^2*y1*y2*y3+x3^2*y1^3*y2*y3
+    +x1^2*x2*x3*y1*y3^2-x2*x3*y1^3*y3^2+x1^3*x3*y2*y3^2-x1*x3*y1^2*y2*y3^2+x1^3*x2*y3^3
+    -x1*x2*y1^2*y3^3+x1^2*y1*y2*y3^3-y1^3*y2*y3^3-x1^2*x2*x3*y1-x2*x3^3*y1+x2*x3*y1^3-x1^3*x3*y2
+    -x1*x3^3*y2+x1*x3*y1^2*y2-x1^3*x2*y3-x1*x2*x3^2*y3+x1*x2*y1^2*y3-x1^2*y1*y2*y3-x3^2*y1*y2*y3
+    +y1^3*y2*y3+x2*x3*y1*y3^2+x1*x3*y2*y3^2+x1*x2*y3^3+y1*y2*y3^3-x2*x3*y1-x1*x3*y2-x1*x2*y3
+    -y1*y2*y3) * h2 + (-x1*x2^4*x3*y1^2*y2^3*d^2-x1^2*x2^3*x3*y1*y2^4*d^2+x1^2*x2^4*y1*y2^3*y3*d^2
+    +x1*x2^3*y1^2*y2^4*y3*d^2-x1*x2^4*x3*y1^2*y2*d-x2^3*x3*y1^3*y2^2*d+x1^3*x2^2*x3*y2^3*d
+    +x1^2*x2*x3*y1*y2^4*d+x1^2*x2^4*y1*y2*y3*d+x1^3*x2^3*y2^2*y3*d-x2^2*y1^3*y2^3*y3*d
+    -x1*x2*y1^2*y2^4*y3*d+x2^3*x3*y1*y2^2*d+x1*x2^2*x3*y2^3*d+x1*x2^3*y2^2*y3*d
+    +x2^2*y1*y2^3*y3*d) * h3
+
+end AssocCore
+
+/-- `n / (b e) / (m / (b e)) = n / m`, the step that removes the inner denominators. -/
+private theorem div_div_cancel_mul {b e n m : F} (hb : b ≠ 0) (he : e ≠ 0) :
+    n / (b * e) / (m / (b * e)) = n / m :=
+  div_div_div_cancel_right₀ (mul_ne_zero hb he) n m
+
+/-- Associativity of `add_coords` for `a = -1`, for three points on the curve, if the
+denominators of the four sums are not zero. -/
+theorem add_coords_assoc (C : EdwardsCurve F) (ha : C.a = -1) {x1 y1 x2 y2 x3 y3 : F}
+    (hP : C.a * x1 ^ 2 + y1 ^ 2 = 1 + C.d * x1 ^ 2 * y1 ^ 2)
+    (hQ : C.a * x2 ^ 2 + y2 ^ 2 = 1 + C.d * x2 ^ 2 * y2 ^ 2)
+    (hR : C.a * x3 ^ 2 + y3 ^ 2 = 1 + C.d * x3 ^ 2 * y3 ^ 2)
+    (p1 : 1 + C.d * x1 * x2 * y1 * y2 ≠ 0) (p2 : 1 - C.d * x1 * x2 * y1 * y2 ≠ 0)
+    (q1 : 1 + C.d * x2 * x3 * y2 * y3 ≠ 0) (q2 : 1 - C.d * x2 * x3 * y2 * y3 ≠ 0)
+    (a1 : 1 + C.d * (add_coords C (x1, y1) (x2, y2)).1 * x3 *
+      (add_coords C (x1, y1) (x2, y2)).2 * y3 ≠ 0)
+    (a2 : 1 - C.d * (add_coords C (x1, y1) (x2, y2)).1 * x3 *
+      (add_coords C (x1, y1) (x2, y2)).2 * y3 ≠ 0)
+    (b1 : 1 + C.d * x1 * (add_coords C (x2, y2) (x3, y3)).1 * y1 *
+      (add_coords C (x2, y2) (x3, y3)).2 ≠ 0)
+    (b2 : 1 - C.d * x1 * (add_coords C (x2, y2) (x3, y3)).1 * y1 *
+      (add_coords C (x2, y2) (x3, y3)).2 ≠ 0) :
+    add_coords C (add_coords C (x1, y1) (x2, y2)) (x3, y3) =
+      add_coords C (x1, y1) (add_coords C (x2, y2) (x3, y3)) := by
+  obtain ⟨a, d⟩ := C
+  dsimp only at ha
+  subst ha
+  have hneg : ∀ u w z : F, u - -1 * w * z = u + w * z := fun u w z => by ring
+  simp only [neg_mul, one_mul] at hP hQ hR
+  have cx := assoc_x_core d x1 y1 x2 y2 x3 y3 hP hQ hR
+  have cy := assoc_y_core d x1 y1 x2 y2 x3 y3 hP hQ hR
+  simp only [add_coords, hneg] at p1 p2 q1 q2 a1 a2 b1 b2 ⊢
+  -- Names for the inner sums `P + Q = (a / b, c / e)` and `Q + R = (f / g, k / l)`.
+  generalize ha : x1 * y2 + y1 * x2 = a at *
+  generalize hb : 1 + d * x1 * x2 * y1 * y2 = b at *
+  generalize hc : y1 * y2 + x1 * x2 = c at *
+  generalize he : 1 - d * x1 * x2 * y1 * y2 = e at *
+  generalize hf : x2 * y3 + y2 * x3 = f at *
+  generalize hg : 1 + d * x2 * x3 * y2 * y3 = g at *
+  generalize hk : y2 * y3 + x2 * x3 = k at *
+  generalize hl : 1 - d * x2 * x3 * y2 * y3 = l at *
+  -- Each coordinate is a quotient of two polynomials.
+  have ex1 : a / b * y3 + c / e * x3 = (a * y3 * e + c * x3 * b) / (b * e) := by
+    field_simp
+  have dx1 : 1 + d * (a / b) * x3 * (c / e) * y3 = (b * e + d * x3 * y3 * a * c) / (b * e) := by
+    field_simp
+  have ex2 : x1 * (k / l) + y1 * (f / g) = (x1 * k * g + y1 * f * l) / (g * l) := by
+    field_simp
+  have dx2 : 1 + d * x1 * (f / g) * y1 * (k / l) = (g * l + d * x1 * y1 * f * k) / (g * l) := by
+    field_simp
+  have ey1 : c / e * y3 + a / b * x3 = (c * y3 * b + a * x3 * e) / (b * e) := by
+    field_simp
+  have dy1 : 1 - d * (a / b) * x3 * (c / e) * y3 = (b * e - d * x3 * y3 * a * c) / (b * e) := by
+    field_simp
+  have ey2 : y1 * (k / l) + x1 * (f / g) = (y1 * k * g + x1 * f * l) / (g * l) := by
+    field_simp
+  have dy2 : 1 - d * x1 * (f / g) * y1 * (k / l) = (g * l - d * x1 * y1 * f * k) / (g * l) := by
+    field_simp
+  rw [dx1] at a1
+  rw [dy1] at a2
+  rw [dx2] at b1
+  rw [dy2] at b2
+  refine Prod.ext ?_ ?_
+  · dsimp only
+    rw [ex1, dx1, ex2, dx2, div_div_cancel_mul p1 p2, div_div_cancel_mul q1 q2,
+      div_eq_div_iff (div_ne_zero_iff.mp a1).1 (div_ne_zero_iff.mp b1).1]
+    exact cx
+  · dsimp only
+    rw [ey1, dy1, ey2, dy2, div_div_cancel_mul p1 p2, div_div_cancel_mul q1 q2,
+      div_eq_div_iff (div_ne_zero_iff.mp a2).1 (div_ne_zero_iff.mp b2).1]
+    exact cy
+
 /-- Addition on Ed25519 is associative: (p + q) + r = p + (q + r). -/
 theorem add_assoc_Ed25519 (p q r : Point Ed25519) : p + q + r = p + (q + r) := by
-  /- **Reference**: Hales, Thomas and Raya, Rodrigo.
-  "Formal Proof of the Group Law for Edwards Elliptic Curves".
-  Automated Reasoning (IJCAR 2020), pp. 254–269.
-  https://doi.org/10.1007/978-3-030-51054-1_15 -/
-  sorry
+  have h := add_coords_assoc Ed25519 rfl p.on_curve q.on_curve r.on_curve
+    (Ed25519.denomsNeZero p q).1 (Ed25519.denomsNeZero p q).2
+    (Ed25519.denomsNeZero q r).1 (Ed25519.denomsNeZero q r).2
+    (Ed25519.denomsNeZero (p + q) r).1 (Ed25519.denomsNeZero (p + q) r).2
+    (Ed25519.denomsNeZero p (q + r)).1 (Ed25519.denomsNeZero p (q + r)).2
+  exact Point.ext (congrArg Prod.fst h) (congrArg Prod.snd h)
 
 /-- The Ed25519 curve points form an additive abelian group. -/
 instance : AddCommGroup (Point Ed25519) where
